@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+{% block title %}Review Upload – {{ upload_type | title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Force white background */
+    body,
+    .container-fluid,
+    .card,
+    .card-body,
+    .card-header {
+        background-color: #ffffff !important;
+    }
+
+    /* Card styling */
+    .card {
+        border-radius: 12px !important;
+        border: 1px solid #e2e8f0 !important;
+        margin-bottom: 20px;
+    }
+
+    /* Slate/Navy buttons */
+    .btn-navy {
+        background-color: #1e293b !important;
+        color: white !important;
+        border: none !important;
+        padding: 8px 20px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .btn-navy:hover {
+        background-color: #1e40af !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+        color: white !important;
+    }
+
+    .btn-outline-navy {
+        background-color: transparent !important;
+        color: #1e293b !important;
+        border: 1px solid #cbd5e1 !important;
+        padding: 8px 20px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .btn-outline-navy:hover {
+        background-color: #f1f5f9 !important;
+        border-color: #1e293b !important;
+        color: #1e293b !important;
+    }
+
+    /* Summary cards */
+    .summary-card {
+        text-align: center;
+        padding: 15px !important;
+    }
+    .summary-value {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    /* Custom Filter Tabs */
+    .filter-tabs-container {
+        display: flex;
+        gap: 8px;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .filter-tab {
+        background: none;
+        border: none;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .filter-tab:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+    .filter-tab.active {
+        background: #1e293b;
+        color: white;
+    }
+    
+    /* Table Styling */
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+    .edu-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    .edu-table thead th {
+        background: #1e293b !important;
+        color: white !important;
+        font-weight: 600;
+        padding: 10px 15px;
+        text-align: left;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .edu-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: background 0.2s ease;
+    }
+    .edu-table tbody tr:hover {
+        background: #f8fafc;
+    }
+    .edu-table tbody td {
+        padding: 10px 15px;
+        color: #334155;
+        vertical-align: middle;
+    }
+
+    /* Badges */
+    .badge-custom {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-success-custom {
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .badge-danger-custom {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    /* Row Layout */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+    }
+    .col-sm-4 {
+        width: 33.333%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+    @media (max-width: 768px) {
+        .col-sm-4 {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+  <!-- Heading in one line with icon -->
+  <h2 class="mb-4" style="font-weight: 700; color: #1e293b;"><i class="fas fa-clipboard-check me-2" style="color: #c6a43b;"></i>Review Upload — {{ upload_type | title }}</h2>
+
+  {% if not records %}
+  <!-- Empty State -->
+  <div class="card text-center py-5">
+    <div class="card-body">
+      <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+      <h5 class="text-muted mb-2">No staged records found</h5>
+      <p class="text-muted small mb-4">Please upload your Excel file first.</p>
+      <a href="{{ url_for('bulk_upload_' + upload_type) }}" class="btn-navy">
+        <i class="fas fa-upload me-2"></i> Go Back to Upload
+      </a>
+    </div>
+  </div>
+
+  {% else %}
+
+  <!-- Summary Cards -->
+  {% set valid_count   = records | selectattr('validation_status','equalto','VALID')   | list | length %}
+  {% set invalid_count = records | selectattr('validation_status','equalto','INVALID') | list | length %}
+  {% set total_count   = records | length %}
+
+  <div class="row mb-4">
+    <div class="col-sm-4">
+      <div class="card summary-card" style="border-top: 4px solid #1e293b !important;">
+        <div class="summary-value" style="color: #1e293b;">{{ total_count }}</div>
+        <div class="small text-muted fw-bold">Total Records</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card summary-card" style="border-top: 4px solid #16a34a !important;">
+        <div class="summary-value" style="color: #16a34a;">{{ valid_count }}</div>
+        <div class="small text-muted fw-bold">✅ Valid (Ready to Import)</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card summary-card" style="border-top: 4px solid #dc2626 !important;">
+        <div class="summary-value" style="color: #dc2626;">{{ invalid_count }}</div>
+        <div class="small text-muted fw-bold">❌ Invalid (Will be Skipped)</div>
+      </div>
+    </div>
+  </div>
+
+  {% if invalid_count > 0 %}
+  <div style="background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; display: flex; align-items: flex-start; gap: 8px;">
+    <i class="fas fa-exclamation-triangle mt-1"></i>
+    <div>
+      <strong>{{ invalid_count }} record(s) have errors.</strong>
+      Fix them in your Excel file and re-upload.
+      Only the <strong>{{ valid_count }} valid</strong> records will be imported.
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Action Buttons (top) -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+    {% if valid_count > 0 %}
+    <a href="{{ url_for('confirm_' + upload_type + '_upload') }}"
+       class="btn-navy"
+       onclick="return confirm('Are you sure? This will import {{ valid_count }} valid record(s) into the system.')">
+      <i class="fas fa-check-circle me-1"></i> Confirm & Import {{ valid_count }} Records
+    </a>
+    {% endif %}
+    <a href="{{ url_for('bulk_upload_' + upload_type) }}" class="btn-outline-navy">
+      <i class="fas fa-redo me-1"></i> Upload New File
+    </a>
+    <a href="{{ url_for('dashboard') }}" class="btn-outline-navy" style="border-color: #e2e8f0 !important; color: #64748b !important;">
+      <i class="fas fa-times me-1"></i> Cancel
+    </a>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs-container">
+    <button class="filter-tab active" onclick="filterRows('all', this)">
+      All Records <span style="background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">{{ total_count }}</span>
+    </button>
+    <button class="filter-tab" onclick="filterRows('VALID', this)">
+      Valid <span style="background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">{{ valid_count }}</span>
+    </button>
+    <button class="filter-tab" onclick="filterRows('INVALID', this)">
+      Invalid <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">{{ invalid_count }}</span>
+    </button>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-wrapper mb-4">
+    <table class="edu-table" id="reviewTable">
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th style="width:100px;">Status</th>
+          <th style="min-width:180px;">Validation Error</th>
+          {% set skip_cols = ['id','validation_status','error_message','uploaded_by','uploaded_date','school_id'] %}
+          {% for key in records[0].keys() if key not in skip_cols %}
+          <th>{{ key | replace('_',' ') | title }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in records %}
+        <tr class="row-record" data-status="{{ record.validation_status }}">
+          <td style="color: #64748b;">{{ loop.index }}</td>
+          <td>
+            {% if record.validation_status == 'VALID' %}
+            <span class="badge-custom badge-success-custom">✅ Valid</span>
+            {% else %}
+            <span class="badge-custom badge-danger-custom">❌ Invalid</span>
+            {% endif %}
+          </td>
+          <td style="color: #dc2626; font-weight: 500;">{{ record.error_message or '—' }}</td>
+          {% for key in record.keys() if key not in skip_cols %}
+          <td>{{ record[key] if record[key] is not none else '—' }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Bottom Action Buttons -->
+  <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+    {% if valid_count > 0 %}
+    <a href="{{ url_for('confirm_' + upload_type + '_upload') }}"
+       class="btn-navy"
+       onclick="return confirm('Import {{ valid_count }} valid record(s)?')">
+      <i class="fas fa-check-circle me-1"></i> Confirm & Import Records
+    </a>
+    {% endif %}
+    <a href="{{ url_for('bulk_upload_' + upload_type) }}" class="btn-outline-navy">
+      <i class="fas fa-redo me-1"></i> Upload New File
+    </a>
+  </div>
+
+  {% endif %}
+</div>
+
+<script>
+function filterRows(status, el) {
+  document.querySelectorAll('.filter-tab').forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.row-record').forEach(row => {
+    if (status === 'all' || row.dataset.status === status) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+  return false;
+}
+</script>
+{% endblock %}

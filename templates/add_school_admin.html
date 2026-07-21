@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}Add School Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        background: white !important;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-container-custom {
+        width: 100%;
+        max-width: 600px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .page-header p {
+        color: #6c7a91;
+        font-size: 0.9rem;
+    }
+
+    .school-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(105deg, #e8f0fe, #d4e3fa);
+        border: 1px solid #b8d0f5;
+        color: #1a4a6f;
+        padding: 0.5rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .form-card {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.05);
+        border: 1px solid #eef2f8;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .card-header-custom {
+        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+        padding: 1.25rem 2rem;
+        color: white;
+    }
+
+    .card-header-custom h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+    }
+
+    .card-header-custom h3 i {
+        color: #e0c87c;
+    }
+
+    .card-body-custom {
+        padding: 2.2rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #5b6e8c;
+        margin-bottom: 0.4rem;
+    }
+
+    .form-label i {
+        color: #c6a43b;
+        margin-right: 6px;
+        width: 14px;
+    }
+
+    .required {
+        color: #e05a5a;
+        margin-left: 3px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i.input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9aa9bf;
+        font-size: 0.9rem;
+        pointer-events: none;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1.5px solid #e5eaf0;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        transition: all 0.2s;
+    }
+
+    .input-wrapper input:focus {
+        outline: none;
+        border-color: #1a4a6f;
+        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+    }
+
+    .input-wrapper input::placeholder {
+        color: #b9c2d0;
+        font-size: 0.82rem;
+    }
+
+    .school-locked-info {
+        background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+        border: 1px solid #c5d8fa;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+        color: #1a4a6f;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .school-locked-info i {
+        color: #e0c87c;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .btn-group-custom {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-custom {
+        padding: 0.75rem 1.8rem;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-custom-primary {
+        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
+        color: white;
+    }
+
+    .btn-custom-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.2);
+    }
+
+    .btn-custom-secondary {
+        background: #f1f4f9;
+        color: #3a4b66;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-custom-secondary:hover {
+        background: #e9eef4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container-custom">
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-user-shield"></i>
+            Add School Admin
+        </h1>
+        {% if school %}
+        <div>
+            <span class="school-badge">
+                <i class="fas fa-school"></i>
+                {{ school.name }}
+            </span>
+        </div>
+        {% endif %}
+        <p>Create a new administrative login account for the school.</p>
+    </div>
+
+    <div class="form-card">
+        <div class="card-header-custom">
+            <h3>
+                <i class="fas fa-plus"></i>
+                Admin Credentials
+            </h3>
+        </div>
+        <div class="card-body-custom">
+            <form method="POST">
+                {% if school %}
+                <div class="school-locked-info">
+                    <i class="fas fa-lock"></i>
+                    <span>Yeh admin account <strong>{{ school.name }}</strong> ke liye banaya jayega.</span>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label">Full Name <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" name="full_name" required placeholder="Enter full name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Username <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user-tag input-icon"></i>
+                        <input type="text" name="username" required placeholder="Choose unique username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key input-icon"></i>
+                        <input type="password" name="password" required placeholder="Enter login password">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" name="email" placeholder="e.g. admin@school.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-phone input-icon"></i>
+                        <input type="text" name="phone" placeholder="e.g. +92 300 1234567">
+                    </div>
+                </div>
+
+                <div class="btn-group-custom">
+                    <button type="submit" class="btn-custom btn-custom-primary">
+                        <i class="fas fa-user-plus"></i> Add School Admin
+                    </button>
+                    <a href="{{ url_for('users') }}" class="btn-custom btn-custom-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

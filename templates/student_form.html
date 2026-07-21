@@ -1,0 +1,1050 @@
+{% extends "base.html" %}
+
+{% block title %}Add Student - School Management System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #ffffff !important;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Main container */
+    .student-reg-page {
+        width: 100%;
+        min-height: calc(100vh - 60px);
+        padding: 2rem;
+        background: #ffffff;
+    }
+
+    .form-container {
+        max-width: 1000px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Page Header */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #1a4a6f 0%, #2c6e9e 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .page-header h1 i {
+        background: none;
+        color: #1a4a6f;
+    }
+
+    .page-header p {
+        color: #6c7a91;
+        font-size: 0.85rem;
+    }
+
+    /* Individual Section Card */
+    .section-card {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid #eef2f8;
+        margin-bottom: 1.8rem;
+        transition: all 0.2s;
+    }
+
+    .section-card:hover {
+        box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+        padding: 0.9rem 1.5rem;
+    }
+
+    .card-header h3 {
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-header h3 i {
+        color: #e0c87c;
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Form Grid - 2 Columns */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: #5b6e8c;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .form-label i {
+        margin-right: 5px;
+        color: #c6a43b;
+        width: 14px;
+        font-size: 0.65rem;
+    }
+
+    .required {
+        color: #e05a5a;
+        margin-left: 3px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i.input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9aa9bf;
+        font-size: 0.85rem;
+        pointer-events: none;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select,
+    .input-wrapper textarea {
+        width: 100%;
+        padding: 0.65rem 0.8rem 0.65rem 2.2rem;
+        border: 1.5px solid #e5eaf0;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        transition: all 0.2s;
+    }
+
+    .input-wrapper textarea {
+        padding: 0.65rem 0.8rem;
+        resize: vertical;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus,
+    .input-wrapper textarea:focus {
+        outline: none;
+        border-color: #1a4a6f;
+        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+    }
+
+    .input-wrapper input::placeholder {
+        color: #b9c2d0;
+        font-size: 0.8rem;
+    }
+
+    .help-text {
+        font-size: 0.6rem;
+        color: #8a99b0;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Entry Cards (Parents & Siblings) */
+    .entry-card {
+        background: #f9fbfe;
+        border-radius: 16px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #eef2f8;
+        transition: all 0.2s;
+    }
+
+    .entry-card:hover {
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .entry-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eef2f6;
+    }
+
+    .entry-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #1a4a6f;
+    }
+
+    .entry-title i {
+        margin-right: 6px;
+    }
+
+    .btn-remove {
+        background: none;
+        border: none;
+        color: #dc3545;
+        cursor: pointer;
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .btn-remove:hover {
+        background: #fee2e2;
+    }
+
+    .btn-add {
+        background: #f1f4f9;
+        border: 1px solid #e2e8f0;
+        padding: 0.5rem 1rem;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #1a4a6f;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 0.5rem;
+    }
+
+    .btn-add:hover {
+        background: #e9eef4;
+        transform: translateY(-1px);
+    }
+
+    /* Small nested grid for entries */
+    .entry-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.8rem;
+    }
+
+    .entry-field label {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #8a99b0;
+        display: block;
+        margin-bottom: 0.3rem;
+    }
+
+    .entry-field input,
+    .entry-field select {
+        width: 100%;
+        padding: 0.5rem 0.7rem;
+        border: 1.5px solid #e5eaf0;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .entry-field input:focus,
+    .entry-field select:focus {
+        outline: none;
+        border-color: #1a4a6f;
+    }
+
+    /* Profile Picture */
+    .profile-upload {
+        text-align: center;
+    }
+
+    .avatar-placeholder {
+        background: #f8f9fa;
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .avatar-placeholder:hover {
+        border-color: #1a4a6f;
+    }
+
+    .profile-preview-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #1a4a6f;
+    }
+
+    /* Password Strength */
+    .strength-bar {
+        height: 3px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 6px;
+    }
+
+    .strength-fill {
+        width: 0%;
+        height: 100%;
+        transition: width 0.2s;
+    }
+
+    .strength-text {
+        font-size: 0.6rem;
+        margin-top: 4px;
+    }
+
+    /* Buttons */
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .btn {
+        padding: 0.7rem 1.8rem;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.2);
+    }
+
+    .btn-secondary {
+        background: #f1f4f9;
+        color: #3a4b66;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+        background: #e9eef4;
+    }
+
+    /* Preview Card */
+    .preview-card {
+        background: #f9fbfe;
+        border-radius: 16px;
+        padding: 0.8rem 1.2rem;
+        margin-bottom: 1rem;
+        border: 1px solid #eef2f8;
+    }
+
+    .preview-title {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6f7d98;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .preview-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .preview-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(145deg, #1a4a6f, #0f2b3d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+    }
+
+    .preview-info h4 {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1a2c3e;
+        margin-bottom: 2px;
+    }
+
+    .preview-info p {
+        font-size: 0.65rem;
+        color: #6c7c97;
+        margin: 0;
+    }
+
+    /* Alert */
+    .alert {
+        padding: 0.7rem 1rem;
+        border-radius: 14px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 3px solid;
+        font-size: 0.8rem;
+    }
+
+    .alert-success {
+        background: #e9f7ef;
+        color: #2b6e3c;
+        border-left-color: #2b6e3c;
+    }
+
+    .alert-error {
+        background: #fee9e6;
+        color: #bc4a2c;
+        border-left-color: #bc4a2c;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .student-reg-page {
+            padding: 1rem;
+        }
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .full-width {
+            grid-column: span 1;
+        }
+        .card-body {
+            padding: 1rem;
+        }
+        .btn-group {
+            flex-direction: column;
+        }
+        .btn {
+            justify-content: center;
+        }
+        .entry-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="student-reg-page">
+    <div class="form-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-user-graduate"></i> Register New Student
+
+            </h1>
+
+        </div>
+
+        <!-- Flash Messages -->
+        <div id="flashContainer"></div>
+
+        <form method="POST" enctype="multipart/form-data" id="studentForm">
+
+            <!-- Preview Card (Shows at top) -->
+            <div id="previewCard" class="preview-card" style="display: none;">
+                <div class="preview-title">
+                    <i class="fas fa-eye"></i> Live Preview
+                </div>
+                <div class="preview-content">
+                    <div class="preview-avatar" id="previewAvatar">S</div>
+                    <div class="preview-info">
+                        <h4 id="previewName">Student Name</h4>
+                        <p id="previewUsername">Username: —</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SECTION 1: PERSONAL INFORMATION ==================== -->
+            <div class="section-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-id-card"></i>
+                        PERSONAL INFORMATION
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user-circle input-icon"></i>
+                                <input type="text" name="full_name" id="fullName" placeholder="e.g. Muhammad Ali" oninput="updatePreview()" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-user-tie"></i> Father's Name</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" name="father_name" placeholder="e.g. Ahmed Khan">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" name="email" placeholder="student@school.edu">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-mobile-alt input-icon"></i>
+                                <input type="text" name="phone" placeholder="300 1234567">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-calendar-alt"></i> Date of Birth</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-cake-candles input-icon"></i>
+                                <input type="date" name="date_of_birth">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-venus-mars"></i> Gender</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-flag input-icon"></i>
+                                <select name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-book"></i> Class</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-graduation-cap input-icon"></i>
+                                <select name="class_id" id="classSelect">
+                                    <option value="">Select Class</option>
+                                    {% for class in classes %}
+                                    <option value="{{ class.id }}">{{ class.class_name }} - {{ class.section }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-calendar-week"></i> Joining Date</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-calendar-day input-icon"></i>
+                                <input type="date" name="joining_date" value="{{ now.strftime('%Y-%m-%d') if now else '' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SECTION 2: ADDRESS DETAILS ==================== -->
+            <div class="section-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-map-marker-alt"></i>
+                        ADDRESS DETAILS
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label"><i class="fas fa-location-dot"></i> Address Line 1</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-home input-icon"></i>
+                                <input type="text" name="address_line1" placeholder="House/Flat No., Building Name">
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label"><i class="fas fa-location-dot"></i> Address Line 2</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-road input-icon"></i>
+                                <input type="text" name="address_line2" placeholder="Street, Area">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-city"></i> City</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-building input-icon"></i>
+                                <input type="text" name="city" placeholder="e.g. Karachi">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-map"></i> State</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-globe input-icon"></i>
+                                <input type="text" name="state" placeholder="e.g. Sindh">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-mail-bulk"></i> Postal Code</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-hashtag input-icon"></i>
+                                <input type="text" name="postal_code" placeholder="e.g. 75500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SECTION 3: PARENTS / GUARDIANS ==================== -->
+            <div class="section-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-users"></i>
+                        PARENTS / GUARDIANS
+                        <span style="font-size: 0.7rem; font-weight: normal; opacity: 0.8;">(Optional)</span>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div id="parentsContainer">
+                        <div class="entry-card">
+                            <div class="entry-header">
+                                <div class="entry-title">
+                                    <i class="fas fa-user-tie"></i> Parent 1
+                                </div>
+                            </div>
+                            <div class="entry-grid">
+                                <div class="entry-field">
+                                    <label>Full Name</label>
+                                    <input type="text" name="parent_name[]" placeholder="e.g. Ahmed Khan">
+                                </div>
+                                <div class="entry-field">
+                                    <label>Relation</label>
+                                    <select name="parent_relation[]">
+                                        <option value="Father">Father</option>
+                                        <option value="Mother">Mother</option>
+                                        <option value="Guardian">Guardian</option>
+                                    </select>
+                                </div>
+                                <div class="entry-field">
+                                    <label>Occupation</label>
+                                    <input type="text" name="parent_occupation[]" placeholder="Job/Profession">
+                                </div>
+                                <div class="entry-field">
+                                    <label>Phone</label>
+                                    <input type="text" name="parent_phone[]" placeholder="Contact">
+                                </div>
+                                <div class="entry-field">
+                                    <label>Email</label>
+                                    <input type="email" name="parent_email[]" placeholder="Email">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add" onclick="addParent()">
+                        <i class="fas fa-plus-circle"></i> Add Parent
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== SECTION 4: SIBLINGS ==================== -->
+            <div class="section-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-child"></i>
+                        SIBLINGS
+                        <span style="font-size: 0.7rem; font-weight: normal; opacity: 0.8;">(Optional)</span>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div id="siblingsContainer">
+                        <div class="entry-card">
+                            <div class="entry-header">
+                                <div class="entry-title">
+                                    <i class="fas fa-user-friends"></i> Sibling 1
+                                </div>
+                            </div>
+                            <div class="entry-grid">
+                                <div class="entry-field">
+                                    <label>Sibling Name</label>
+                                    <input type="text" name="sibling_name[]" placeholder="Full Name">
+                                </div>
+                                <div class="entry-field">
+                                    <label>Age</label>
+                                    <input type="number" name="sibling_age[]" placeholder="Years">
+                                </div>
+                                <div class="entry-field">
+                                    <label>Class</label>
+                                    <input type="text" name="sibling_class[]" placeholder="e.g., 5th">
+                                </div>
+                                <div class="entry-field">
+                                    <label>School Name</label>
+                                    <input type="text" name="sibling_school_name[]" placeholder="School Name">
+                                </div>
+                                <div class="entry-field">
+                                    <label>Link Student</label>
+                                    <select name="sibling_student_id[]" class="sibling-student-select">
+                                        <option value="">None</option>
+                                        {% if all_students %}
+                                            {% for student in all_students %}
+                                            <option value="{{ student.id }}">{{ student.full_name }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add" onclick="addSibling()">
+                        <i class="fas fa-plus-circle"></i> Add Sibling
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== SECTION 5: MEDICAL DETAILS ==================== -->
+            <div class="section-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-notes-medical"></i>
+                        MEDICAL DETAILS
+                        <span style="font-size: 0.7rem; font-weight: normal; opacity: 0.8;">(Optional)</span>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group full-width">
+                        <div class="input-wrapper">
+                            <textarea name="medical_details" rows="3" placeholder="Any medical conditions, allergies, medications, blood group, etc.&#10;Example: Allergic to penicillin, Asthma, Blood group B+"></textarea>
+                        </div>
+                        <div class="help-text"><i class="fas fa-lock"></i> This information is confidential and only visible to authorized staff</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SECTION 6: PROFILE PICTURE ==================== -->
+            <div class="section-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-camera"></i>
+                        PROFILE PICTURE
+                        <span style="font-size: 0.7rem; font-weight: normal; opacity: 0.8;">(Optional)</span>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="profile-upload">
+                        <div id="imagePreview" class="avatar-placeholder">
+                            <i class="fas fa-user-graduate fa-3x text-muted"></i>
+                        </div>
+                        <input type="file" name="profile_pic" class="form-control" accept="image/jpeg,image/png,image/gif" style="margin-top: 1rem; width: auto; display: inline-block;" onchange="previewImage(this)">
+                        <div class="help-text" style="margin-top: 0.5rem;"><i class="fas fa-info-circle"></i> JPG, PNG, GIF (Max 5MB)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SECTION 7: LOGIN CREDENTIALS ==================== -->
+            <div class="section-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-key"></i>
+                        LOGIN CREDENTIALS
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-user-tag"></i> Username <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" name="username" id="username" placeholder="Unique username" oninput="updatePreview()" required>
+                            </div>
+                            <div class="help-text"><i class="fas fa-info-circle"></i> Must be unique across the system</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-key"></i> Password <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" name="password" id="password" placeholder="Minimum 6 characters" oninput="checkStrength()" required>
+                            </div>
+                            <div class="help-text"><i class="fas fa-shield-alt"></i> Use at least 6 characters</div>
+                            <div id="strengthContainer"></div>
+                        </div>
+
+                        <div class="btn-group">
+                            <a href="{{ url_for('students') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                              <i class="fas fa-save"></i> Save Student Record
+                            </button>
+            </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </form>
+    </div>
+</div>
+
+<script>
+    let parentCount = 1;
+    let siblingCount = 1;
+
+    function addParent() {
+        parentCount++;
+        const container = document.getElementById('parentsContainer');
+        const parentHTML = `
+            <div class="entry-card">
+                <div class="entry-header">
+                    <div class="entry-title">
+                        <i class="fas fa-user-tie"></i> Parent ${parentCount}
+                    </div>
+                    <button type="button" class="btn-remove" onclick="this.closest('.entry-card').remove()">
+                        <i class="fas fa-trash-alt"></i> Remove
+                    </button>
+                </div>
+                <div class="entry-grid">
+                    <div class="entry-field">
+                        <label>Full Name</label>
+                        <input type="text" name="parent_name[]" placeholder="e.g. Ahmed Khan">
+                    </div>
+                    <div class="entry-field">
+                        <label>Relation</label>
+                        <select name="parent_relation[]">
+                            <option value="Father">Father</option>
+                            <option value="Mother">Mother</option>
+                            <option value="Guardian">Guardian</option>
+                        </select>
+                    </div>
+                    <div class="entry-field">
+                        <label>Occupation</label>
+                        <input type="text" name="parent_occupation[]" placeholder="Job/Profession">
+                    </div>
+                    <div class="entry-field">
+                        <label>Phone</label>
+                        <input type="text" name="parent_phone[]" placeholder="Contact">
+                    </div>
+                    <div class="entry-field">
+                        <label>Email</label>
+                        <input type="email" name="parent_email[]" placeholder="Email">
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', parentHTML);
+    }
+
+    function addSibling() {
+        siblingCount++;
+        const container = document.getElementById('siblingsContainer');
+        const existingSelect = document.querySelector('.sibling-student-select');
+        let selectOptions = '';
+        if (existingSelect) {
+            selectOptions = existingSelect.innerHTML;
+        }
+
+        const siblingHTML = `
+            <div class="entry-card">
+                <div class="entry-header">
+                    <div class="entry-title">
+                        <i class="fas fa-user-friends"></i> Sibling ${siblingCount}
+                    </div>
+                    <button type="button" class="btn-remove" onclick="this.closest('.entry-card').remove()">
+                        <i class="fas fa-trash-alt"></i> Remove
+                    </button>
+                </div>
+                <div class="entry-grid">
+                    <div class="entry-field">
+                        <label>Sibling Name</label>
+                        <input type="text" name="sibling_name[]" placeholder="Full Name">
+                    </div>
+                    <div class="entry-field">
+                        <label>Age</label>
+                        <input type="number" name="sibling_age[]" placeholder="Years">
+                    </div>
+                    <div class="entry-field">
+                        <label>Class</label>
+                        <input type="text" name="sibling_class[]" placeholder="e.g., 5th">
+                    </div>
+                    <div class="entry-field">
+                        <label>School Name</label>
+                        <input type="text" name="sibling_school_name[]" placeholder="School Name">
+                    </div>
+                    <div class="entry-field">
+                        <label>Link Student</label>
+                        <select name="sibling_student_id[]" class="sibling-student-select">
+                            ${selectOptions}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', siblingHTML);
+    }
+
+    function previewImage(input) {
+        const preview = document.getElementById('imagePreview');
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size should not exceed 5MB');
+                input.value = '';
+                return;
+            }
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file (JPG, PNG, GIF)');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="profile-preview-img">`;
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.innerHTML = '<i class="fas fa-user-graduate fa-3x text-muted"></i>';
+        }
+    }
+
+    function updatePreview() {
+        const fullName = document.getElementById('fullName')?.value.trim();
+        const username = document.getElementById('username')?.value.trim();
+        const previewCard = document.getElementById('previewCard');
+        const previewAvatar = document.getElementById('previewAvatar');
+        const previewName = document.getElementById('previewName');
+        const previewUsername = document.getElementById('previewUsername');
+
+        if (fullName && fullName !== '') {
+            previewCard.style.display = 'block';
+            previewAvatar.textContent = fullName.charAt(0).toUpperCase();
+            previewName.textContent = fullName;
+            previewUsername.textContent = username ? `Username: ${username}` : 'Username: —';
+        } else {
+            previewCard.style.display = 'none';
+        }
+    }
+
+    function checkStrength() {
+        const password = document.getElementById('password').value;
+        const container = document.getElementById('strengthContainer');
+
+        if (password.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let strength = 0;
+        if (password.length >= 6) strength++;
+        if (password.length >= 10) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+        let percent = 0, color = '#e05a5a', text = 'Weak';
+        if (strength <= 2) { percent = 25; color = '#e05a5a'; text = 'Weak password'; }
+        else if (strength <= 4) { percent = 55; color = '#f0b341'; text = 'Medium password'; }
+        else if (strength <= 5) { percent = 80; color = '#2c6e9e'; text = 'Strong password'; }
+        else { percent = 100; color = '#10b981'; text = 'Very strong password'; }
+
+        container.innerHTML = `
+            <div class="strength-bar">
+                <div class="strength-fill" style="width: ${percent}%; background: ${color};"></div>
+            </div>
+            <div class="strength-text" style="color: ${color};"><i class="fas fa-shield-alt"></i> ${text}</div>
+        `;
+    }
+
+    function showMessage(type, message) {
+        const container = document.getElementById('flashContainer');
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+        container.innerHTML = `<div class="alert ${alertClass}"><i class="fas ${icon}"></i> ${message}</div>`;
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 4000);
+    }
+
+   function validateForm(event) {
+
+    const fullName = document.getElementById('fullName')?.value.trim();
+    const username = document.getElementById('username')?.value.trim();
+    const password = document.getElementById('password')?.value;
+
+    if (!fullName) {
+        showMessage('error', 'Please enter student full name');
+        return false;
+    }
+
+    if (!username) {
+        showMessage('error', 'Please enter username');
+        return false;
+    }
+
+    if (!password || password.length < 6) {
+        showMessage('error', 'Password must be at least 6 characters');
+        return false;
+    }
+
+    return true;   // submit allow
+    });
+</script>
+{% endblock %}

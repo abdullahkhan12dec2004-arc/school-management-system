@@ -1,0 +1,635 @@
+{% extends "base.html" %}
+{% block title %}Login — EduManage Pro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hide sidebar, topbar */
+    body {
+        display: block !important;
+        background: linear-gradient(135deg, #0f2b3d 0%, #0a1a2e 100%) !important;
+    }
+    .sidebar, .topbar { display: none !important; }
+    .main { margin-left: 0 !important; width: 100% !important; }
+    .content { padding: 0 !important; }
+
+    /* ===== LOGIN PAGE ===== */
+    .login-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: stretch;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    /* ===== LEFT PANEL ===== */
+    .login-left {
+        flex: 1;
+        background: linear-gradient(135deg, #0f2b3d 0%, #0a1a2e 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 60px 50px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-left::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+            radial-gradient(circle at 20% 20%, rgba(198,164,59,0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(198,164,59,0.06) 0%, transparent 50%),
+            radial-gradient(circle at 40% 60%, rgba(44,110,158,0.1) 0%, transparent 60%);
+        pointer-events: none;
+        animation: pulseBg 8s ease-in-out infinite;
+    }
+
+    @keyframes pulseBg {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+
+    .left-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(44,110,158,0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(44,110,158,0.15) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+        0% { transform: translate(0,0); }
+        100% { transform: translate(50px,50px); }
+    }
+
+    .left-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-width: 400px;
+    }
+
+    .left-logo {
+        width: 80px; height: 80px;
+        background: linear-gradient(135deg, #c6a43b 0%, #a07d2a 100%);
+        border-radius: 24px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 36px;
+        color: #0f2b3d;
+        margin: 0 auto 30px;
+        box-shadow: 0 10px 40px rgba(198,164,59,0.3);
+        animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .left-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.2;
+        margin-bottom: 12px;
+        letter-spacing: -0.02em;
+    }
+
+    .left-title span {
+        background: linear-gradient(135deg, #c6a43b 0%, #e0c87c 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .left-sub {
+        font-size: 14px;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        text-align: left;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 14px 18px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .feature-item:hover {
+        background: rgba(198,164,59,0.08);
+        border-color: rgba(198,164,59,0.25);
+        transform: translateX(5px);
+    }
+
+    .feature-icon {
+        width: 40px; height: 40px;
+        background: rgba(198,164,59,0.12);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        color: #c6a43b;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .feature-text strong {
+        display: block;
+        color: #e2e8f0;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    .feature-text span {
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    .left-footer {
+        position: absolute;
+        bottom: 25px;
+        left: 0; right: 0;
+        text-align: center;
+        font-size: 11px;
+        color: rgba(148,163,184,0.5);
+        letter-spacing: 0.5px;
+    }
+
+    /* ===== RIGHT PANEL ===== */
+    .login-right {
+        width: 520px;
+        flex-shrink: 0;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 48px;
+        box-shadow: -5px 0 30px rgba(0,0,0,0.05);
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .card-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #c6a43b;
+        margin-bottom: 10px;
+    }
+
+    .card-heading {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f2b3d;
+        margin-bottom: 8px;
+        letter-spacing: -0.02em;
+    }
+
+    .card-desc {
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 32px;
+        line-height: 1.5;
+    }
+
+    .login-alert {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
+        color: #dc2626;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        animation: shakeIn 0.4s ease;
+    }
+
+    @keyframes shakeIn {
+        0% { transform: translateX(-8px); opacity: 0; }
+        50% { transform: translateX(5px); }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+
+    .login-form-group { margin-bottom: 20px; }
+
+    .login-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .login-input-wrap { position: relative; }
+
+    .login-input-wrap .input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 14px;
+        pointer-events: none;
+        transition: color 0.2s;
+        z-index: 1;
+    }
+
+    .login-input-wrap input {
+        width: 100%;
+        padding: 12px 42px 12px 42px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 16px;
+        color: #1e293b;
+        background: white;
+        outline: none;
+        transition: all 0.2s;
+        -webkit-appearance: none;
+    }
+
+    .login-input-wrap input::placeholder { color: #cbd5e1; }
+    .login-input-wrap input:hover { border-color: #cbd5e1; }
+    .login-input-wrap input:focus {
+        border-color: #c6a43b;
+        box-shadow: 0 0 0 3px rgba(198,164,59,0.1);
+    }
+
+    .pwd-toggle {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 14px;
+        cursor: pointer;
+        transition: color 0.2s;
+        z-index: 2;
+    }
+    .pwd-toggle:hover { color: #c6a43b; }
+
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 28px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        -webkit-appearance: none;
+    }
+
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(15,43,61,0.3);
+    }
+
+    .btn-login:hover::before { left: 100%; }
+    .btn-login:active { transform: translateY(0); }
+
+    /* NEW: School Admin Signup Button */
+    .signup-link-container {
+        margin-top: 20px;
+        text-align: center;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-school-signup {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: transparent;
+        color: #1a4a6f;
+        border: 2px solid #1a4a6f;
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-school-signup:hover {
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        color: white;
+        border-color: transparent;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(15,43,61,0.2);
+    }
+
+    .btn-school-signup i {
+        font-size: 14px;
+    }
+
+    .demo-box {
+        margin-top: 25px;
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 18px 20px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .demo-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .demo-title::before {
+        content: '';
+        width: 20px; height: 2px;
+        background: #c6a43b;
+        border-radius: 2px;
+    }
+
+    .demo-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        color: #475569;
+        padding: 6px 0;
+    }
+
+    .demo-row span {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        background: white;
+        color: #1a4a6f;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: 1px solid #e2e8f0;
+    }
+
+    .login-copyright {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 11px;
+        color: #94a3b8;
+    }
+
+    /* ═══════════════════════════════════════
+       MOBILE RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media (max-width: 900px) {
+        .login-page {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .login-left {
+            display: none !important;
+        }
+        .login-right {
+            width: 100% !important;
+            min-height: 100vh;
+            padding: 48px 24px;
+            box-shadow: none;
+            background: linear-gradient(135deg, #0f2b3d 0%, #0a1a2e 100%);
+            align-items: flex-start;
+            padding-top: 60px;
+        }
+        .login-card {
+            max-width: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .card-heading { font-size: 24px; }
+        .card-desc { font-size: 13px; margin-bottom: 24px; }
+        .btn-login { padding: 13px; font-size: 14px; }
+        .demo-box { padding: 14px 16px; }
+        .btn-school-signup { padding: 10px 16px; font-size: 12px; }
+    }
+
+    @media (max-width: 480px) {
+        .login-right {
+            padding: 32px 16px;
+            padding-top: 48px;
+        }
+        .login-card {
+            padding: 28px 20px;
+        }
+        .card-heading { font-size: 22px; }
+    }
+
+    @media (max-width: 360px) {
+        .login-card { padding: 24px 16px; }
+        .card-heading { font-size: 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="login-page">
+
+    <!-- LEFT PANEL (desktop only) -->
+    <div class="login-left">
+        <div class="left-grid"></div>
+        <div class="left-content">
+
+            <div class="left-logo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+
+            <h1 class="left-title">
+                Smart School<br><span>Management</span>
+            </h1>
+            <p class="left-sub">
+                Manage students, teachers, classes,<br>
+                marks and results — all in one place.
+            </p>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-school"></i></div>
+                    <div class="feature-text">
+                        <strong>Multi-School Support</strong>
+                        <span>Manage multiple branches from one dashboard</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="feature-text">
+                        <strong>Result & Report Cards</strong>
+                        <span>Auto-generated results with grade & pass/fail</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="feature-text">
+                        <strong>Role-Based Access</strong>
+                        <span>Admin, Teacher & Student separate portals</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
+                    <div class="feature-text">
+                        <strong>Analytics Dashboard</strong>
+                        <span>Real-time insights and performance tracking</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="left-footer">© 2024 EduManage Pro — All rights reserved</div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="login-right">
+        <div class="login-card">
+
+            <div class="card-eyebrow">
+                <i class="fas fa-key"></i> Welcome Back
+            </div>
+            <h2 class="card-heading">Sign in to your account</h2>
+            <p class="card-desc">Enter your credentials to access the EduManage Pro dashboard.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="login-alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" autocomplete="off">
+
+                <div class="login-form-group">
+                    <label class="login-label" for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <div class="login-input-wrap">
+                        <i class="fas fa-user-circle input-icon"></i>
+                        <input type="text" id="username" name="username"
+                               placeholder="Enter your username"
+                               required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="login-form-group">
+                    <label class="login-label" for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <div class="login-input-wrap">
+                        <i class="fas fa-key input-icon"></i>
+                        <input type="password" id="password" name="password"
+                               placeholder="Enter your password"
+                               required autocomplete="current-password">
+                        <i class="fas fa-eye pwd-toggle" id="pwdToggle"
+                           onclick="togglePassword()"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+
+            </form>
+
+            <!-- 🔥 NEW: School Admin Registration Link 🔥 -->
+            <!-- 🔥 FIXED: School Admin Registration Link 🔥 -->
+           <div class="signup-link-container">
+             <a href="{{ url_for('school_admin_signup') }}" class="btn-school-signup">
+                 <i class="fas fa-school"></i>
+                    Register Your School as Admin
+                <i class="fas fa-arrow-right"></i>
+             </a>
+           </div>
+
+            <div class="demo-box">
+                <div class="demo-title">
+                    <i class="fas fa-info-circle"></i> Default Admin Credentials
+                </div>
+                <div class="demo-row">
+                    <span>Username</span>
+                    <span>admin</span>
+                </div>
+                <div class="demo-row">
+                    <span>Password</span>
+                    <span>admin123</span>
+                </div>
+            </div>
+
+            <div class="login-copyright">
+                <i class="fas fa-copyright"></i> 2024 EduManage Pro — School Management System
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById('password');
+    const icon  = document.getElementById('pwdToggle');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+</script>
+{% endblock %}

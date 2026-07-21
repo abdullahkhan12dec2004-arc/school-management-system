@@ -1,0 +1,801 @@
+{% extends "base.html" %}
+{% block title %}Enter Marks{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== PROFESSIONAL MARKS ENTRY STYLES ===== */
+
+    :root {
+        --primary-dark: #0f2b3d;
+        --primary: #1a4a6f;
+        --primary-light: #2c6e9e;
+        --primary-bg: #e8f1f8;
+        --secondary: #c6a43b;
+        --secondary-dark: #a07d2a;
+        --success: #10b981;
+        --success-light: #d1fae5;
+        --danger: #ef4444;
+        --danger-light: #fee2e2;
+        --warning: #f59e0b;
+        --warning-light: #fed7aa;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+    }
+
+    /* Page Styles */
+    .marks-page {
+        padding: 0;
+    }
+
+    /* Page Header */
+    .page-header-modern {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .page-title-modern {
+        font-size: 1.75rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-sub-modern {
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+    }
+
+    /* Filter Panel */
+    .filter-panel-modern {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-field label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--gray-500);
+    }
+
+    .filter-field select,
+    .filter-field input {
+        padding: 0.625rem 0.875rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .filter-field select:focus,
+    .filter-field input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.1);
+    }
+
+    /* Table Styles with Borders */
+    .marks-table-wrapper {
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .table-meta-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .meta-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-badge {
+        background: var(--primary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .stats-row-modern {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .stat-chip-modern {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .stat-chip-total {
+        background: var(--gray-100);
+        color: var(--gray-600);
+    }
+
+    .stat-chip-filled {
+        background: var(--success-light);
+        color: var(--success);
+    }
+
+    .stat-chip-empty {
+        background: var(--warning-light);
+        color: var(--warning);
+    }
+
+    /* Student Table with Borders */
+    .marks-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .marks-table th,
+    .marks-table td {
+        border: 1px solid var(--gray-200);
+        padding: 0.875rem;
+        vertical-align: middle;
+    }
+
+    .marks-table thead th {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-color: var(--primary-light);
+    }
+
+    .marks-table tbody tr:nth-child(even) {
+        background-color: var(--gray-50);
+    }
+
+    .marks-table tbody tr:hover {
+        background-color: var(--primary-bg);
+    }
+
+    .marks-table td:first-child {
+        font-weight: 600;
+        color: var(--secondary);
+        text-align: center;
+        width: 50px;
+    }
+
+    /* Student Info */
+    .student-name-modern {
+        font-weight: 600;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .student-avatar {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .student-code-modern {
+        font-size: 0.7rem;
+        color: var(--gray-400);
+        font-family: monospace;
+    }
+
+    /* Marks Input */
+    .marks-input-wrap-modern {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: white;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gray-300);
+        transition: all 0.2s ease;
+    }
+
+    .marks-input-wrap-modern:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.1);
+    }
+
+    .marks-input-modern {
+        width: 80px;
+        padding: 0.5rem 0.5rem;
+        border: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-align: center;
+        background: transparent;
+        outline: none;
+    }
+
+    .marks-input-modern.valid {
+        color: var(--success);
+    }
+
+    .marks-input-modern.invalid {
+        color: var(--danger);
+    }
+
+    .total-marks-label-modern {
+        font-size: 0.7rem;
+        color: var(--gray-400);
+        padding-right: 0.5rem;
+    }
+
+    /* Percentage Badge */
+    .pct-badge-modern {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-align: center;
+        min-width: 55px;
+    }
+
+    .pct-pass-modern {
+        background: var(--success-light);
+        color: var(--success);
+    }
+
+    .pct-fail-modern {
+        background: var(--danger-light);
+        color: var(--danger);
+    }
+
+    .pct-na-modern {
+        background: var(--gray-100);
+        color: var(--gray-400);
+    }
+
+    /* Progress Bar */
+    .progress-bar-container {
+        width: 200px;
+        background: var(--gray-200);
+        border-radius: 20px;
+        overflow: hidden;
+        height: 6px;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--secondary), var(--secondary-dark));
+        border-radius: 20px;
+        transition: width 0.3s ease;
+        width: 0%;
+    }
+
+    /* Save Bar */
+    .save-bar-modern {
+        position: sticky;
+        bottom: 1rem;
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-lg);
+        margin-top: 1rem;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .save-summary-modern {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .save-count {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    /* Buttons */
+    .btn-modern {
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary-modern {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary-modern:hover {
+        background: var(--primary-light);
+        transform: translateY(-1px);
+    }
+
+    .btn-success-modern {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-success-modern:hover {
+        background: #0d9668;
+        transform: translateY(-1px);
+    }
+
+    .btn-ghost-modern {
+        background: transparent;
+        border: 1px solid var(--gray-300);
+        color: var(--gray-600);
+    }
+
+    .btn-ghost-modern:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    /* Loading Area */
+    .loading-area-modern {
+        display: none;
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--gray-200);
+    }
+
+    .spinner-modern {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--gray-200);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state-modern {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-icon-modern {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .table-meta-bar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .save-bar-modern {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .marks-table th,
+        .marks-table td {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .marks-input-modern {
+            width: 60px;
+        }
+    }
+    .dashboard-container {
+        background-color: #ffffff !important;
+    }
+
+    body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="marks-page">
+    <!-- Page Header -->
+    <div class="page-header-modern">
+        <div class="page-title-modern">
+            <i class="fas fa-pen-to-square"></i> Marks Entry
+        </div>
+        <div class="page-sub-modern">
+            Select class and subject to enter marks for all students at once
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} mb-3">
+            <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- Filter Panel -->
+    <div class="filter-panel-modern">
+        <div class="filter-grid">
+            <div class="filter-field">
+                <label><i class="fas fa-door-open"></i> Class</label>
+                <select id="sel-class" onchange="loadStudents()">
+                    <option value="">— Select Class —</option>
+                    {% for cls in classes %}
+                    <option value="{{ cls.id }}" data-section="{{ cls.section }}">
+                        {{ cls.class_name }}{% if cls.section %} - {{ cls.section }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label><i class="fas fa-book"></i> Subject</label>
+                <select id="sel-subject" onchange="updateTotalMarks()">
+                    <option value="">— Select Subject —</option>
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label><i class="fas fa-calendar-alt"></i> Exam Type</label>
+                <select id="sel-exam">
+                    <option value="Annual">📅 Annual Exam</option>
+                    <option value="Mid-Term">📖 Mid-Term Exam</option>
+                    <option value="Monthly">📊 Monthly Test</option>
+                    <option value="Test">✏️ Unit Test</option>
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label><i class="fas fa-calendar"></i> Academic Year</label>
+                <input type="number" id="sel-year" value="{{ now.year }}" min="2020" max="2035">
+            </div>
+
+            {% if role != 'teacher' %}
+            <div class="filter-field">
+                <label><i class="fas fa-chalkboard-user"></i> Teacher</label>
+                <select id="sel-teacher">
+                    <option value="">— Select Teacher —</option>
+                    {% for t in teachers %}
+                    <option value="{{ t.id }}">{{ t.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% else %}
+            <input type="hidden" id="sel-teacher" value="{{ teacher.id }}">
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Loading Area -->
+    <div class="loading-area-modern" id="loading-area">
+        <div class="spinner-modern"></div>
+        <div>Loading students data...</div>
+    </div>
+
+    <!-- Marks Form -->
+    <form method="POST" id="marks-form">
+        <input type="hidden" name="class_id" id="h-class">
+        <input type="hidden" name="subject_id" id="h-subject">
+        <input type="hidden" name="exam_type" id="h-exam">
+        <input type="hidden" name="academic_year" id="h-year">
+        <input type="hidden" name="teacher_id" id="h-teacher">
+
+        <div class="marks-table-wrapper" id="table-wrapper" style="display: none;">
+            <div class="table-meta-bar">
+                <div class="meta-info">
+                    <span class="meta-badge" id="meta-class">—</span>
+                    <span class="meta-badge" id="meta-subject">—</span>
+                    <span class="meta-badge" id="meta-exam">—</span>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progress-bar"></div>
+                    </div>
+                </div>
+                <div class="stats-row-modern">
+                    <span class="stat-chip-modern stat-chip-total" id="chip-total">0 Students</span>
+                    <span class="stat-chip-modern stat-chip-filled" id="chip-filled">0 Filled</span>
+                    <span class="stat-chip-modern stat-chip-empty" id="chip-empty">0 Remaining</span>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="marks-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>Roll No</th>
+                            <th style="text-align: center;">Marks Obtained</th>
+                            <th style="text-align: center;">Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-body">
+                        <tr>
+                            <td colspan="5" class="empty-state-modern">
+                                <div class="empty-icon-modern">📋</div>
+                                <div>Select a class to view students</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Save Bar -->
+        <div class="save-bar-modern" id="save-bar" style="display: none;">
+            <div class="save-summary-modern">
+                <span class="save-count" id="sb-filled">0</span>
+                <span>students ready to save</span>
+            </div>
+            <div class="save-actions" style="display: flex; gap: 0.75rem;">
+                <button type="button" class="btn-modern btn-ghost-modern" onclick="clearAll()">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+                <button type="submit" class="btn-modern btn-success-modern" onclick="prepareSubmit()">
+                    <i class="fas fa-save"></i> Save Marks
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+let totalMarksVal = 100;
+let passingMarksVal = 40;
+
+async function loadStudents() {
+    const classId = document.getElementById('sel-class').value;
+    if (!classId) return;
+
+    document.getElementById('table-wrapper').style.display = 'none';
+    document.getElementById('loading-area').style.display = 'block';
+    document.getElementById('save-bar').style.display = 'none';
+
+    const subRes = await fetch(`/get_subjects/${classId}`);
+    const subjects = await subRes.json();
+    const subSel = document.getElementById('sel-subject');
+    subSel.innerHTML = '<option value="">— Select Subject —</option>';
+    subjects.forEach(s => {
+        subSel.innerHTML += `<option value="${s.id}" data-total="${s.total_marks}" data-pass="${s.passing_marks}">${s.subject_name} (${s.total_marks} marks)</option>`;
+    });
+
+    const stuRes = await fetch(`/get_students/${classId}`);
+    const students = await stuRes.json();
+
+    document.getElementById('loading-area').style.display = 'none';
+
+    const classOpt = document.getElementById('sel-class');
+    const className = classOpt.options[classOpt.selectedIndex].text;
+    const examType = document.getElementById('sel-exam').value;
+
+    document.getElementById('meta-class').textContent = className;
+    document.getElementById('meta-exam').textContent = examType;
+    document.getElementById('chip-total').textContent = students.length + ' Students';
+    document.getElementById('chip-filled').textContent = '0 Filled';
+    document.getElementById('chip-empty').textContent = students.length + ' Remaining';
+
+    const tbody = document.getElementById('students-body');
+
+    if (students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state-modern"><div class="empty-icon-modern">👤</div><div>No students found in this class</div></td></tr>`;
+        document.getElementById('table-wrapper').style.display = 'block';
+        return;
+    }
+
+    tbody.innerHTML = students.map((s, i) => `
+        <tr id="row-${s.id}">
+            <td>${i + 1}</td>
+            <td>
+                <div class="student-name-modern">
+                    <span class="student-avatar">${(s.full_name?.charAt(0) || 'S')}</span>
+                    ${s.full_name}
+                </div>
+                <div class="student-code-modern">${s.student_code || ''}</div>
+            </td>
+            <td><code style="font-family: monospace; font-size: 0.7rem;">${s.student_code || '—'}</code></td>
+            <td class="marks-input-cell">
+                <div class="marks-input-wrap-modern">
+                    <input type="number"
+                        class="marks-input-modern"
+                        name="obtained_marks[]"
+                        id="marks-${s.id}"
+                        data-student-id="${s.id}"
+                        placeholder="0"
+                        min="0"
+                        max="${totalMarksVal}"
+                        autocomplete="off"
+                        onchange="onMarkChange(this)"
+                        oninput="onMarkChange(this)"
+                        onkeydown="onKeyDown(event, ${i}, ${students.length})">
+                    <span class="total-marks-label-modern">/ ${totalMarksVal}</span>
+                    <input type="hidden" name="student_id[]" value="${s.id}">
+                </div>
+            </td>
+            <td style="text-align: center">
+                <span class="pct-badge-modern pct-na-modern" id="badge-${s.id}">—</span>
+            </td>
+        </tr>
+    `).join('');
+
+    document.getElementById('table-wrapper').style.display = 'block';
+    document.getElementById('save-bar').style.display = 'flex';
+    updateCounts();
+}
+
+function updateTotalMarks() {
+    const subSel = document.getElementById('sel-subject');
+    const opt = subSel.options[subSel.selectedIndex];
+    totalMarksVal = parseInt(opt.dataset.total) || 100;
+    passingMarksVal = parseInt(opt.dataset.pass) || 40;
+
+    document.getElementById('meta-subject').textContent = opt.text || '—';
+
+    document.querySelectorAll('.marks-input-modern').forEach(inp => {
+        inp.max = totalMarksVal;
+        onMarkChange(inp);
+    });
+    document.querySelectorAll('.total-marks-label-modern').forEach(el => {
+        el.innerHTML = `/ ${totalMarksVal}`;
+    });
+}
+
+function onMarkChange(inp) {
+    const val = parseFloat(inp.value);
+    const studentId = inp.dataset.studentId;
+    const badge = document.getElementById(`badge-${studentId}`);
+
+    if (inp.value === '' || isNaN(val)) {
+        inp.classList.remove('valid', 'invalid');
+        badge.textContent = '—';
+        badge.className = 'pct-badge-modern pct-na-modern';
+    } else if (val < 0 || val > totalMarksVal) {
+        inp.classList.add('invalid');
+        inp.classList.remove('valid');
+        badge.textContent = 'Invalid';
+        badge.className = 'pct-badge-modern pct-fail-modern';
+    } else {
+        inp.classList.add('valid');
+        inp.classList.remove('invalid');
+        const pct = (val / totalMarksVal * 100).toFixed(0);
+        badge.textContent = pct + '%';
+        badge.className = 'pct-badge-modern ' + (val >= passingMarksVal ? 'pct-pass-modern' : 'pct-fail-modern');
+    }
+    updateCounts();
+}
+
+function onKeyDown(e, idx, total) {
+    if (e.key === 'Enter' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const inputs = Array.from(document.querySelectorAll('.marks-input-modern'));
+        const currentIndex = inputs.indexOf(e.target);
+        if (inputs[currentIndex + 1]) {
+            inputs[currentIndex + 1].focus();
+            inputs[currentIndex + 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+    if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const inputs = Array.from(document.querySelectorAll('.marks-input-modern'));
+        const currentIndex = inputs.indexOf(e.target);
+        if (inputs[currentIndex - 1]) {
+            inputs[currentIndex - 1].focus();
+            inputs[currentIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+}
+
+function updateCounts() {
+    const inputs = document.querySelectorAll('.marks-input-modern');
+    let filled = 0, total = inputs.length;
+    inputs.forEach(inp => { if (inp.value.trim() !== '') filled++; });
+
+    document.getElementById('chip-total').textContent = total + ' Students';
+    document.getElementById('chip-filled').textContent = filled + ' Filled';
+    document.getElementById('chip-empty').textContent = (total - filled) + ' Remaining';
+    document.getElementById('sb-filled').textContent = filled;
+
+    const pct = total > 0 ? (filled / total * 100) : 0;
+    document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function clearAll() {
+    document.querySelectorAll('.marks-input-modern').forEach(inp => {
+        inp.value = '';
+        inp.classList.remove('valid', 'invalid');
+        const badge = document.getElementById(`badge-${inp.dataset.studentId}`);
+        if (badge) {
+            badge.textContent = '—';
+            badge.className = 'pct-badge-modern pct-na-modern';
+        }
+    });
+    updateCounts();
+}
+
+function prepareSubmit() {
+    document.getElementById('h-class').value = document.getElementById('sel-class').value;
+    document.getElementById('h-subject').value = document.getElementById('sel-subject').value;
+    document.getElementById('h-exam').value = document.getElementById('sel-exam').value;
+    document.getElementById('h-year').value = document.getElementById('sel-year').value;
+    document.getElementById('h-teacher').value = document.getElementById('sel-teacher').value;
+}
+</script>
+{% endblock %}

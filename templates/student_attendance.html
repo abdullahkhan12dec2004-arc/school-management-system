@@ -1,0 +1,661 @@
+{% extends "base.html" %}
+
+{% block title %}Student Attendance Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .attendance-wrapper {
+        padding: 1.5rem 0;
+    }
+
+    /* ── Main Header Card ── */
+    .main-card {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(44, 62, 80, 0.12);
+        margin-bottom: 1.25rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .card-head {
+        background: var(--primary-color, #2c3e50);
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .head-icon {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .head-icon i { font-size: 22px; color: #fff; }
+
+    .head-text h4 {
+        color: #fff;
+        font-size: 17px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .head-text p {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 13px;
+        margin: 3px 0 0 0;
+    }
+
+    /* ── Filter Section ── */
+    .filter-body {
+        background: var(--card-bg, #ffffff);
+        padding: 1.5rem;
+    }
+
+    .filter-inner {
+        background: var(--bg-secondary, #f8f9fa);
+        border-radius: 10px;
+        padding: 1.25rem 1.5rem;
+        border: 1px solid var(--border-color, #e9ecef);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr 1fr 0.8fr;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .filter-field label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary, #6c757d);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 6px;
+    }
+
+    .filter-field label i {
+        font-size: 13px;
+        color: var(--primary-color, #2c3e50);
+    }
+
+    .form-select, .form-control {
+        border: 1.5px solid var(--border-color, #d0d5dd);
+        border-radius: 8px;
+        padding: 0.55rem 0.85rem;
+        background-color: var(--input-bg, #fff);
+        color: var(--text-primary, #495057);
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+
+    .form-select:focus, .form-control:focus {
+        border-color: var(--primary-color, #2c3e50);
+        box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+    }
+
+    .btn-load {
+        width: 100%;
+        background: var(--primary-color, #2c3e50);
+        border: none;
+        padding: 0.58rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: #fff;
+        letter-spacing: 0.3px;
+        transition: background 0.2s, transform 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    .btn-load:hover {
+        background: var(--primary-dark, #1a252f);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .btn-reset {
+        width: 100%;
+        background: transparent;
+        border: 1.5px solid var(--border-color, #d0d5dd);
+        padding: 0.58rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text-secondary, #6c757d);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-reset:hover {
+        background: var(--bg-secondary, #f0f0f0);
+    }
+
+    /* ── Students Table ── */
+    .table-card {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(44, 62, 80, 0.12);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        background: var(--card-bg, #fff);
+    }
+
+    .table-head {
+        background: var(--primary-color, #2c3e50);
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-head h5 {
+        color: #fff;
+        margin: 0;
+        font-size: 15px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .student-count {
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f1f4f8;
+        color: var(--primary-color, #2c3e50);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        padding: 0.8rem 1rem;
+        border-bottom: 1.5px solid #e2e8f0;
+        border-top: none;
+    }
+
+    .table tbody td {
+        padding: 0.8rem 1rem;
+        vertical-align: middle;
+        border-color: var(--border-color, #f0f0f0);
+        color: var(--text-primary, #2c3e50);
+        font-size: 14px;
+    }
+
+    .table tbody tr {
+        transition: background 0.15s;
+        background-color: var(--card-bg, white);
+    }
+
+    .table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    /* ── Student Info ── */
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .student-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--primary-color, #2c3e50);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .student-name {
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text-primary, #2c3e50);
+    }
+
+    .student-gender {
+        font-size: 12px;
+        color: var(--text-secondary, #7f8c8d);
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        margin-top: 2px;
+    }
+
+    .student-code {
+        font-size: 13px;
+        color: var(--text-secondary, #7f8c8d);
+        font-family: monospace;
+    }
+
+    /* ── Status Select ── */
+    .status-select {
+        border-radius: 6px;
+        padding: 0.38rem 0.7rem;
+        font-size: 13px;
+        font-weight: 500;
+        border: 1.5px solid;
+        cursor: pointer;
+        min-width: 130px;
+        transition: all 0.2s;
+    }
+
+    .status-present  { color: #166534; border-color: #bbf7d0; background: #f0fdf4; }
+    .status-absent   { color: #991b1b; border-color: #fecaca; background: #fff5f5; }
+    .status-late     { color: #92400e; border-color: #fde68a; background: #fffbeb; }
+    .status-halfday  { color: #9a3412; border-color: #fed7aa; background: #fff7ed; }
+    .status-holiday  { color: #6b21a8; border-color: #e9d5ff; background: #faf5ff; }
+
+    /* Dark theme overrides for status */
+    [data-theme="dark"] .status-present  { color: #4ade80; border-color: #166534; background: rgba(22,101,52,0.2); }
+    [data-theme="dark"] .status-absent   { color: #f87171; border-color: #991b1b; background: rgba(153,27,27,0.2); }
+    [data-theme="dark"] .status-late     { color: #fbbf24; border-color: #92400e; background: rgba(146,64,14,0.2); }
+    [data-theme="dark"] .status-halfday  { color: #fb923c; border-color: #9a3412; background: rgba(154,52,18,0.2); }
+    [data-theme="dark"] .status-holiday  { color: #c084fc; border-color: #6b21a8; background: rgba(107,33,168,0.2); }
+
+    /* ── Remarks Input ── */
+    .remarks-input {
+        border-radius: 6px;
+        border: 1.5px solid var(--border-color, #d0d5dd);
+        padding: 0.38rem 0.75rem;
+        font-size: 13px;
+        background: var(--input-bg, #fff);
+        color: var(--text-primary, #495057);
+        transition: border-color 0.2s;
+    }
+
+    .remarks-input:focus {
+        border-color: var(--primary-color, #2c3e50);
+        box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+        outline: none;
+    }
+
+    /* ── Action Buttons ── */
+    .action-buttons {
+        background: var(--bg-secondary, #f8f9fa);
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        border-top: 1px solid var(--border-color, #e9ecef);
+    }
+
+    .btn-save {
+        background: #16a34a;
+        border: none;
+        padding: 0.65rem 2.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        color: white;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-save:hover {
+        background: #15803d;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+    }
+
+    .btn-cancel {
+        background: transparent;
+        border: 1.5px solid #dc2626;
+        padding: 0.65rem 2.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        color: #dc2626;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+        background: #dc2626;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-markall {
+        background: transparent;
+        border: 1.5px solid #bae6fd;
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        color: #0369a1;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-markall:hover {
+        background: #f0f9ff;
+        transform: translateY(-1px);
+    }
+
+    /* ── No Data ── */
+    .no-data {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--card-bg, white);
+        border-radius: 14px;
+        border: 1px solid rgba(44,62,80,0.1);
+    }
+
+    .no-data-icon {
+        font-size: 3.5rem;
+        color: var(--text-secondary, #bdc3c7);
+        margin-bottom: 1rem;
+    }
+
+    .no-data-text {
+        font-size: 1.1rem;
+        color: var(--text-secondary, #95a5a6);
+        font-weight: 500;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .table thead {
+            display: none;
+        }
+
+        .table tbody td {
+            display: block;
+            text-align: right;
+            padding: 0.5rem 1rem;
+        }
+
+        .table tbody td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            color: var(--text-secondary, #7f8c8d);
+        }
+    }
+    .dashboard-container {
+        background-color: #ffffff !important;
+    }
+
+    body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="attendance-wrapper">
+    <div class="container">
+
+        <!-- ── Header + Filter Card ── -->
+        <div class="main-card">
+            <div class="card-head">
+                <div class="head-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="head-text">
+                    <h4>Student Attendance Management</h4>
+                    <p>Mark and manage student attendance efficiently</p>
+                </div>
+            </div>
+
+            <div class="filter-body">
+                <form method="POST" action="{{ url_for('student_attendance') }}" id="attendanceForm">
+                    <div class="filter-inner">
+                        <div class="filter-grid">
+                            <div class="filter-field">
+                                <label for="class_id">
+                                    <i class="fas fa-chalkboard"></i>Select class
+                                </label>
+                                <select name="class_id" id="class_id" class="form-select" required>
+                                    <option value="">-- Choose Class --</option>
+                                    {% for class in classes %}
+                                    <option value="{{ class.id }}" {% if selected_class|string == class.id|string %}selected{% endif %}>
+                                        {{ class.class_name }} - Section {{ class.section }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="filter-field">
+                                <label for="attendance_date">
+                                    <i class="fas fa-calendar-alt"></i>Attendance date
+                                </label>
+                                <input type="date" name="attendance_date" id="attendance_date"
+                                       class="form-control" value="{{ attendance_date }}" required>
+                            </div>
+
+                            <div class="filter-field">
+                                <label>&nbsp;</label>
+                                <button type="submit" class="btn-load">
+                                    <i class="fas fa-search"></i>Load students
+                                </button>
+                            </div>
+
+                            <div class="filter-field">
+                                <label>&nbsp;</label>
+                                <button type="button" class="btn-reset" onclick="resetForm()">
+                                    <i class="fas fa-redo"></i>Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Students Table ── -->
+        {% if students %}
+        <div class="table-card">
+            <div class="table-head">
+                <h5><i class="fas fa-users"></i>Student attendance list</h5>
+                <span class="student-count">
+                    <i class="fas fa-user-graduate me-1"></i>
+                    Total students: {{ students|length }}
+                </span>
+            </div>
+
+            <form method="POST" action="{{ url_for('save_student_attendance') }}" id="saveAttendanceForm">
+                <input type="hidden" name="class_id" value="{{ selected_class }}">
+                <input type="hidden" name="attendance_date" value="{{ attendance_date }}">
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="30%">Student information</th>
+                                <th width="14%">Student code</th>
+                                <th width="25%">Attendance status</th>
+                                <th width="26%">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td data-label="#">
+                                    <span class="badge bg-secondary rounded-pill">{{ loop.index }}</span>
+                                    <input type="hidden" name="student_id[]" value="{{ student.id }}">
+                                </td>
+                                <td data-label="Student Information">
+                                    <div class="student-info">
+                                        <div class="student-avatar">
+                                            {{ student.full_name[:1] }}
+                                        </div>
+                                        <div>
+                                            <div class="student-name">{{ student.full_name }}</div>
+                                            {% if student.gender %}
+                                            <div class="student-gender">
+                                                <i class="fas fa-{{ 'mars' if student.gender == 'Male' else 'venus' }}"></i>
+                                                {{ student.gender }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Student Code">
+                                    <span class="student-code">{{ student.student_code }}</span>
+                                </td>
+                                <td data-label="Attendance Status">
+                                    <select name="status[]" class="form-select status-select" required
+                                            onchange="updateStatusStyle(this)">
+                                        <option value="Present" {% if existing[student.id] and existing[student.id].status == 'Present' %}selected{% endif %}>
+                                            ✅ Present
+                                        </option>
+                                        <option value="Absent" {% if existing[student.id] and existing[student.id].status == 'Absent' %}selected{% endif %}>
+                                            ❌ Absent
+                                        </option>
+                                        <option value="Late" {% if existing[student.id] and existing[student.id].status == 'Late' %}selected{% endif %}>
+                                            ⏰ Late
+                                        </option>
+                                        <option value="Half Day" {% if existing[student.id] and existing[student.id].status == 'Half Day' %}selected{% endif %}>
+                                            🌓 Half Day
+                                        </option>
+                                        <option value="Holiday" {% if existing[student.id] and existing[student.id].status == 'Holiday' %}selected{% endif %}>
+                                            🏖️ Holiday
+                                        </option>
+                                    </select>
+                                </td>
+                                <td data-label="Remarks">
+                                    <input type="text" name="remarks[]" class="form-control remarks-input"
+                                           placeholder="Add remarks..."
+                                           value="{{ existing[student.id].remarks if existing[student.id] else '' }}">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i>Save attendance
+                    </button>
+                    <button type="button" class="btn-cancel"
+                            onclick="window.location.href='{{ url_for('dashboard') }}'">
+                        <i class="fas fa-times"></i>Cancel
+                    </button>
+                    <button type="button" class="btn-markall" onclick="markAllPresent()">
+                        <i class="fas fa-check-double"></i>Mark all present
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% elif selected_class %}
+        <!-- No Students -->
+        <div class="no-data">
+            <div class="no-data-icon">
+                <i class="fas fa-user-slash"></i>
+            </div>
+            <p class="no-data-text">No students found for the selected class</p>
+            <p class="text-muted mt-2">Please select a different class or add students first.</p>
+            <a href="{{ url_for('add_student') }}" class="btn btn-primary mt-3">
+                <i class="fas fa-user-plus me-2"></i>Add new student
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateStatusStyle(selectElement) {
+        selectElement.classList.remove(
+            'status-present', 'status-absent', 'status-late',
+            'status-halfday', 'status-holiday'
+        );
+        const value = selectElement.value.toLowerCase().replace(' ', '');
+        selectElement.classList.add('status-' + value);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.status-select').forEach(s => updateStatusStyle(s));
+
+        const dateInput = document.getElementById('attendance_date');
+        if (!dateInput.value) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    });
+
+    function resetForm() {
+        document.getElementById('class_id').value = '';
+        document.getElementById('attendance_date').value = '';
+        document.getElementById('attendanceForm').submit();
+    }
+
+    function markAllPresent() {
+        if (confirm('Are you sure you want to mark all students as Present?')) {
+            document.querySelectorAll('select[name="status[]"]').forEach(s => {
+                s.value = 'Present';
+                updateStatusStyle(s);
+            });
+        }
+    }
+
+    window.addEventListener('beforeunload', function (e) {
+        const form = document.getElementById('saveAttendanceForm');
+        if (!form) return;
+        let modified = false;
+        form.querySelectorAll('select[name="status[]"]').forEach(s => {
+            if (s.value !== 'Present') modified = true;
+        });
+        if (modified) {
+            const msg = 'You have unsaved attendance changes. Are you sure you want to leave?';
+            (e || window.event).returnValue = msg;
+            return msg;
+        }
+    });
+</script>
+{% endblock %}

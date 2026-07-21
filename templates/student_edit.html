@@ -1,0 +1,681 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ── EduManage Pro – Edit Student ── */
+  :root {
+    --edu-dark:    #1e2a3a;
+    --edu-darker:  #172130;
+    --edu-gold:    #f5a623;
+    --edu-gold-lt: rgba(245,166,35,0.12);
+    --edu-gold-bd: rgba(245,166,35,0.35);
+    --radius-md:   8px;
+    --radius-lg:   12px;
+  }
+
+  .edu-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .edu-page-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1e2a3a;
+    margin: 0;
+  }
+  .edu-breadcrumb {
+    font-size: 13px;
+    color: #6c757d;
+    margin-top: 3px;
+  }
+  .edu-breadcrumb a {
+    color: var(--edu-gold);
+    text-decoration: none;
+  }
+
+  /* Card */
+  .edu-card {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 12px rgba(30,42,58,0.08);
+    overflow: hidden;
+    border: none;
+  }
+  .edu-card-header {
+    background: var(--edu-dark);
+    padding: 1.1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .edu-card-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--edu-gold-lt);
+    border: 1px solid var(--edu-gold-bd);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--edu-gold);
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .edu-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+  }
+  .edu-card-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    margin: 2px 0 0;
+  }
+  .edu-card-body {
+    padding: 1.75rem;
+  }
+
+  /* Tabs */
+  .edu-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 1.75rem;
+  }
+  .edu-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 22px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #6c757d;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    transition: color .15s;
+  }
+  .edu-tab-btn i { font-size: 16px; }
+  .edu-tab-btn:hover { color: var(--edu-dark); }
+  .edu-tab-btn.active {
+    color: var(--edu-gold);
+    border-bottom-color: var(--edu-gold);
+  }
+
+  /* Section labels */
+  .edu-section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    color: #8a95a3;
+    margin: 1.5rem 0 1rem;
+  }
+  .edu-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e9ecef;
+  }
+  .edu-section-label:first-child { margin-top: 0; }
+
+  /* Form grid */
+  .edu-row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1rem;
+  }
+  .col-6  { grid-column: span 6; }
+  .col-4  { grid-column: span 4; }
+  .col-12 { grid-column: span 12; }
+
+  .edu-form-group { display: flex; flex-direction: column; gap: 5px; }
+  .edu-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #495057;
+    letter-spacing: 0.2px;
+  }
+  .edu-label .req { color: #e24b4a; }
+
+  .edu-input,
+  .edu-select,
+  .edu-textarea {
+    height: 38px;
+    padding: 0 12px;
+    border: 1.5px solid #dee2e6;
+    border-radius: var(--radius-md);
+    font-size: 13.5px;
+    color: #212529;
+    background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+    outline: none;
+    width: 100%;
+  }
+  .edu-input:focus,
+  .edu-select:focus,
+  .edu-textarea:focus {
+    border-color: var(--edu-gold);
+    box-shadow: 0 0 0 3px rgba(245,166,35,0.15);
+  }
+  .edu-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .edu-textarea {
+    height: auto;
+    padding: 10px 12px;
+    resize: vertical;
+  }
+
+  /* File upload */
+  .edu-file-upload {
+    border: 1.5px dashed #ced4da;
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    background: #fafafa;
+    transition: border-color .15s, background .15s;
+    position: relative;
+  }
+  .edu-file-upload:hover {
+    border-color: var(--edu-gold);
+    background: var(--edu-gold-lt);
+  }
+  .edu-file-upload input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .edu-file-upload i { font-size: 30px; color: #adb5bd; }
+  .edu-file-upload:hover i { color: var(--edu-gold); }
+  .edu-file-upload span { font-size: 13px; color: #6c757d; }
+  .edu-file-upload b { color: var(--edu-gold); }
+
+  /* Entry cards (parents / siblings) */
+  .edu-entry-card {
+    background: #f8f9fa;
+    border: 1.5px solid #e9ecef;
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.1rem 0.9rem;
+    margin-bottom: 0.85rem;
+    position: relative;
+  }
+  .edu-entry-card:hover { border-color: #ced4da; }
+
+  /* Buttons */
+  .edu-btn-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    padding: 9px;
+    border: 1.5px dashed #ced4da;
+    border-radius: var(--radius-md);
+    background: none;
+    color: #6c757d;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .15s;
+    margin-top: 0.25rem;
+  }
+  .edu-btn-add:hover {
+    border-color: var(--edu-gold);
+    color: var(--edu-gold);
+    background: var(--edu-gold-lt);
+  }
+
+  .edu-btn-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 9px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #dc3545;
+    background: #fff5f5;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .edu-btn-remove:hover { background: #fce8ea; }
+
+  /* Footer buttons */
+  .edu-footer {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+    margin-top: 0.5rem;
+  }
+  .edu-btn-save {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 30px;
+    background: var(--edu-gold);
+    color: #1e2a3a;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    box-shadow: 0 2px 8px rgba(245,166,35,0.35);
+  }
+  .edu-btn-save:hover { background: #e09415; transform: translateY(-1px); }
+  .edu-btn-cancel {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 22px;
+    background: #fff;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1.5px solid #dee2e6;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .edu-btn-cancel:hover { background: #f8f9fa; color: #495057; }
+
+  @media (max-width: 768px) {
+    .col-6, .col-4 { grid-column: span 12; }
+  }
+  .dashboard-container {
+        background-color: #ffffff !important;
+  }
+
+  body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+  }
+</style>
+
+<div class="container-fluid px-4 py-3">
+
+  <!-- Page Header -->
+  <div class="edu-page-header">
+    <div>
+      <h1 class="edu-page-title">
+        <i class="bi bi-person-gear me-2" style="color:var(--edu-gold)"></i>
+        Edit Student
+      </h1>
+      <div class="edu-breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Home</a>
+        &rsaquo; <a href="{{ url_for('students') }}">Students</a>
+        &rsaquo; Edit: {{ student.full_name }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="edu-card">
+
+    <div class="edu-card-header">
+      <div class="edu-card-icon">
+        <i class="bi bi-person-vcard"></i>
+      </div>
+      <div>
+        <div class="edu-card-title">{{ student.full_name }}</div>
+        <div class="edu-card-sub">Update student record &amp; information</div>
+      </div>
+    </div>
+
+    <div class="edu-card-body">
+      <form method="POST" enctype="multipart/form-data">
+
+        <!-- Tabs -->
+        <div class="edu-tabs">
+          <button type="button" class="edu-tab-btn active" data-target="tab-basic">
+            <i class="bi bi-person-lines-fill"></i> Basic Info
+          </button>
+          <button type="button" class="edu-tab-btn" data-target="tab-parents">
+            <i class="bi bi-people-fill"></i> Parents Info
+          </button>
+          <button type="button" class="edu-tab-btn" data-target="tab-siblings">
+            <i class="bi bi-person-hearts"></i> Siblings
+          </button>
+        </div>
+
+        <!-- ═══════════════════════════════════
+             TAB 1 – Basic Info
+        ═══════════════════════════════════ -->
+        <div id="tab-basic" class="edu-tab-pane">
+
+          <div class="edu-section-label"><i class="bi bi-info-circle"></i> Personal Details</div>
+          <div class="edu-row">
+            <div class="col-6 edu-form-group">
+              <label class="edu-label">Full Name <span class="req">*</span></label>
+              <input type="text" name="full_name" class="edu-input"
+                     value="{{ student.full_name }}" required>
+            </div>
+            <div class="col-6 edu-form-group">
+              <label class="edu-label">Father Name</label>
+              <input type="text" name="father_name" class="edu-input"
+                     value="{{ student.father_name or '' }}">
+            </div>
+            <div class="col-6 edu-form-group">
+              <label class="edu-label">Email</label>
+              <input type="email" name="email" class="edu-input"
+                     value="{{ student.email or '' }}">
+            </div>
+            <div class="col-6 edu-form-group">
+              <label class="edu-label">Phone</label>
+              <input type="text" name="phone" class="edu-input"
+                     value="{{ student.phone or '' }}">
+            </div>
+            <div class="col-4 edu-form-group">
+              <label class="edu-label">Date of Birth</label>
+              <input type="date" name="date_of_birth" class="edu-input"
+                     value="{{ student.date_of_birth }}">
+            </div>
+            <div class="col-4 edu-form-group">
+              <label class="edu-label">Gender</label>
+              <select name="gender" class="edu-select">
+                <option value="">— Select —</option>
+                <option value="Male"   {% if student.gender == 'Male'   %}selected{% endif %}>Male</option>
+                <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
+              </select>
+            </div>
+            <div class="col-4 edu-form-group">
+              <label class="edu-label">Class</label>
+              <select name="class_id" class="edu-select">
+                <option value="">— Select Class —</option>
+                {% for class in classes %}
+                <option value="{{ class.id }}"
+                  {% if student.class_id == class.id %}selected{% endif %}>
+                  {{ class.class_name }} – {{ class.section }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="edu-section-label"><i class="bi bi-geo-alt"></i> Address</div>
+          <div class="edu-row">
+            <div class="col-6 edu-form-group">
+              <label class="edu-label">Address Line 1</label>
+              <input type="text" name="address_line1" class="edu-input"
+                     value="{{ student.address_line1 or '' }}">
+            </div>
+            <div class="col-6 edu-form-group">
+              <label class="edu-label">Address Line 2</label>
+              <input type="text" name="address_line2" class="edu-input"
+                     value="{{ student.address_line2 or '' }}">
+            </div>
+            <div class="col-4 edu-form-group">
+              <label class="edu-label">City</label>
+              <input type="text" name="city" class="edu-input"
+                     value="{{ student.city or '' }}">
+            </div>
+            <div class="col-4 edu-form-group">
+              <label class="edu-label">State</label>
+              <input type="text" name="state" class="edu-input"
+                     value="{{ student.state or '' }}">
+            </div>
+            <div class="col-4 edu-form-group">
+              <label class="edu-label">Postal Code</label>
+              <input type="text" name="postal_code" class="edu-input"
+                     value="{{ student.postal_code or '' }}">
+            </div>
+          </div>
+
+          <div class="edu-section-label"><i class="bi bi-heart-pulse"></i> Other Details</div>
+          <div class="edu-row">
+            <div class="col-12 edu-form-group">
+              <label class="edu-label">Medical Details</label>
+              <textarea name="medical_details" class="edu-textarea" rows="3">{{ student.medical_details or '' }}</textarea>
+            </div>
+            <div class="col-12 edu-form-group">
+              <label class="edu-label">Profile Picture</label>
+              <div class="edu-file-upload">
+                <input type="file" name="profile_pic" accept="image/*">
+                <i class="bi bi-cloud-arrow-up"></i>
+                <span>Click to upload or drag &amp; drop</span>
+                {% if student.profile_pic %}
+                <span>Current: <b><a href="/static/uploads/students/{{ student.profile_pic }}"
+                     target="_blank" style="color:var(--edu-gold)">View photo</a></b></span>
+                {% else %}
+                <span>PNG, JPG up to 5MB</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /tab-basic -->
+
+        <!-- ═══════════════════════════════════
+             TAB 2 – Parents Info
+        ═══════════════════════════════════ -->
+        <div id="tab-parents" class="edu-tab-pane" style="display:none">
+          <div id="parents-container">
+            {% for parent in parents %}
+            <div class="edu-entry-card parent-entry">
+              <button type="button" class="edu-btn-remove remove-parent">
+                <i class="bi bi-trash3"></i> Remove
+              </button>
+              <div class="edu-row">
+                <div class="col-6 edu-form-group">
+                  <label class="edu-label">Parent Name</label>
+                  <input type="text" name="parent_name[]" class="edu-input"
+                         value="{{ parent.parent_name }}">
+                </div>
+                <div class="col-6 edu-form-group">
+                  <label class="edu-label">Relation</label>
+                  <input type="text" name="parent_relation[]" class="edu-input"
+                         value="{{ parent.relation }}">
+                </div>
+                <div class="col-6 edu-form-group">
+                  <label class="edu-label">Occupation</label>
+                  <input type="text" name="parent_occupation[]" class="edu-input"
+                         value="{{ parent.occupation or '' }}">
+                </div>
+                <div class="col-6 edu-form-group">
+                  <label class="edu-label">Phone</label>
+                  <input type="text" name="parent_phone[]" class="edu-input"
+                         value="{{ parent.phone or '' }}">
+                </div>
+                <div class="col-12 edu-form-group">
+                  <label class="edu-label">Email</label>
+                  <input type="email" name="parent_email[]" class="edu-input"
+                         value="{{ parent.email or '' }}">
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <button type="button" class="edu-btn-add" id="add-parent">
+            <i class="bi bi-plus-circle"></i> Add Parent
+          </button>
+        </div><!-- /tab-parents -->
+
+        <!-- ═══════════════════════════════════
+             TAB 3 – Siblings
+        ═══════════════════════════════════ -->
+        <div id="tab-siblings" class="edu-tab-pane" style="display:none">
+          <div id="siblings-container">
+            {% for sibling in siblings %}
+            <div class="edu-entry-card sibling-entry">
+              <button type="button" class="edu-btn-remove remove-sibling">
+                <i class="bi bi-trash3"></i> Remove
+              </button>
+              <div class="edu-row">
+                <div class="col-4 edu-form-group">
+                  <label class="edu-label">Sibling Name</label>
+                  <input type="text" name="sibling_name[]" class="edu-input"
+                         value="{{ sibling.sibling_name }}">
+                </div>
+                <div class="col-2 edu-form-group">
+                  <label class="edu-label">Age</label>
+                  <input type="number" name="sibling_age[]" class="edu-input"
+                         value="{{ sibling.age or '' }}">
+                </div>
+                <div class="col-3 edu-form-group">
+                  <label class="edu-label">Class</label>
+                  <input type="text" name="sibling_class[]" class="edu-input"
+                         value="{{ sibling.class or '' }}">
+                </div>
+                <div class="col-3 edu-form-group">
+                  <label class="edu-label">School Name</label>
+                  <input type="text" name="sibling_school_name[]" class="edu-input"
+                         value="{{ sibling.school_name or '' }}">
+                </div>
+                <div class="col-12 edu-form-group">
+                  <label class="edu-label">Linked Student <span style="color:#adb5bd;font-weight:400">(Optional)</span></label>
+                  <select name="sibling_student_id[]" class="edu-select">
+                    <option value="">None</option>
+                    {% for s in all_students %}
+                    <option value="{{ s.id }}"
+                      {% if sibling.sibling_student_id == s.id %}selected{% endif %}>
+                      {{ s.full_name }} ({{ s.student_code }})
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <button type="button" class="edu-btn-add" id="add-sibling">
+            <i class="bi bi-plus-circle"></i> Add Sibling
+          </button>
+        </div><!-- /tab-siblings -->
+
+        <!-- Footer -->
+        <div class="edu-footer">
+          <button type="submit" class="edu-btn-save">
+            <i class="bi bi-floppy2-fill"></i> Update Student
+          </button>
+          <a href="{{ url_for('students') }}" class="edu-btn-cancel">
+            <i class="bi bi-x-lg"></i> Cancel
+          </a>
+        </div>
+
+      </form>
+    </div><!-- /card-body -->
+  </div><!-- /edu-card -->
+</div><!-- /container -->
+
+<script>
+  /* ── Tab switching ── */
+  document.querySelectorAll('.edu-tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.edu-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.edu-tab-pane').forEach(function(p){ p.style.display = 'none'; });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).style.display = 'block';
+    });
+  });
+
+  /* ── Add Parent ── */
+  document.getElementById('add-parent').addEventListener('click', function() {
+    const container = document.getElementById('parents-container');
+    const div = document.createElement('div');
+    div.className = 'edu-entry-card parent-entry';
+    div.innerHTML = `
+      <button type="button" class="edu-btn-remove remove-parent">
+        <i class="bi bi-trash3"></i> Remove
+      </button>
+      <div class="edu-row">
+        <div class="col-6 edu-form-group">
+          <label class="edu-label">Parent Name</label>
+          <input type="text" name="parent_name[]" class="edu-input">
+        </div>
+        <div class="col-6 edu-form-group">
+          <label class="edu-label">Relation</label>
+          <input type="text" name="parent_relation[]" class="edu-input">
+        </div>
+        <div class="col-6 edu-form-group">
+          <label class="edu-label">Occupation</label>
+          <input type="text" name="parent_occupation[]" class="edu-input">
+        </div>
+        <div class="col-6 edu-form-group">
+          <label class="edu-label">Phone</label>
+          <input type="text" name="parent_phone[]" class="edu-input">
+        </div>
+        <div class="col-12 edu-form-group">
+          <label class="edu-label">Email</label>
+          <input type="email" name="parent_email[]" class="edu-input">
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+
+  /* ── Add Sibling ── */
+  document.getElementById('add-sibling').addEventListener('click', function() {
+    const container = document.getElementById('siblings-container');
+    const div = document.createElement('div');
+    div.className = 'edu-entry-card sibling-entry';
+    div.innerHTML = `
+      <button type="button" class="edu-btn-remove remove-sibling">
+        <i class="bi bi-trash3"></i> Remove
+      </button>
+      <div class="edu-row">
+        <div class="col-4 edu-form-group">
+          <label class="edu-label">Sibling Name</label>
+          <input type="text" name="sibling_name[]" class="edu-input">
+        </div>
+        <div class="col-2 edu-form-group">
+          <label class="edu-label">Age</label>
+          <input type="number" name="sibling_age[]" class="edu-input">
+        </div>
+        <div class="col-3 edu-form-group">
+          <label class="edu-label">Class</label>
+          <input type="text" name="sibling_class[]" class="edu-input">
+        </div>
+        <div class="col-3 edu-form-group">
+          <label class="edu-label">School Name</label>
+          <input type="text" name="sibling_school_name[]" class="edu-input">
+        </div>
+        <div class="col-12 edu-form-group">
+          <label class="edu-label">Linked Student <span style="color:#adb5bd;font-weight:400">(Optional)</span></label>
+          <select name="sibling_student_id[]" class="edu-select">
+            <option value="">None</option>
+            {% for s in all_students %}
+            <option value="{{ s.id }}">{{ s.full_name }} ({{ s.student_code }})</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+
+  /* ── Remove handlers (event delegation) ── */
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.remove-parent')) {
+      e.target.closest('.parent-entry').remove();
+    }
+    if (e.target.closest('.remove-sibling')) {
+      e.target.closest('.sibling-entry').remove();
+    }
+  });
+</script>
+
+{% endblock %}

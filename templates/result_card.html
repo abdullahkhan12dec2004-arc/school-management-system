@@ -1,0 +1,734 @@
+{% extends "base.html" %}
+{% block title %} Result Card - {{ student.full_name }} {% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== PROFESSIONAL RESULT CARD STYLES ===== */
+
+    :root {
+        --primary-dark: #0f2b3d;
+        --primary: #1a4a6f;
+        --primary-light: #2c6e9e;
+        --secondary: #c6a43b;
+        --secondary-dark: #a07d2a;
+        --secondary-light: #e0c87c;
+        --success: #10b981;
+        --success-dark: #059669;
+        --danger: #ef4444;
+        --danger-dark: #dc2626;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+    }
+
+    /* Action Bar */
+    .action-bar-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .btn-modern {
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+
+    .btn-back-modern {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+    }
+
+    .btn-back-modern:hover {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .btn-print-modern {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        border: none;
+    }
+
+    .btn-print-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Filter Form */
+    .filter-form-modern {
+        background: white;
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .filter-form-modern label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--gray-500);
+    }
+
+    .filter-form-modern select,
+    .filter-form-modern input {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        background: white;
+    }
+
+    .filter-form-modern select:focus,
+    .filter-form-modern input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(26, 74, 111, 0.1);
+    }
+
+    .filter-form-modern button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .filter-form-modern button:hover {
+        background: var(--primary-light);
+    }
+
+    /* Result Card */
+    .result-card-modern {
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Watermark */
+    .watermark-modern {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-30deg);
+        font-size: 5rem;
+        font-weight: 900;
+        opacity: 0.03;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 1;
+    }
+
+    .watermark-modern.PASS {
+        color: var(--success);
+    }
+
+    .watermark-modern.FAIL {
+        color: var(--danger);
+    }
+
+    /* Card Header */
+    .result-header-modern {
+        text-align: center;
+        padding: 1.5rem;
+        border-bottom: 2px solid var(--gray-200);
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    }
+
+    .school-logo-modern {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-bottom: 1rem;
+    }
+
+    .logo-placeholder-modern {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 1rem;
+    }
+
+    .school-name-modern {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        letter-spacing: -0.5px;
+    }
+
+    .school-address-modern {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+    }
+
+    /* Title Band */
+    .title-band-modern {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        color: white;
+        padding: 0.75rem;
+        text-align: center;
+    }
+
+    .title-band-modern h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    /* Student Info */
+    .student-info-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .info-row-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed var(--gray-200);
+    }
+
+    .info-row-modern:last-child {
+        border-bottom: none;
+    }
+
+    .info-label-modern {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--gray-500);
+    }
+
+    .info-value-modern {
+        font-weight: 600;
+        color: var(--gray-700);
+    }
+
+    /* Marks Section */
+    .marks-section-modern {
+        padding: 1.5rem;
+    }
+
+    .section-heading-modern {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--secondary);
+        display: inline-block;
+    }
+
+    /* Marks Table with Borders */
+    .marks-table-modern {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .marks-table-modern th,
+    .marks-table-modern td {
+        border: 1px solid var(--gray-200);
+        padding: 0.75rem;
+        vertical-align: middle;
+    }
+
+    .marks-table-modern thead th {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: center;
+    }
+
+    .marks-table-modern tbody tr:nth-child(even) {
+        background-color: var(--gray-50);
+    }
+
+    .marks-table-modern tbody tr:hover {
+        background-color: var(--primary-bg);
+    }
+
+    .marks-table-modern td:first-child {
+        text-align: center;
+        font-weight: 600;
+        color: var(--secondary);
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .pass-mark-modern {
+        font-weight: 700;
+        color: var(--success);
+    }
+
+    .fail-mark-modern {
+        font-weight: 700;
+        color: var(--danger);
+    }
+
+    .status-badge-modern {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .status-badge-modern.PASS {
+        background: #d1fae5;
+        color: var(--success);
+    }
+
+    .status-badge-modern.FAIL {
+        background: #fee2e2;
+        color: var(--danger);
+    }
+
+    /* Total Row */
+    .total-row-modern {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        color: white;
+        font-weight: 700;
+    }
+
+    .total-row-modern td {
+        color: white !important;
+        border-color: var(--primary-light) !important;
+    }
+
+    /* Summary Strip */
+    .summary-strip-modern {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        border-top: 1px solid var(--gray-200);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .summary-box-modern {
+        text-align: center;
+        min-width: 100px;
+    }
+
+    .summary-label-modern {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--gray-500);
+        margin-bottom: 0.25rem;
+    }
+
+    .summary-value-modern {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .summary-value-modern.grade {
+        color: var(--secondary);
+        font-size: 1.75rem;
+    }
+
+    /* Signatures */
+    .signatures-modern {
+        display: flex;
+        justify-content: space-around;
+        padding: 1.5rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .sig-block-modern {
+        text-align: center;
+        flex: 1;
+    }
+
+    .sig-line-modern {
+        width: 150px;
+        height: 2px;
+        background: var(--gray-300);
+        margin: 0 auto 0.5rem;
+    }
+
+    .sig-label-modern {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--gray-500);
+    }
+
+    .sig-name-modern {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--gray-600);
+        margin-top: 0.25rem;
+    }
+
+    /* No Marks */
+    .no-marks-modern {
+        text-align: center;
+        padding: 2rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-lg);
+        color: var(--gray-500);
+    }
+
+    /* Print Styles */
+    @media print {
+        .action-bar-modern,
+        .filter-form-modern,
+        .btn-print-modern,
+        .btn-back-modern {
+            display: none !important;
+        }
+
+        .result-card-modern {
+            box-shadow: none;
+            border: 1px solid var(--gray-200);
+            margin: 0;
+            padding: 0;
+        }
+
+        .watermark-modern {
+            opacity: 0.05;
+        }
+
+        body {
+            background: white;
+            padding: 0;
+            margin: 0;
+        }
+
+        .marks-table-modern th,
+        .marks-table-modern td {
+            border: 1px solid #000 !important;
+        }
+
+        .summary-strip-modern {
+            border: 1px solid var(--gray-200);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .student-info-modern {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .marks-table-modern th,
+        .marks-table-modern td {
+            padding: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .summary-strip-modern {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .signatures-modern {
+            flex-direction: column;
+        }
+
+        .sig-line-modern {
+            width: 100%;
+            max-width: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Action Bar -->
+<div class="action-bar-modern">
+    <a href="{{ url_for('students') }}" class="btn-modern btn-back-modern">
+        <i class="fas fa-arrow-left"></i> Back to Students
+    </a>
+    <button class="btn-modern btn-print-modern" onclick="window.print()">
+        <i class="fas fa-print"></i> Print / Save PDF
+    </button>
+</div>
+
+<!-- Exam Filter -->
+<form class="filter-form-modern" method="GET" action="">
+    <label><i class="fas fa-calendar-alt"></i> Exam Type:</label>
+    <select name="exam_type">
+        {% for etype in ['Annual', 'Mid-Term', 'Monthly', 'Test'] %}
+            <option value="{{ etype }}" {% if exam_type == etype %}selected{% endif %}>{{ etype }}</option>
+        {% endfor %}
+    </select>
+    <label><i class="fas fa-calendar"></i> Academic Year:</label>
+    <input type="number" name="academic_year" value="{{ academic_year }}" min="2000" max="2100">
+    <button type="submit"><i class="fas fa-search"></i> Filter</button>
+</form>
+
+<!-- Result Card -->
+<div class="result-card-modern">
+
+    <!-- Watermark -->
+    <div class="watermark-modern {{ status }}">{{ status }}</div>
+
+    <!-- Header -->
+    <div class="result-header-modern">
+        {% if student.school_logo %}
+            <img class="school-logo-modern"
+                 src="{{ url_for('static', filename='uploads/logos/' ~ student.school_logo) }}"
+                 alt="School Logo">
+        {% else %}
+            <div class="logo-placeholder-modern">
+                {{ student.school_name[0] if student.school_name else 'S' }}
+            </div>
+        {% endif %}
+        <div class="school-name-modern">{{ student.school_name }}</div>
+        {% if student.school_address %}
+            <div class="school-address-modern">{{ student.school_address }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Title Band -->
+    <div class="title-band-modern">
+        <h2>
+            <i class="fas fa-graduation-cap"></i>
+            Result Card | {{ exam_type }} Examination {{ academic_year }}
+        </h2>
+    </div>
+
+    <!-- Student Info -->
+    <div class="student-info-modern">
+        <div>
+            <div class="info-row-modern">
+                <span class="info-label-modern">Student Name</span>
+                <span class="info-value-modern"><strong>{{ student.full_name }}</strong></span>
+            </div>
+            <div class="info-row-modern">
+                <span class="info-label-modern">Father Name</span>
+                <span class="info-value-modern">{{ student.father_name or '—' }}</span>
+            </div>
+            <div class="info-row-modern">
+                <span class="info-label-modern">Student Code</span>
+                <span class="info-value-modern">{{ student.student_code }}</span>
+            </div>
+        </div>
+        <div>
+            <div class="info-row-modern">
+                <span class="info-label-modern">Class</span>
+                <span class="info-value-modern">
+                    {{ student.class_name or '—' }}
+                    {% if student.section %} – {{ student.section }}{% endif %}
+                </span>
+            </div>
+            <div class="info-row-modern">
+                <span class="info-label-modern">Roll Number</span>
+                <span class="info-value-modern">{{ student.roll_number or student.id }}</span>
+            </div>
+            <div class="info-row-modern">
+                <span class="info-label-modern">Date of Birth</span>
+                <span class="info-value-modern">
+                    {% if student.date_of_birth %}
+                        {% if student.date_of_birth is string %}
+                            {{ student.date_of_birth[:10] }}
+                        {% else %}
+                            {{ student.date_of_birth.strftime('%d-%m-%Y') }}
+                        {% endif %}
+                    {% else %}
+                        —
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marks Section -->
+    <div class="marks-section-modern">
+        <div class="section-heading-modern">
+            <i class="fas fa-chart-line"></i> Marks Detail
+        </div>
+
+        {% if marks %}
+        <table class="marks-table-modern">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Subject</th>
+                    <th class="center">Total Marks</th>
+                    <th class="center">Passing Marks</th>
+                    <th class="center">Obtained Marks</th>
+                    <th class="center">%</th>
+                    <th class="center">Grade</th>
+                    <th class="center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in marks %}
+                {% set sub_pct = (m.obtained_marks / m.total_marks * 100) if m.total_marks > 0 else 0 %}
+                {% set sub_pass = m.obtained_marks >= m.passing_marks %}
+                {% if sub_pct >= 90 %}{% set sub_grade = 'A+' %}
+                {% elif sub_pct >= 80 %}{% set sub_grade = 'A' %}
+                {% elif sub_pct >= 70 %}{% set sub_grade = 'B' %}
+                {% elif sub_pct >= 60 %}{% set sub_grade = 'C' %}
+                {% elif sub_pct >= 50 %}{% set sub_grade = 'D' %}
+                {% else %}{% set sub_grade = 'F' %}
+                {% endif %}
+                <tr>
+                    <td class="center">{{ loop.index }}</td>
+                    <td><strong>{{ m.subject_name }}</strong></td>
+                    <td class="center">{{ m.total_marks }}</td>
+                    <td class="center">{{ m.passing_marks }}</td>
+                    <td class="center {% if sub_pass %}pass-mark-modern{% else %}fail-mark-modern{% endif %}">
+                        {{ m.obtained_marks }}
+                    </td>
+                    <td class="center">{{ '%.1f'|format(sub_pct) }}%</td>
+                    <td class="center"><strong>{{ sub_grade }}</strong></td>
+                    <td class="center">
+                        <span class="status-badge-modern {% if sub_pass %}PASS{% else %}FAIL{% endif %}">
+                            {{ 'PASS' if sub_pass else 'FAIL' }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <!-- Total Row -->
+                <tr class="total-row-modern">
+                    <td colspan="2" style="text-align: left; color: white;">TOTAL</td>
+                    <td class="center" style="color: white;">{{ total_marks }}</td>
+                    <td class="center" style="color: var(--secondary-light);">—</td>
+                    <td class="center" style="color: var(--secondary-light); font-size: 1.1rem;">
+                        <strong>{{ total_obtained }}</strong>
+                    </td>
+                    <td class="center" style="color: var(--secondary-light);">
+                        <strong>{{ percentage }}%</strong>
+                    </td>
+                    <td class="center" style="color: var(--secondary-light); font-size: 1.1rem;">
+                        <strong>{{ grade }}</strong>
+                    </td>
+                    <td class="center"></td>
+                </tr>
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-marks-modern">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+            No marks found for this exam type and academic year.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Summary Strip -->
+    <div class="summary-strip-modern">
+        <div class="summary-box-modern">
+            <div class="summary-label-modern">Total Marks</div>
+            <div class="summary-value-modern">{{ total_marks }}</div>
+        </div>
+        <div class="summary-box-modern">
+            <div class="summary-label-modern">Obtained</div>
+            <div class="summary-value-modern">{{ total_obtained }}</div>
+        </div>
+        <div class="summary-box-modern">
+            <div class="summary-label-modern">Percentage</div>
+            <div class="summary-value-modern">{{ percentage }}%</div>
+        </div>
+        <div class="summary-box-modern">
+            <div class="summary-label-modern">Grade</div>
+            <div class="summary-value-modern grade">{{ grade }}</div>
+        </div>
+        <div class="summary-box-modern">
+            <div class="summary-label-modern">Result</div>
+            <div class="summary-value-modern">
+                <span class="status-badge-modern {{ status }}">
+                    <i class="fas fa-{% if status == 'PASS' %}check-circle{% else %}times-circle{% endif %}"></i>
+                    {{ status }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signatures -->
+    <div class="signatures-modern">
+        <div class="sig-block-modern">
+            <div class="sig-line-modern"></div>
+            <div class="sig-label-modern">Class Teacher</div>
+            {% if class_teacher %}
+                <div class="sig-name-modern">{{ class_teacher.full_name }}</div>
+            {% endif %}
+        </div>
+        <div class="sig-block-modern">
+            <div class="sig-line-modern"></div>
+            <div class="sig-label-modern">Principal</div>
+            <div class="sig-name-modern">_________________</div>
+        </div>
+        <div class="sig-block-modern">
+            <div class="sig-line-modern"></div>
+            <div class="sig-label-modern">Parent / Guardian</div>
+            <div class="sig-name-modern">_________________</div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

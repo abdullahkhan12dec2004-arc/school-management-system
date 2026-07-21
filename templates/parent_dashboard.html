@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+{% block title %}Parent Dashboard - {{ child.full_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        background: #f5f7fb !important;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .container-fluid-custom {
+        padding: 1.5rem;
+    }
+
+    /* Top Info Bar */
+    .top-info-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid #eef2f8;
+        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.03);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .child-avatar-large {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #1a4a6f;
+    }
+
+    .child-avatar-placeholder {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #1a4a6f 0%, #2c6e9e 100%);
+    }
+
+    /* Switch buttons */
+    .switch-btn {
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 20px;
+        padding: 5px 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .switch-btn-active {
+        background: #1a4a6f;
+        color: white;
+    }
+
+    .switch-btn-inactive {
+        background: #f1f4f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .switch-btn-inactive:hover {
+        background: #e9eef4;
+    }
+
+    /* Quick Cards */
+    .quick-card {
+        background: #ffffff;
+        border: 1px solid #eef2f8 !important;
+        border-radius: 20px;
+        transition: all 0.25s ease;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(15, 43, 61, 0.02) !important;
+    }
+
+    .quick-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 30px rgba(15, 43, 61, 0.08) !important;
+        border-color: #1a4a6f !important;
+    }
+
+    .icon-wrapper-custom {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+        font-size: 1.15rem;
+    }
+
+    .icon-wrapper-custom.blue {
+        background: #e8f1f8;
+        color: #1a4a6f;
+    }
+
+    .icon-wrapper-custom.green {
+        background: #e8faf0;
+        color: #16a34a;
+    }
+
+    .icon-wrapper-custom.gold {
+        background: #fff8e1;
+        color: #c6a43b;
+    }
+
+    .icon-wrapper-custom.red {
+        background: #fde8f0;
+        color: #ef4444;
+    }
+
+    .quick-card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1a2c3e;
+        margin-bottom: 2px;
+    }
+
+    .quick-card-sub {
+        font-size: 0.72rem;
+        color: #8a99b0;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid #eef2f8;
+        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.03);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .dashboard-card-header {
+        padding: 1.2rem 1.5rem;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dashboard-card-header.success {
+        background: linear-gradient(98deg, #0f3d23 0%, #16a34a 100%);
+    }
+
+    .dashboard-card-header.warning {
+        background: linear-gradient(98deg, #5c4308 0%, #c6a43b 100%);
+    }
+
+    .dashboard-card-header.primary {
+        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+    }
+
+    .dashboard-card-header h6 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ========== FIX: Make all text and icons white inside card headers ========== */
+    .dashboard-card-header.success,
+    .dashboard-card-header.warning,
+    .dashboard-card-header.primary,
+    .dashboard-card-header.success *,
+    .dashboard-card-header.warning *,
+    .dashboard-card-header.primary * {
+        color: white !important;
+    }
+
+    /* Specifically target icons and SVG elements */
+    .dashboard-card-header.success i,
+    .dashboard-card-header.warning i,
+    .dashboard-card-header.primary i,
+    .dashboard-card-header.success .bi,
+    .dashboard-card-header.warning .bi,
+    .dashboard-card-header.primary .bi,
+    .dashboard-card-header.success svg,
+    .dashboard-card-header.warning svg,
+    .dashboard-card-header.primary svg {
+        color: white !important;
+        fill: white !important;
+    }
+
+    /* Ensure headings, spans, and small text are white */
+    .dashboard-card-header.success h6,
+    .dashboard-card-header.warning h6,
+    .dashboard-card-header.primary h6,
+    .dashboard-card-header.success span,
+    .dashboard-card-header.warning span,
+    .dashboard-card-header.primary span,
+    .dashboard-card-header.success small,
+    .dashboard-card-header.warning small,
+    .dashboard-card-header.primary small {
+        color: white !important;
+    }
+    /* ========== END OF FIX ========== */
+
+    .dashboard-card-body {
+        padding: 1.5rem;
+    }
+
+    /* Tables */
+    .table-bordered-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-bordered-custom th,
+    .table-bordered-custom td {
+        border: 1px solid #eef2f8 !important;
+        padding: 10px 12px;
+        vertical-align: middle;
+        font-size: 0.82rem;
+    }
+
+    .table-bordered-custom thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .table-bordered-custom tbody tr:hover {
+        background: #f4f8fb;
+    }
+
+    /* Fee list items */
+    .fee-item-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.85rem 1rem;
+        border: 1px solid #eef2f8;
+        border-radius: 14px;
+        margin-bottom: 0.75rem;
+        background: #ffffff;
+        transition: all 0.2s;
+        border-left: 4px solid #16a34a;
+    }
+
+    .fee-item-custom:hover {
+        background: #f9fbfe;
+        transform: translateX(2px);
+    }
+
+    .fee-info h5 {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #1a2c3e;
+        margin: 0 0 2px 0;
+    }
+
+    .fee-info small {
+        font-size: 0.72rem;
+        color: #8a99b0;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .fee-status {
+        text-align: right;
+    }
+
+    .fee-amount {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #16a34a;
+    }
+
+    .fee-badge {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: #e8faf0;
+        color: #16a34a;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 2px;
+    }
+
+    /* Attendance summary components */
+    .att-summary-box {
+        text-align: center;
+        flex: 1;
+        padding: 0.75rem;
+        border-radius: 12px;
+    }
+
+    .att-summary-box.green { background: #e8faf0; color: #16a34a; }
+    .att-summary-box.red   { background: #fde8e8; color: #ef4444; }
+    .att-summary-box.gold  { background: #fff8e1; color: #c6a43b; }
+    .att-summary-box.blue  { background: #e8f1f8; color: #1a4a6f; }
+
+    .att-summary-box .val {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .att-summary-box .lbl {
+        font-size: 0.7rem;
+        color: #6c7c97;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid-custom">
+
+    <!-- ===== TOP BAR ===== -->
+    <div class="top-info-card">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <!-- Child Info -->
+                <div class="d-flex align-items-center gap-3">
+                    {% if child.profile_pic %}
+                        <img src="{{ url_for('static', filename='uploads/students/' + child.profile_pic) }}"
+                             class="child-avatar-large">
+                    {% else %}
+                        <div class="child-avatar-placeholder">
+                            {{ child.full_name[0].upper() }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h4 class="mb-1 fw-bold" style="color: #1a2c3e;">{{ child.full_name }}</h4>
+                        <small class="text-muted" style="font-size: 0.8rem;">
+                            {% if child.class_name %}
+                                <i class="fas fa-chalkboard me-1"></i>Class {{ child.class_name }}{% if child.section %} - {{ child.section }}{% endif %} &nbsp;|&nbsp;
+                            {% endif %}
+                            <i class="fas fa-school me-1"></i>{{ child.school_name }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Child Switcher (agar multiple children hain) -->
+                {% if all_children | length > 1 %}
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted me-1" style="font-size: 0.82rem; font-weight: 500;">Switch:</span>
+                    {% for c_item in all_children %}
+                        <a href="{{ url_for('switch_child', child_id=c_item.id) }}"
+                           class="switch-btn {% if c_item.id == child.id %}switch-btn-active{% else %}switch-btn-inactive{% endif %}">
+                            {% if c_item.profile_pic %}
+                                <img src="{{ url_for('static', filename='uploads/students/' + c_item.profile_pic) }}"
+                                     class="rounded-circle" style="width: 16px; height: 16px; object-fit: cover;">
+                            {% endif %}
+                            {{ c_item.full_name.split()[0] }}
+                        </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== QUICK ACTION BUTTONS ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('result_card', student_id=child.id) }}" class="text-decoration-none">
+                <div class="card quick-card py-3 h-100">
+                    <div class="card-body">
+                        <div class="icon-wrapper-custom blue">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="quick-card-title">Result Card</div>
+                        <div class="quick-card-sub">Marks & Grades</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <a href="#attendanceSection" class="text-decoration-none">
+                <div class="card quick-card py-3 h-100">
+                    <div class="card-body">
+                        <div class="icon-wrapper-custom green">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="quick-card-title">Attendance</div>
+                        <div class="quick-card-sub">Hazri Summary</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <a href="#feesSection" class="text-decoration-none">
+                <div class="card quick-card py-3 h-100">
+                    <div class="card-body">
+                        <div class="icon-wrapper-custom gold">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="quick-card-title">Fees</div>
+                        <div class="quick-card-sub">Payment History</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('view_notices') }}" class="text-decoration-none">
+                <div class="card quick-card py-3 h-100">
+                    <div class="card-body">
+                        <div class="icon-wrapper-custom red">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="quick-card-title">Notices</div>
+                        <div class="quick-card-sub">School Notices</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== ATTENDANCE + FEES ===== -->
+    <div class="row g-4">
+        <!-- ATTENDANCE -->
+        <div class="col-lg-6" id="attendanceSection">
+            <div class="dashboard-card h-100">
+                <div class="dashboard-card-header success">
+                    <h6>
+                        <i class="fas fa-calendar-check"></i> Attendance (Last 30 Days)
+                    </h6>
+                    {% if attendance %}
+                        {% set present = attendance | selectattr('status', 'equalto', 'Present') | list | length %}
+                        {% set total = attendance | length %}
+                        <span class="badge bg-white text-success fw-bold" style="font-size: 0.72rem;">
+                            {{ present }}/{{ total }} Present
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="dashboard-card-body">
+                    {% if attendance %}
+                        {% set present_count = attendance | selectattr('status', 'equalto', 'Present') | list | length %}
+                        {% set absent_count = attendance | selectattr('status', 'equalto', 'Absent') | list | length %}
+                        {% set leave_count = attendance | selectattr('status', 'equalto', 'Leave') | list | length %}
+                        {% set total_count = attendance | length %}
+                        {% set pct = ((present_count / total_count) * 100) | round(0) if total_count > 0 else 0 %}
+
+                        <div class="d-flex gap-2 mb-4">
+                            <div class="att-summary-box green">
+                                <div class="val">{{ present_count }}</div>
+                                <div class="lbl">Present</div>
+                            </div>
+                            <div class="att-summary-box red">
+                                <div class="val">{{ absent_count }}</div>
+                                <div class="lbl">Absent</div>
+                            </div>
+                            <div class="att-summary-box gold">
+                                <div class="val">{{ leave_count }}</div>
+                                <div class="lbl">Leave</div>
+                            </div>
+                            <div class="att-summary-box blue">
+                                <div class="val">{{ pct }}%</div>
+                                <div class="lbl">Rate</div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress mb-4" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: {{ pct }}%"></div>
+                        </div>
+
+                        <!-- Attendance List -->
+                        <div style="max-height: 250px; overflow-y: auto; padding-right: 4px;">
+                            <table class="table-bordered-custom">
+                                <thead style="position: sticky; top: 0; z-index: 1;">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for att in attendance %}
+                                    <tr>
+                                        <td class="text-muted">{{ att.attendance_date }}</td>
+                                        <td>
+                                            {% if att.status == 'Present' %}
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Present
+                                                </span>
+                                            {% elif att.status == 'Absent' %}
+                                                <span class="badge badge-danger">
+                                                    <i class="fas fa-times-circle me-1"></i>Absent
+                                                </span>
+                                            {% else %}
+                                                <span class="badge badge-warning">
+                                                    <i class="fas fa-clock me-1"></i>{{ att.status }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-calendar fa-3x mb-3 text-muted opacity-30"></i>
+                            <p>No attendance records available for last 30 days.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- FEES -->
+        <div class="col-lg-6" id="feesSection">
+            <div class="dashboard-card h-100">
+                <div class="dashboard-card-header warning">
+                    <h6>
+                        <i class="fas fa-money-bill-wave"></i> Fee Payment History
+                    </h6>
+                    {% if fees %}
+                        <span class="badge bg-white text-dark fw-bold" style="font-size: 0.72rem;">{{ fees | length }} Record(s)</span>
+                    {% endif %}
+                </div>
+                <div class="dashboard-card-body">
+                    {% if fees %}
+                        <div style="max-height: 330px; overflow-y: auto; padding-right: 4px;">
+                            {% for fee in fees %}
+                            <div class="fee-item-custom">
+                                <div class="fee-info">
+                                    <h5>Month: {{ fee.month }}/{{ fee.year }}</h5>
+                                    <small><i class="fas fa-receipt"></i>Receipt: {{ fee.receipt_number }}</small><br>
+                                    <small><i class="fas fa-credit-card"></i>Mode: {{ fee.payment_mode }}</small>
+                                </div>
+                                <div class="fee-status">
+                                    <div class="fee-amount">Rs. {{ "{:,.0f}".format(fee.amount) }}</div>
+                                    <span class="fee-badge">
+                                        <i class="fas fa-check-circle me-1"></i>Paid
+                                    </span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Total Card -->
+                        <div class="mt-3 p-3 rounded d-flex justify-content-between align-items-center"
+                             style="background: #f8fafc; border: 1px solid #eef2f8; border-radius: 14px;">
+                            <span class="fw-semibold text-muted" style="font-size: 0.85rem;">Total Paid Amount</span>
+                            <span class="fw-bold text-success fs-5">
+                                Rs. {{ "{:,.0f}".format(fees | sum(attribute='amount')) }}
+                            </span>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-file-invoice-dollar fa-3x mb-3 text-muted opacity-30"></i>
+                            <p>No fee payment records available.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== RESULT PREVIEW ===== -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header primary">
+                    <h6>
+                        <i class="fas fa-chart-bar"></i> Academics & Results Preview
+                    </h6>
+                </div>
+                <div class="dashboard-card-body text-center py-4">
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">
+                        <i class="fas fa-info-circle me-1 text-primary"></i>
+                        {{ child.full_name }} ke saalana results, subject-wise marks aur grade reports dekhne ke liye card ko open karein.
+                    </p>
+                    <a href="{{ url_for('result_card', student_id=child.id) }}" class="btn btn-primary px-5 py-2 fw-bold" style="border-radius: 30px;">
+                        <i class="fas fa-file-invoice me-2"></i>Result Card Kholo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

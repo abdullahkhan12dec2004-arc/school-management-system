@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Pending School Admins{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">⏳ Pending School Admin Requests</h4>
+        </div>
+        <div class="card-body">
+            {% if pending_list %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>School Name</th>
+                                <th>Admin Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Registered Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pending in pending_list %}
+                            <tr>
+                                <td>
+                                    <strong>{{ pending.school_name }}</strong><br>
+                                    <small class="text-muted">{{ pending.school_city }}</small>
+                                </td>
+                                <td>{{ pending.full_name }}</td>
+                                <td>{{ pending.username }}</td>
+                                <td>{{ pending.email or '-' }}</td>
+                                <td>{{ pending.phone or '-' }}</td>
+                                <td>{{ pending.created_date.strftime('%Y-%m-%d') if pending.created_date else '-' }}</td>
+                                <td>
+                                    <a href="{{ url_for('approve_admin', user_id=pending.user_id) }}"
+                                       class="btn btn-success btn-sm"
+                                       onclick="return confirm('Approve this school admin?')">
+                                        ✅ Approve
+                                    </a>
+                                    <a href="{{ url_for('reject_admin', user_id=pending.user_id) }}"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Reject and delete this request?')">
+                                        ❌ Reject
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <h5>No pending requests</h5>
+                    <p class="text-muted">All school admin requests have been processed.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

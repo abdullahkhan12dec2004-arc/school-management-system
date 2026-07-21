@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}Classes{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom table styles with borders */
+    .table-bordered-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-bordered-custom th,
+    .table-bordered-custom td {
+        border: 1px solid #dee2e6 !important;
+        padding: 12px;
+        vertical-align: middle;
+    }
+
+    .table-bordered-custom thead th {
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        color: white;
+        border: 1px solid #2c6e9e !important;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-bordered-custom tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    .table-bordered-custom tbody tr:hover {
+        background-color: #e8f1f8;
+        cursor: pointer;
+    }
+
+    .table-bordered-custom td:first-child {
+        font-weight: 700;
+        color: #c6a43b;
+        text-align: center;
+        width: 50px;
+    }
+
+    /* Student count badge */
+    .student-count {
+        display: inline-block;
+        background: #e8f1f8;
+        color: #1a4a6f;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 13px;
+        text-align: center;
+        min-width: 40px;
+    }
+
+    /* Filter card styling */
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .table-bordered-custom th,
+        .table-bordered-custom td {
+            padding: 8px;
+            font-size: 12px;
+        }
+    }
+    .dashboard-container {
+        background-color: #ffffff !important;
+    }
+
+    body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="fw-bold mb-0">
+        <i class="fas fa-door-open" style="color: #c6a43b;"></i> Classes
+    </h2>
+    <div>
+        <a href="{{ url_for('add_class') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Class
+        </a>
+    </div>
+</div>
+
+<!-- School Filter Card -->
+<div class="filter-card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold mb-2">
+                    <i class="fas fa-filter"></i> Filter by School
+                </label>
+                <select name="school_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- All Schools --</option>
+                    {% for school in schools %}
+                        <option value="{{ school.id }}" {% if selected_school == school.id|string %}selected{% endif %}>
+                            {{ school.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                {% if selected_school %}
+                    <a href="{{ url_for('classes') }}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-times"></i> Clear Filter
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Classes Table Card -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-bordered-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Class Name</th>
+                        <th>Section</th>
+                        <th>Academic Year</th>
+                        <th style="text-align: center;">Students</th>
+                        <th>School</th>
+                        <th style="width: 120px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for class in classes %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="fw-semibold">{{ class.class_name }}</td>
+                        <td>{{ class.section or '—' }}</td>
+                        <td>{{ class.academic_year or '—' }}</td>
+                        <td style="text-align: center;">
+                            <span class="student-count">
+                                <i class="fas fa-user-graduate" style="font-size: 11px;"></i>
+                                {{ class.student_count or 0 }}
+                            </span>
+                        </td>
+                        <td>
+                            <i class="fas fa-school" style="color: #c6a43b; font-size: 12px;"></i>
+                            {{ class.school_name }}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{{ url_for('class_students', class_id=class.id) }}"
+                                   class="btn btn-outline-primary" title="View Students">
+                                    <i class="fas fa-users"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-info" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fas fa-door-closed fa-3x text-muted mb-3 d-block"></i>
+                            <p class="text-muted mb-0">No classes found</p>
+                            <a href="{{ url_for('add_class') }}" class="btn btn-sm btn-primary mt-3">
+                                <i class="fas fa-plus"></i> Add First Class
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Summary -->
+{% if classes %}
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card bg-primary bg-opacity-10 border-0">
+            <div class="card-body text-center">
+                <h3 class="mb-0 text-primary">{{ classes|length }}</h3>
+                <small class="text-muted">Total Classes</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success bg-opacity-10 border-0">
+            <div class="card-body text-center">
+                <h3 class="mb-0 text-success">
+                    {{ classes|sum(attribute='student_count')|default(0) }}
+                </h3>
+                <small class="text-muted">Total Students</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning bg-opacity-10 border-0">
+            <div class="card-body text-center">
+                <h3 class="mb-0 text-warning">{{ classes|selectattr('section', 'ne', '')|list|length }}</h3>
+                <small class="text-muted">With Sections</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add hover effect on table rows
+    document.querySelectorAll('.table-bordered-custom tbody tr').forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Don't trigger if clicking on action buttons
+            if (!e.target.closest('.btn-group')) {
+                // Optional: Add click functionality
+                console.log('Row clicked');
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,572 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Attendance Report{% endblock %}
+{% block page_title %}Attendance Report{% endblock %}
+
+{% block breadcrumb %}
+<span>/</span> <span>Teacher Attendance Report</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ─── FIX: base.html .content override ───────────────────── */
+.content {
+    overflow-x: hidden;
+    min-width: 0;
+}
+
+/* ─── ROOT CONTAINER ─────────────────────────────────────── */
+.tar {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+
+/* ─── ALL CARDS: constrained width ───────────────────────── */
+.tar-topbar,
+.tar-stats,
+.tar-chart-card,
+.tar-tbl-card,
+.tar-legend {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* ─── TABLE SCROLL WRAPPER ───────────────────────────────── */
+.tar-tbl-scroll {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+}
+
+/* ─── TOP BAR ────────────────────────────────────────────── */
+.tar-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.tar-title-group { display: flex; align-items: center; gap: 10px; }
+.tar-title-group h2 { margin: 0; font-size: 18px; color: #1e293b; font-weight: 700; }
+.tar-title-group p { margin: 3px 0 0; font-size: 12px; color: #64748b; }
+
+.tar-filter-form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tar-filter-form label { font-size: 13px; font-weight: 500; color: #475569; }
+.tar-filter-form input[type="month"] {
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    color: #334155;
+}
+.tar-btn-apply, .tar-btn-back {
+    padding: 7px 13px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.tar-btn-apply { background: #2563eb; color: #fff; border: none; }
+.tar-btn-apply:hover { background: #1d4ed8; }
+.tar-btn-back { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+.tar-btn-back:hover { background: #e2e8f0; }
+
+/* ─── STATS CARDS (compact) ──────────────────────────────── */
+.tar-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);   /* always 4 in a row */
+    gap: 8px;
+}
+@media (max-width: 640px) {
+    .tar-stats { grid-template-columns: repeat(2, 1fr); }
+}
+.tar-stat {
+    background: #fff;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.tar-stat-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.ic-blue { background: #dbeafe; color: #1d4ed8; }
+.ic-green { background: #dcfce7; color: #15803d; }
+.ic-gold { background: #fef3c7; color: #b45309; }
+.ic-navy { background: #e0f2fe; color: #0369a1; }
+.tar-stat-val { font-size: 20px; font-weight: 700; color: #0f172a; line-height: 1.2; }
+.tar-stat-lbl { font-size: 11px; color: #64748b; margin-top: 1px; }
+
+/* ─── CHART CARD (smaller height) ───────────────────────── */
+.tar-chart-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.tar-chart-hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.tar-chart-hdr h3 { margin: 0; font-size: 14px; color: #1e293b; }
+.tar-month-pill {
+    background: #f1f5f9;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    color: #475569;
+    font-weight: 500;
+}
+
+/* ─── TABLE CARD ─────────────────────────────────────────── */
+.tar-tbl-card {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    width: 100%;
+    overflow: hidden;       /* clip outer radius */
+}
+
+/* Scrollable wrapper — KEY FIX */
+.tar-tbl-scroll {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    /* Ensure it never stretches parent */
+    display: block;
+}
+.tar-tbl-scroll::-webkit-scrollbar { height: 8px; }
+.tar-tbl-scroll::-webkit-scrollbar-track { background: #f8fafc; }
+.tar-tbl-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1; border-radius: 20px; border: 2px solid #f8fafc;
+}
+.tar-tbl-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Table itself */
+table.tar-tbl {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12.5px;
+    /* Do NOT set width:100% here — let it be natural width so scroll kicks in */
+    min-width: 700px;   /* minimum so it triggers scroll on small screens */
+    table-layout: auto;
+}
+
+table.tar-tbl thead tr { background: #0f172a; }
+
+table.tar-tbl th {
+    text-align: center;
+    padding: 11px 8px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.88);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    border-bottom: 1px solid #1e293b;
+}
+
+table.tar-tbl td {
+    padding: 9px 8px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+    color: #334155;
+    background: #ffffff;
+    white-space: nowrap;
+}
+
+table.tar-tbl tbody tr:last-child td { border-bottom: none; }
+
+/* Date columns */
+table.tar-tbl th:nth-child(n+3),
+table.tar-tbl td:nth-child(n+3) {
+    min-width: 38px;
+    text-align: center;
+}
+
+/* Sticky col 1 — # */
+table.tar-tbl th:nth-child(1),
+table.tar-tbl td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    min-width: 36px;
+    max-width: 36px;
+    text-align: center;
+}
+table.tar-tbl th:nth-child(1) { background: #0f172a; }
+table.tar-tbl td:nth-child(1) { background: #ffffff; font-weight: 600; color: #94a3b8; }
+
+/* Sticky col 2 — Teacher Name */
+table.tar-tbl th:nth-child(2),
+table.tar-tbl td:nth-child(2) {
+    position: sticky;
+    left: 36px;
+    z-index: 20;
+    text-align: left;
+    min-width: 150px;
+    max-width: 150px;
+}
+table.tar-tbl th:nth-child(2) { background: #0f172a; }
+table.tar-tbl td:nth-child(2) {
+    background: #ffffff;
+    /* Right shadow separates sticky from scrolling content */
+    box-shadow: 3px 0 6px -2px rgba(0,0,0,0.12);
+}
+
+/* Row hover — must override sticky bg too */
+table.tar-tbl tbody tr:hover td { background: #f8fafc !important; }
+
+.tar-tbl .t-name { font-weight: 600; color: #1e293b; font-size: 13px; }
+
+/* Status badges */
+.db {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 5px;
+    font-size: 9.5px;
+    font-weight: 700;
+}
+.db-p  { background: #dcfce7; color: #15803d; }
+.db-a  { background: #fee2e2; color: #dc2626; }
+.db-l  { background: #fef3c7; color: #d97706; }
+.db-lv { background: #dbeafe; color: #2563eb; width: 28px; font-size: 8.5px; }
+.db-e  { color: #cbd5e1; }
+
+/* Summary columns */
+.cp  { color: #16a34a; font-weight: 600; }
+.ca  { color: #dc2626; font-weight: 600; }
+.cl  { color: #d97706; font-weight: 600; }
+.clv { color: #2563eb; font-weight: 600; }
+
+.pct-hi { color: #16a34a; font-weight: 700; background: #f0fdf4 !important; }
+.pct-md { color: #d97706; font-weight: 700; background: #fffdf2 !important; }
+.pct-lo { color: #dc2626; font-weight: 700; background: #fef2f2 !important; }
+
+/* ─── LEGEND ─────────────────────────────────────────────── */
+.tar-legend {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 12px;
+}
+.tar-legend .li {
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.empty-state { text-align: center; padding: 40px; color: #64748b; }
+.empty-state i { font-size: 36px; margin-bottom: 10px; color: #cbd5e1; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 992px) {
+    .tar-topbar { flex-direction: column; align-items: flex-start; }
+    .tar-filter-form { width: 100%; }
+}
+@media (max-width: 768px) {
+    table.tar-tbl th { font-size: 9.5px; padding: 9px 5px; }
+    table.tar-tbl td { padding: 8px 5px; }
+    table.tar-tbl td:nth-child(2),
+    table.tar-tbl th:nth-child(2) { min-width: 120px; max-width: 120px; left: 32px; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{% set total_teachers = teachers_map|length %}
+{% set overall_present = namespace(value=0) %}
+{% set total_records = namespace(value=0) %}
+{% for tid, data in teachers_map.items() %}
+    {% for date, status in data.attendance.items() %}
+        {% set total_records.value = total_records.value + 1 %}
+        {% if status|lower == 'present' %}{% set overall_present.value = overall_present.value + 1 %}{% endif %}
+    {% endfor %}
+{% endfor %}
+
+<div class="tar">
+
+    <!-- TOP BAR -->
+    <div class="tar-topbar">
+        <div class="tar-title-group">
+            <div>
+                <h2><i class="fas fa-chalkboard-user"></i> Teacher Attendance Report</h2>
+                <p><i class="fas fa-calendar-check"></i> Detailed monthly overview &amp; presence analytics</p>
+            </div>
+        </div>
+        <form method="GET" action="{{ url_for('teacher_attendance_report') }}" class="tar-filter-form">
+            <label><i class="fas fa-calendar"></i> Month:</label>
+            <input type="month" name="month" value="{{ month }}" required>
+            <button type="submit" class="tar-btn-apply">
+                <i class="fas fa-filter"></i> Apply
+            </button>
+            <a href="{{ url_for('teacher_attendance') }}" class="tar-btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </form>
+    </div>
+
+    <!-- STATS (compact, 4 in a row) -->
+    <div class="tar-stats">
+        <div class="tar-stat">
+            <div class="tar-stat-icon ic-blue"><i class="fas fa-users"></i></div>
+            <div>
+                <div class="tar-stat-val">{{ total_teachers }}</div>
+                <div class="tar-stat-lbl">Total Teachers</div>
+            </div>
+        </div>
+        <div class="tar-stat">
+            <div class="tar-stat-icon ic-green"><i class="fas fa-user-check"></i></div>
+            <div>
+                <div class="tar-stat-val">{{ overall_present.value }}</div>
+                <div class="tar-stat-lbl">Present (Month)</div>
+            </div>
+        </div>
+        <div class="tar-stat">
+            <div class="tar-stat-icon ic-gold"><i class="fas fa-chart-line"></i></div>
+            <div>
+                <div class="tar-stat-val">
+                    {% if total_records.value > 0 %}{{ (overall_present.value / total_records.value * 100)|round(1) }}{% else %}0{% endif %}%
+                </div>
+                <div class="tar-stat-lbl">Overall %</div>
+            </div>
+        </div>
+        <div class="tar-stat">
+            <div class="tar-stat-icon ic-navy"><i class="fas fa-flag-checkered"></i></div>
+            <div>
+                <div class="tar-stat-val">{{ dates|length }}</div>
+                <div class="tar-stat-lbl">Working Days</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHART (reduced height: 180px) -->
+    {% if total_teachers > 0 %}
+    <div class="tar-chart-card">
+        <div class="tar-chart-hdr">
+            <h3><i class="fas fa-chart-bar"></i> Attendance Overview (Present %)</h3>
+            <span class="tar-month-pill"><i class="fas fa-calendar"></i> {{ month }}</span>
+        </div>
+        <div style="position:relative; height:180px; width:100%;">
+            <canvas id="tarChart"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- TABLE with horizontal scroll -->
+    <div class="tar-tbl-card">
+        <div class="tar-tbl-scroll">
+            <table class="tar-tbl">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style="text-align:left;">Teacher Name</th>
+                        {% for date_str in dates %}
+                        <th>{{ date_str[5:] }}</th>
+                        {% endfor %}
+                        <th>P</th>
+                        <th>A</th>
+                        <th>L</th>
+                        <th>LV</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set ctr = namespace(value=0) %}
+                    {% for teacher_id, data in teachers_map.items() %}
+                    {% set ctr.value = ctr.value + 1 %}
+                    {% set pc  = namespace(value=0) %}
+                    {% set ac  = namespace(value=0) %}
+                    {% set lc  = namespace(value=0) %}
+                    {% set lvc = namespace(value=0) %}
+                    <tr>
+                        <td>{{ ctr.value }}</td>
+                        <td class="t-name">{{ data.name }}</td>
+                        {% for date_str in dates %}
+                            {% set status = data.attendance.get(date_str, '') %}
+                            {% set sl = status|lower %}
+                            <td>
+                                {% if sl == 'present' %}
+                                    {% set pc.value = pc.value + 1 %}
+                                    <span class="db db-p">P</span>
+                                {% elif sl == 'absent' %}
+                                    {% set ac.value = ac.value + 1 %}
+                                    <span class="db db-a">A</span>
+                                {% elif sl == 'late' %}
+                                    {% set lc.value = lc.value + 1 %}
+                                    <span class="db db-l">L</span>
+                                {% elif sl == 'leave' %}
+                                    {% set lvc.value = lvc.value + 1 %}
+                                    <span class="db db-lv">LV</span>
+                                {% else %}
+                                    <span class="db db-e">—</span>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td class="cp">{{ pc.value }}</td>
+                        <td class="ca">{{ ac.value }}</td>
+                        <td class="cl">{{ lc.value }}</td>
+                        <td class="clv">{{ lvc.value }}</td>
+                        {% set td_count = pc.value + ac.value + lc.value + lvc.value %}
+                        {% set pct = (pc.value / td_count * 100)|round(1) if td_count > 0 else 0 %}
+                        <td class="{% if pct >= 80 %}pct-hi{% elif pct < 50 %}pct-lo{% else %}pct-md{% endif %}">
+                            {{ pct }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    {% if total_teachers == 0 %}
+                    <tr>
+                        <td colspan="{{ dates|length + 6 }}">
+                            <div class="empty-state">
+                                <i class="fas fa-chalkboard"></i>
+                                <p>No records found for <strong>{{ month }}</strong>.<br>Please mark attendance first.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="tar-legend">
+        <span style="font-weight:600; color:#64748b;"><i class="fas fa-info-circle"></i> Status:</span>
+        <span class="li" style="background:#DCFCE7; color:#15803D;">✓ Present</span>
+        <span class="li" style="background:#FEE2E2; color:#DC2626;">✗ Absent</span>
+        <span class="li" style="background:#FEF3C7; color:#D97706;">⏰ Late</span>
+        <span class="li" style="background:#DBEAFE; color:#2563EB;">🏖 Leave</span>
+        <span style="color:#64748b; margin-left:auto; font-size:11px;">
+            {{ month }} &nbsp;|&nbsp; {{ dates|length }} working days
+        </span>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('tarChart');
+    if (!canvas) return;
+
+    const teacherData = [];
+    {% for teacher_id, data in teachers_map.items() %}
+    {
+        let p=0, a=0, l=0, lv=0;
+        {% for date_str in dates %}
+        {
+            let s = "{{ data.attendance.get(date_str,'') }}".toLowerCase();
+            if (s==='present') p++;
+            else if (s==='absent') a++;
+            else if (s==='late') l++;
+            else if (s==='leave') lv++;
+        }
+        {% endfor %}
+        let t = p+a+l+lv;
+        teacherData.push({
+            name: "{{ data.name | replace('"', '\\"') }}",
+            pct: t>0 ? +(p/t*100).toFixed(1) : 0,
+            p, a, l, lv
+        });
+    }
+    {% endfor %}
+
+    if (!teacherData.length) return;
+
+    new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: teacherData.map(t => t.name.length > 14 ? t.name.slice(0,12)+'..' : t.name),
+            datasets: [{
+                label: 'Present %',
+                data: teacherData.map(t => t.pct),
+                backgroundColor: teacherData.map(t =>
+                    t.pct >= 80 ? 'rgba(22,163,74,0.75)' :
+                    t.pct <  50 ? 'rgba(220,38,38,0.72)' :
+                                  'rgba(217,119,6,0.75)'
+                ),
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.5,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            const d = teacherData[ctx.dataIndex];
+                            return [`Present: ${ctx.raw}%`, `P:${d.p}  A:${d.a}  L:${d.l}  LV:${d.lv}`];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: '#F0F4FA' },
+                    ticks: { callback: v => v+'%', font: { size: 10 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { autoSkip: false, maxRotation: 35, font: { size: 10 } }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% block title %}Subjects{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom table styles with borders */
+    .table-bordered-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-bordered-custom th,
+    .table-bordered-custom td {
+        border: 1px solid #dee2e6 !important;
+        padding: 12px;
+        vertical-align: middle;
+    }
+
+    .table-bordered-custom thead th {
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        color: white;
+        border: 1px solid #2c6e9e !important;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-bordered-custom tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    .table-bordered-custom tbody tr:hover {
+        background-color: #e8f1f8;
+        cursor: pointer;
+    }
+
+    .table-bordered-custom td:first-child {
+        font-weight: 700;
+        color: #c6a43b;
+        text-align: center;
+        width: 50px;
+    }
+
+    /* Form Card Styling (original colors unchanged) */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        color: white;
+        padding: 15px 20px;
+        border-bottom: 1px solid #2c6e9e;
+    }
+
+    .form-card-header h5 {
+        margin: 0;
+        color: white;
+    }
+
+    /* Class Badge */
+    .class-badge {
+        background: #e8f1f8;
+        color: #1a4a6f;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    /* Marks Styling */
+    .marks-total {
+        font-weight: 600;
+        color: #059669;
+    }
+
+    .marks-passing {
+        font-weight: 600;
+        color: #d97706;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .table-bordered-custom th,
+        .table-bordered-custom td {
+            padding: 8px;
+            font-size: 12px;
+        }
+        /* Make form row wrap on mobile */
+        .compact-form-row {
+            flex-wrap: wrap;
+        }
+        .compact-form-row .compact-field {
+            min-width: 120px;
+        }
+    }
+    .dashboard-container {
+        background-color: #ffffff !important;
+    }
+
+    body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+    }
+
+   /* Compact row form styles - "All in one row with equal gaps" */
+    .compact-form {
+       display: flex;
+       flex-wrap: nowrap;
+       align-items: flex-end;
+       gap: 1rem;
+       padding: 0.5rem 0;
+    }
+   .compact-form .form-group {
+      flex: 1;
+      min-width: 0;
+   }
+   .compact-form .form-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 0.25rem;
+      display: block;
+   }
+  .compact-form .form-control,
+  .compact-form .form-select {
+      background-color: #f9fafb;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.2s;
+      width: 100%;
+  }
+  .compact-form .form-control:focus,
+  .compact-form .form-select:focus {
+     border-color: #c6a43b;
+     box-shadow: 0 0 0 2px rgba(198, 164, 59, 0.2);
+     background-color: white;
+  }
+  .compact-form .btn-add {
+    background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: white;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .compact-form .btn-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #1a4a6f 0%, #0f2b3d 100%);
+  }
+
+  /* For smaller screens, all items stack */
+   @media (max-width: 992px) {
+      .compact-form {
+          flex-direction: column;
+           align-items: stretch;
+           gap: 0.75rem;
+      }
+      .compact-form .btn-add {
+          width: 100%;
+          justify-content: center;
+      }
+     .compact-form .form-group {
+        width: 100%;
+     }
+   }
+    /* Custom styling for the card body when using compact form */
+    .card-body.p-4 {
+        padding: 1.2rem 1.5rem !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">
+        <i class="fas fa-book" style="color: #c6a43b;"></i> Subjects
+    </h2>
+</div>
+
+<div class="row g-4">
+    <!-- Add Subject Form - Now in COMPACT ONE ROW layout (After image) -->
+    <div class="col-md-12">
+        <div class="form-card">
+            <div class="form-card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus-circle"></i> Add New Subject
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <!-- Compact row form: class, subject name, total marks, passing marks inline -->
+                <form method="POST">
+                    <div class="compact-form">
+                        <div class="form-group">
+                            <label><i class="fas fa-door-open"></i> CLASS *</label>
+                            <select name="class_id" class="form-select" required>
+                                <option value="">-- Select Class --</option>
+                                {% for c in classes %}
+                                <option value="{{ c.id }}">{{ c.class_name }}{% if c.section %} - {{ c.section }}{% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> SUBJECT NAME *</label>
+                            <input type="text" name="subject_name" class="form-control" required placeholder="e.g. Mathematics">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-star"></i> TOTAL MARKS</label>
+                            <input type="number" name="total_marks" class="form-control" value="100" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-flag-checkered"></i> PASSING MARKS</label>
+                            <input type="number" name="passing_marks" class="form-control" value="40" min="1">
+                        </div>
+                        <button type="submit" class="btn-add">
+                            <i class="fas fa-save"></i> Add Subject
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subjects List with Borders -->
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="fas fa-list"></i> All Subjects
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table-bordered-custom">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Subject Name</th>
+                                <th>Class</th>
+                                <th style="text-align: center;">Total Marks</th>
+                                <th style="text-align: center;">Passing Marks</th>
+                                <th style="width: 80px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in subjects %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td class="fw-semibold">
+                                    <i class="fas fa-book-open" style="color: #c6a43b;"></i>
+                                    {{ s.subject_name }}
+                                </td>
+                                <td>
+                                    <span class="class-badge">
+                                        <i class="fas fa-door-open"></i>
+                                        {{ s.class_name }}{% if s.section %} - {{ s.section }}{% endif %}
+                                    </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="marks-total">
+                                        <i class="fas fa-star"></i> {{ s.total_marks }}
+                                    </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="marks-passing">
+                                        <i class="fas fa-flag-checkered"></i> {{ s.passing_marks }}
+                                    </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    {% if s.passing_marks <= s.total_marks * 0.4 %}
+                                    <span class="badge bg-success">Pass: {{ ((s.passing_marks/s.total_marks)*100)|int }}%</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">{{ ((s.passing_marks/s.total_marks)*100)|int }}%</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="fas fa-book fa-3x text-muted mb-3 d-block"></i>
+                                    <p class="text-muted mb-0">No subjects found</p>
+                                    <small class="text-muted">Add a subject using the form</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        {% if subjects %}
+        <div class="row mt-3 g-2">
+            <div class="col-4">
+                <div class="card bg-primary bg-opacity-10 border-0 text-center p-2">
+                    <small class="text-muted">Total Subjects</small>
+                    <h4 class="mb-0 text-primary">{{ subjects|length }}</h4>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card bg-success bg-opacity-10 border-0 text-center p-2">
+                    <small class="text-muted">Avg Total Marks</small>
+                    <h4 class="mb-0 text-success">{{ (subjects|sum(attribute='total_marks') / subjects|length)|int }}</h4>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card bg-warning bg-opacity-10 border-0 text-center p-2">
+                    <small class="text-muted">Classes</small>
+                    <h4 class="mb-0 text-warning">{{ subjects|map(attribute='class_name')|unique|list|length }}</h4>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

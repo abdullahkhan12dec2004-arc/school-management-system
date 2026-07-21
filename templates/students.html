@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+{% block title %}Students{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom table styles with borders */
+    .table-bordered-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-bordered-custom th,
+    .table-bordered-custom td {
+        border: 1px solid #dee2e6 !important;
+        padding: 12px;
+        vertical-align: middle;
+    }
+
+    .table-bordered-custom thead th {
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        color: white;
+        border: 1px solid #2c6e9e !important;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-bordered-custom tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    .table-bordered-custom tbody tr:hover {
+        background-color: #e8f1f8;
+    }
+
+    .table-bordered-custom td:first-child {
+        font-weight: 700;
+        color: #c6a43b;
+        text-align: center;
+        width: 50px;
+    }
+
+    /* Student Code Badge */
+    .student-code-badge {
+        background: #0f2b3d;
+        color: #e0c87c;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 5px 8px;
+        border-radius: 6px;
+        display: inline-block;
+        letter-spacing: 0.5px;
+    }
+
+    /* Class Badge */
+    .class-badge {
+        background: #e8f1f8;
+        color: #1a4a6f;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    /* Gender Badge */
+    .gender-male {
+        background: #dbeafe;
+        color: #2563eb;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .gender-female {
+        background: #fce7f3;
+        color: #db2777;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        padding: 5px 12px;
+        font-size: 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-edit {
+        background: #f59e0b;
+        color: white;
+        border: none;
+    }
+
+    .btn-edit:hover {
+        background: #d97706;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-result {
+        background: #0f2b3d;
+        color: white;
+        border: none;
+    }
+
+    .btn-result:hover {
+        background: #1a4a6f;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(26, 74, 111, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .table-bordered-custom th,
+        .table-bordered-custom td {
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 3px 8px;
+            font-size: 10px;
+        }
+    }
+    .dashboard-container {
+        background-color: #ffffff !important;
+    }
+
+    body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="fw-bold mb-0">
+        <i class="fas fa-user-graduate" style="color: #c6a43b;"></i> Students
+    </h2>
+    <div>
+        <a href="{{ url_for('add_student') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Student
+        </a>
+    </div>
+</div>
+
+<!-- Students Table Card -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-bordered-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Student Code</th>
+                        <th>Full Name</th>
+                        <th>Father Name</th>
+                        <th>Class</th>
+                        <th>Gender</th>
+                        <th>Phone</th>
+                        <th style="width: 180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><span class="student-code-badge">{{ s.student_code }}</span></td>
+                        <td class="fw-semibold">
+                            <i class="fas fa-user" style="color: #c6a43b; font-size: 12px;"></i>
+                            {{ s.full_name }}
+                        </td>
+                        <td>
+                            <i class="fas fa-user-friends" style="color: #64748b; font-size: 11px;"></i>
+                            {{ s.father_name or '—' }}
+                        </td>
+                        <td>
+                            {% if s.class_name %}
+                            <span class="class-badge">
+                                <i class="fas fa-door-open"></i>
+                                {{ s.class_name }}{% if s.section %} - {{ s.section }}{% endif %}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if s.gender == 'Male' %}
+                            <span class="gender-male">
+                                <i class="fas fa-mars"></i> Male
+                            </span>
+                            {% elif s.gender == 'Female' %}
+                            <span class="gender-female">
+                                <i class="fas fa-venus"></i> Female
+                            </span>
+                            {% else %}
+                            <span class="text-muted">{{ s.gender or '—' }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <i class="fas fa-phone" style="color: #64748b; font-size: 11px;"></i>
+                            {{ s.phone or '—' }}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('edit_student', student_id=s.id) }}"
+                                   class="btn btn-sm btn-edit"
+                                   title="Edit Student">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{{ url_for('result_card', student_id=s.id) }}"
+                                   class="btn btn-sm btn-result"
+                                   title="View Result Card">
+                                    <i class="fas fa-file-alt"></i> Result
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5">
+                            <i class="fas fa-user-graduate fa-3x text-muted mb-3 d-block"></i>
+                            <p class="text-muted mb-0">No students found</p>
+                            <a href="{{ url_for('add_student') }}" class="btn btn-sm btn-primary mt-3">
+                                <i class="fas fa-plus"></i> Add First Student
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Summary -->
+{% if students %}
+<div class="row mt-4 g-3">
+    <div class="col-md-3">
+        <div class="card bg-primary bg-opacity-10 border-0">
+            <div class="card-body text-center">
+                <h3 class="mb-0 text-primary">{{ students|length }}</h3>
+                <small class="text-muted">Total Students</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success bg-opacity-10 border-0">
+            <div class="card-body text-center">
+                <h3 class="mb-0 text-success">
+                    {{ students|selectattr('gender', 'equalto', 'Male')|list|length }}
+                </h3>
+                <small class="text-muted"><i class="fas fa-mars"></i> Boys</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger bg-opacity-10 border-0">
+            <div class="card-body text-center">
+                <h3 class="mb-0 text-danger">
+                    {{ students|selectattr('gender', 'equalto', 'Female')|list|length }}
+                </h3>
+                <small class="text-muted"><i class="fas fa-venus"></i> Girls</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning bg-opacity-10 border-0">
+            <div class="card-body text-center">
+                <h3 class="mb-0 text-warning">
+                    {{ students|selectattr('class_name')|list|length }}
+                </h3>
+                <small class="text-muted">Enrolled</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Optional: Remove row click if you don't want it
+    // Row click ab disabled hai kyunki ab buttons clear hain
+    console.log('Students page loaded with Edit & Result buttons');
+</script>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}Add Students in  Class{% endblock %}
+{% block head %}
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+{% endblock %}
+{% block content %}
+
+
+<!-- Top Nav -->
+<nav class="topnav">
+  <div class="nav-left">
+    <div class="nav-title">👥 Class Students</div>
+    <div class="breadcrumb">
+      <span>/</span>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <span>/</span>
+      <a href="{{ url_for('classes') }}">Classes</a>
+      <span>/</span>
+      <span>Students add karen</span>
+    </div>
+  </div>
+  <div>
+    <a href="{{ url_for('classes') }}" class="btn btn-ghost">← Wapas</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">
+        {% if category == 'success' %}✓{% else %}⚠{% endif %}
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">Students Add Karen</div>
+      <div class="page-sub">Ek baar mein kai students is class mein register karen</div>
+    </div>
+  </div>
+
+  <!-- Class info card -->
+  <div class="class-card">
+    <div class="class-badge">
+      {{ cls.class_name }}{% if cls.section %} – {{ cls.section }}{% endif %}
+    </div>
+    <div class="class-detail-grid">
+      <div class="class-detail">
+        <div class="label">Class ID</div>
+        <div class="value">#{{ cls.id }}</div>
+      </div>
+      {% if cls.academic_year %}
+      <div class="class-detail">
+        <div class="label">Academic Year</div>
+        <div class="value">{{ cls.academic_year }}</div>
+      </div>
+      {% endif %}
+      <div class="class-detail">
+        <div class="label">Maujuda Students</div>
+        <div class="value">{{ existing|length }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Existing students -->
+  {% if existing %}
+  <div class="existing-section">
+    <div class="section-header">
+      <div class="section-title">
+        ✅ Pehle se registered students
+        <span class="count-pill">{{ existing|length }}</span>
+      </div>
+    </div>
+    <div class="existing-list">
+      {% for s in existing %}
+      <div class="existing-chip">{{ s.full_name }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Password note -->
+  <div class="password-note">
+    ⚡ Password khali chhodne par student ka username hi password banega
+  </div>
+
+  <!-- New entry form -->
+  <div class="entry-section">
+    <div class="section-header">
+      <div class="section-title">
+        ➕ Naye students
+        <span class="count-pill" id="new-count">0</span>
+      </div>
+      <div class="tooltip">Enter ya Tab se agli row par jaen</div>
+    </div>
+
+    <form method="POST" id="students-form">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th class="req" style="min-width:180px">Poora naam</th>
+              <th style="min-width:150px">Baap ka naam</th>
+              <th style="min-width:90px">Gender</th>
+              <th class="req" style="min-width:140px">Username</th>
+              <th style="min-width:120px">Password</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="students-body">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="add-row-btn" onclick="addRow()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Row add karen
+      </button>
+    </form>
+
+  </div><!-- /entry-section -->
+
+</div><!-- /page -->
+
+<!-- Save bar -->
+<div class="save-bar">
+  <div class="save-info">
+    <strong id="sb-count">0</strong> naye students save hone ke liye tayyar hain
+  </div>
+  <div class="save-actions">
+    <button type="button" class="btn btn-ghost" onclick="clearRows()">Clear</button>
+    <button type="submit" form="students-form" class="btn btn-success">
+      💾 Students Save Karen
+    </button>
+  </div>
+</div>
+
+<script>
+let rowCount = 0;
+
+function addRow(focusFirst) {
+  rowCount++;
+  const tbody = document.getElementById('students-body');
+  const tr = document.createElement('tr');
+  tr.className = 'empty-row';
+  tr.id = `row-${rowCount}`;
+  tr.innerHTML = `
+    <td class="row-num">${tbody.rows.length + 1}</td>
+    <td>
+      <input type="text" class="cell-input required-field" name="full_name[]"
+             placeholder="Naam likhen..." autocomplete="off"
+             oninput="onInput(this, ${rowCount})" onkeydown="onKey(event, this)">
+    </td>
+    <td>
+      <input type="text" class="cell-input" name="father_name[]"
+             placeholder="Baap ka naam..." autocomplete="off"
+             oninput="onInput(this, ${rowCount})" onkeydown="onKey(event, this)">
+    </td>
+    <td>
+      <select class="cell-input" name="gender[]" onchange="onInput(this, ${rowCount})">
+        <option value="">—</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    </td>
+    <td>
+      <input type="text" class="cell-input required-field" name="username[]"
+             placeholder="username..." autocomplete="off"
+             oninput="onInput(this, ${rowCount})" onkeydown="onKey(event, this)">
+    </td>
+    <td>
+      <input type="password" class="cell-input" name="password[]"
+             placeholder="(khali = username)" autocomplete="new-password"
+             oninput="onInput(this, ${rowCount})" onkeydown="onKey(event, this)">
+    </td>
+    <td>
+      <button type="button" class="del-btn" onclick="deleteRow('row-${rowCount}')">✕</button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+  if (focusFirst !== false) {
+    tr.querySelector('input').focus();
+  }
+  updateCounts();
+}
+
+function onInput(el, rId) {
+  const row = document.getElementById(`row-${rId}`);
+  const inputs = row.querySelectorAll('input, select');
+  const hasAny = Array.from(inputs).some(i => i.value.trim() !== '');
+  row.classList.toggle('empty-row', !hasAny);
+  el.classList.toggle('has-value', el.value.trim() !== '');
+  updateCounts();
+}
+
+function onKey(e, el) {
+  if (e.key === 'Tab' && !e.shiftKey) {
+    // check if last input in last row
+    const allInputs = [...document.querySelectorAll('#students-body .cell-input')];
+    const idx = allInputs.indexOf(el);
+    if (idx === allInputs.length - 2) { // second to last (before del btn)
+      e.preventDefault();
+      addRow();
+    }
+  }
+}
+
+function deleteRow(id) {
+  document.getElementById(id)?.remove();
+  // renumber
+  document.querySelectorAll('#students-body tr .row-num').forEach((el, i) => {
+    el.textContent = i + 1;
+  });
+  updateCounts();
+}
+
+function clearRows() {
+  document.getElementById('students-body').innerHTML = '';
+  rowCount = 0;
+  updateCounts();
+  addRow(false);
+  addRow(false);
+  addRow(false);
+}
+
+function updateCounts() {
+  const rows = document.querySelectorAll('#students-body tr:not(.empty-row)');
+  const total = document.querySelectorAll('#students-body tr').length;
+  // count rows with at least name filled
+  let ready = 0;
+  document.querySelectorAll('#students-body tr').forEach(row => {
+    const nameIn = row.querySelector('input[name="full_name[]"]');
+    if (nameIn && nameIn.value.trim() !== '') ready++;
+  });
+  document.getElementById('new-count').textContent = ready;
+  document.getElementById('sb-count').textContent  = ready;
+}
+
+// Init with 5 blank rows
+for (let i = 0; i < 5; i++) addRow(false);
+</script>
+{% endblock %}

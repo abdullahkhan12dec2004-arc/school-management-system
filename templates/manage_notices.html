@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Manage Notices{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📢 New Notice</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label>Title *</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Message / Body</label>
+                            <textarea name="body" class="form-control" rows="4" placeholder="Write notice here..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label>Image (optional)</label>
+                            <input type="file" name="notice_image" class="form-control" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label>Send to</label>
+                            <select name="recipient_role" class="form-select">
+                                <option value="all">📢 All (Students + Teachers)</option>
+                                <option value="student">🎓 Only Students</option>
+                                <option value="teacher">👨‍🏫 Only Teachers</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">📢 Publish Notice</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📋 Previous Notices</h5>
+                </div>
+                <div class="card-body">
+                    {% for notice in notices %}
+                    <div class="border-bottom mb-3 pb-3">
+                        <div class="d-flex justify-content-between">
+                            <h6>{{ notice.title }}</h6>
+                            <small class="text-muted">{{ notice.formatted_date }}</small>
+                        </div>
+                        <p class="mb-1">{{ notice.body[:150] }}{% if notice.body|length > 150 %}...{% endif %}</p>
+                        {% if notice.image_path %}
+                            <img src="{{ url_for('static', filename='uploads/notices/' + notice.image_path) }}"
+                                 style="max-height: 100px; max-width: 100%;" class="mt-2">
+                        {% endif %}
+                        <div class="mt-2">
+                            <small class="text-muted">By: {{ notice.creator_name }}</small>
+                            <a href="{{ url_for('delete_notice', notice_id=notice.id) }}"
+                               class="btn btn-sm btn-danger float-end"
+                               onclick="return confirm('Delete this notice?')">Delete</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No notices yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

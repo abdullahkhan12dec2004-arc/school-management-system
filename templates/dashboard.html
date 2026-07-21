@@ -1,0 +1,841 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== PROFESSIONAL DASHBOARD STYLES ===== */
+
+    :root {
+        --primary-dark: #0f2b3d;
+        --primary: #1a4a6f;
+        --primary-light: #2c6e9e;
+        --primary-bg: #e8f1f8;
+        --secondary: #c6a43b;
+        --secondary-dark: #a07d2a;
+        --secondary-light: #e0c87c;
+        --success: #10b981;
+        --success-light: #d1fae5;
+        --danger: #ef4444;
+        --danger-light: #fee2e2;
+        --warning: #f59e0b;
+        --warning-light: #fed7aa;
+        --info: #3b82f6;
+        --info-light: #dbeafe;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --radius-2xl: 1.5rem;
+    }
+
+    /* Welcome Section */
+    .welcome-section-modern {
+        margin-bottom: 1.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .welcome-title-modern {
+        font-size: 1.75rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.25rem;
+    }
+
+    .welcome-subtitle-modern {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+    }
+
+    .school-logo-modern {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: var(--radius-xl);
+        border: 2px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Stats Grid */
+    .stats-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card-modern {
+        background: white;
+        border-radius: var(--radius-2xl);
+        padding: 1.25rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    .stat-card-modern:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-card-modern.students::before {
+        background: linear-gradient(90deg, #4361ee, #6c8cff);
+    }
+
+    .stat-card-modern.teachers::before {
+        background: linear-gradient(90deg, #2ec4b6, #6ee7e0);
+    }
+
+    .stat-card-modern.classes::before {
+        background: linear-gradient(90deg, #f72585, #ff6b9d);
+    }
+
+    .stat-card-modern.schools::before {
+        background: linear-gradient(90deg, #f8961e, #ffb347);
+    }
+
+    .stat-content-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-left-modern {
+        flex: 1;
+    }
+
+    .stat-label-modern {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--gray-500);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-number-modern {
+        font-size: 2.25rem;
+        font-weight: 800;
+        line-height: 1.2;
+        color: var(--gray-800);
+    }
+
+    .stat-number-modern.students {
+        color: #4361ee;
+    }
+
+    .stat-number-modern.teachers {
+        color: #2ec4b6;
+    }
+
+    .stat-number-modern.classes {
+        color: #f72585;
+    }
+
+    .stat-number-modern.schools {
+        color: #f8961e;
+    }
+
+    .stat-icon-modern {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        opacity: 0.8;
+    }
+
+    .stat-icon-modern.students {
+        background: rgba(67, 97, 238, 0.1);
+        color: #4361ee;
+    }
+
+    .stat-icon-modern.teachers {
+        background: rgba(46, 196, 182, 0.1);
+        color: #2ec4b6;
+    }
+
+    .stat-icon-modern.classes {
+        background: rgba(247, 37, 133, 0.1);
+        color: #f72585;
+    }
+
+    .stat-icon-modern.schools {
+        background: rgba(248, 150, 30, 0.1);
+        color: #f8961e;
+    }
+
+    /* Table Card */
+    .table-card-modern {
+        background: white;
+        border-radius: var(--radius-2xl);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.5rem;
+    }
+
+    .table-header-modern {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .table-title-modern {
+        color: white;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .table-badge-modern {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    /* Results Table with Borders */
+    .results-table-modern {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .results-table-modern th,
+    .results-table-modern td {
+        border: 1px solid var(--gray-200);
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .results-table-modern thead th {
+        background: var(--gray-50);
+        color: var(--gray-600);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .results-table-modern tbody tr {
+        transition: background 0.2s ease;
+    }
+
+    .results-table-modern tbody tr:hover {
+        background-color: var(--gray-50);
+    }
+
+    .class-name-modern {
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+
+    /* Badges */
+    .badge-pass-modern {
+        background: var(--success-light);
+        color: var(--success);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .badge-fail-modern {
+        background: var(--danger-light);
+        color: var(--danger);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Progress Bar */
+    .progress-modern {
+        background: var(--gray-200);
+        border-radius: 20px;
+        overflow: hidden;
+        height: 8px;
+        flex: 1;
+    }
+
+    .progress-bar-modern {
+        height: 100%;
+        background: linear-gradient(90deg, var(--success), #34d399);
+        border-radius: 20px;
+        transition: width 0.3s ease;
+    }
+
+    .progress-percent-modern {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        min-width: 45px;
+    }
+
+    /* Empty State */
+    .empty-state-modern {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-icon-modern {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-title-modern {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--gray-600);
+    }
+
+    /* Info Grid Cards (Quick Actions, Fee Collection, System Overview) */
+    .info-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .info-card-modern {
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .info-card-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .info-card-header-modern {
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    .info-card-header-modern i {
+        color: var(--secondary);
+        font-size: 1.1rem;
+    }
+
+    .info-card-header-modern h4 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--gray-700);
+        letter-spacing: -0.2px;
+    }
+
+    .info-card-body-modern {
+        padding: 1.25rem;
+    }
+
+    /* Quick Actions Styles */
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .quick-action-link {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: var(--radius-md);
+        color: var(--gray-600);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+        font-weight: 500;
+        background: var(--gray-50);
+        border: 1px solid transparent;
+    }
+
+    .quick-action-link:hover {
+        background: var(--primary-bg);
+        color: var(--primary);
+        transform: translateX(4px);
+        border-color: var(--gray-200);
+    }
+
+    .quick-action-link i {
+        width: 22px;
+        font-size: 1rem;
+        color: var(--secondary);
+    }
+
+    /* Fee Collection Card - Redesigned to match theme perfectly */
+    .fee-collection-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .fee-collection-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .fee-collection-header {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    .fee-collection-header i {
+        color: var(--secondary);
+        font-size: 1.2rem;
+    }
+
+    .fee-collection-header h4 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: white;
+        letter-spacing: -0.2px;
+    }
+
+    .fee-collection-body {
+        padding: 1.5rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .fee-info-text {
+        text-align: center;
+        color: var(--gray-500);
+        font-size: 0.8rem;
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-fee-collect {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        width: 100%;
+        padding: 0.8rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-lg);
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-fee-collect:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+        color: white;
+    }
+
+    .btn-fee-collect i {
+        font-size: 1rem;
+    }
+
+    /* System Overview Styles */
+    .overview-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .overview-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 0.85rem;
+        color: var(--gray-600);
+    }
+
+    .overview-item:last-child {
+        border-bottom: none;
+    }
+
+    .overview-item strong {
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    /* Misc */
+    .text-center {
+        text-align: center;
+    }
+
+    .badge.bg-light {
+        background: var(--gray-100) !important;
+        color: var(--gray-600);
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stats-grid-modern {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-number-modern {
+            font-size: 1.5rem;
+        }
+
+        .stat-icon-modern {
+            width: 44px;
+            height: 44px;
+            font-size: 1.25rem;
+        }
+
+        .results-table-modern th,
+        .results-table-modern td {
+            padding: 0.625rem;
+            font-size: 0.75rem;
+        }
+
+        .welcome-title-modern {
+            font-size: 1.25rem;
+        }
+
+        .info-grid-modern {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+    .dashboard-container {
+        background-color: #ffffff !important;
+    }
+
+    body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-container">
+
+    <!-- Welcome Section -->
+    <div class="welcome-section-modern">
+        <div>
+            <div class="welcome-title-modern">
+                <i class="fas fa-chart-line" style="color: var(--secondary); font-size: 1.5rem;"></i>
+                Dashboard
+            </div>
+            <div class="welcome-subtitle-modern">
+                Welcome back, <strong>{{ session['full_name'] }}</strong>
+            </div>
+        </div>
+        {% if school and school['logo'] %}
+        <img src="{{ url_for('static', filename='uploads/logos/' + school['logo']) }}"
+             class="school-logo-modern"
+             alt="School Logo"
+             onerror="this.style.display='none'">
+        {% endif %}
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} fade-in">
+            <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- Stats Cards -->
+    <div class="stats-grid-modern">
+        <div class="stat-card-modern students">
+            <div class="stat-content-modern">
+                <div class="stat-left-modern">
+                    <div class="stat-label-modern">Total Students</div>
+                    <div class="stat-number-modern students">{{ stats.students }}</div>
+                </div>
+                <div class="stat-icon-modern students">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-modern teachers">
+            <div class="stat-content-modern">
+                <div class="stat-left-modern">
+                    <div class="stat-label-modern">Total Teachers</div>
+                    <div class="stat-number-modern teachers">{{ stats.teachers }}</div>
+                </div>
+                <div class="stat-icon-modern teachers">
+                    <i class="fas fa-chalkboard-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-modern classes">
+            <div class="stat-content-modern">
+                <div class="stat-left-modern">
+                    <div class="stat-label-modern">Total Classes</div>
+                    <div class="stat-number-modern classes">{{ stats.classes }}</div>
+                </div>
+                <div class="stat-icon-modern classes">
+                    <i class="fas fa-door-open"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-modern schools">
+            <div class="stat-content-modern">
+                <div class="stat-left-modern">
+                    <div class="stat-label-modern">Total Schools</div>
+                    <div class="stat-number-modern schools">{{ stats.schools }}</div>
+                </div>
+                <div class="stat-icon-modern schools">
+                    <i class="fas fa-school"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Summary Table -->
+    <div class="table-card-modern">
+        <div class="table-header-modern">
+            <div class="table-title-modern">
+                <i class="fas fa-chart-simple"></i> Class-wise Result Summary
+            </div>
+            <div class="table-badge-modern">
+                <i class="fas fa-calendar-alt"></i> {{ now.year if now else 'Current' }} Academic Year
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            {% if results %}
+            <table class="results-table-modern">
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th class="text-center">Total Students</th>
+                        <th class="text-center">Passed</th>
+                        <th class="text-center">Failed</th>
+                        <th>Pass Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                    <tr>
+                        <td class="class-name-modern">
+                            <i class="fas fa-graduation-cap" style="color: var(--secondary); font-size: 0.7rem;"></i>
+                            {{ r.class_name }}
+                        </td>
+                        <td>
+                            {% if r.section %}
+                            <span class="badge bg-light text-dark">{{ r.section }}</span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <strong>{{ r.total_students }}</strong>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge-pass-modern">
+                                <i class="fas fa-check-circle"></i> {{ r.passed }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge-fail-modern">
+                                <i class="fas fa-times-circle"></i> {{ r.failed }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if r.total_students > 0 %}
+                            {% set pct = (r.passed / r.total_students * 100)|round(1) %}
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress-modern">
+                                    <div class="progress-bar-modern" style="width: {{ pct }}%"></div>
+                                </div>
+                                <span class="progress-percent-modern">{{ pct }}%</span>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state-modern">
+                <div class="empty-icon-modern">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="empty-title-modern">No data available</div>
+                <div class="text-muted small">Add students and marks to see results</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- School Admin / Super Admin ke liye bulk upload dropdown -->
+{% if session.role in ['admin', 'school_admin'] %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="bulkUploadDropdown" role="button" data-toggle="dropdown">
+        📤 Bulk Upload
+    </a>
+    <div class="dropdown-menu">
+        <a class="dropdown-item" href="{{ url_for('bulk_upload_classes') }}">📚 Upload Classes</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="{{ url_for('bulk_upload_teachers') }}">👨‍🏫 Upload Teachers</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="{{ url_for('bulk_upload_students') }}">🎓 Upload Students</a>
+    </div>
+</li>
+{% endif %}
+    <!-- Three Column Grid: Quick Actions, Fee Collection, System Overview -->
+    <div class="info-grid-modern">
+        <!-- Quick Actions Card -->
+        <div class="info-card-modern">
+            <div class="info-card-header-modern">
+                <i class="fas fa-rocket"></i>
+                <h4>Quick Actions</h4>
+            </div>
+            <div class="info-card-body-modern">
+                <div class="quick-actions">
+                    <a href="{{ url_for('add_student') }}" class="quick-action-link">
+                        <i class="fas fa-user-plus"></i> Add New Student
+                    </a>
+                    <a href="{{ url_for('add_teacher') }}" class="quick-action-link">
+                        <i class="fas fa-chalkboard-user"></i> Add New Teacher
+                    </a>
+                    <a href="{{ url_for('marks') }}" class="quick-action-link">
+                        <i class="fas fa-pen-to-square"></i> Enter Marks
+                    </a>
+                    <a href="{{ url_for('student_attendance') }}" class="quick-action-link">
+                        <i class="fas fa-calendar-check"></i> Mark Student Attendance
+                    </a>
+                    <a href="{{ url_for('teacher_attendance') }}" class="quick-action-link">
+                        <i class="fas fa-user-clock"></i> Mark Teacher Attendance
+                    </a>
+                    <a href="{{ url_for('fee_collection') }}" class="quick-action-link">
+                        <i class="fas fa-money-bill-wave"></i> Collect Fees
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fee Collection Card - Redesigned to match theme perfectly -->
+
+
+        <!-- System Overview Card -->
+        <div class="info-card-modern">
+            <div class="info-card-header-modern">
+                <i class="fas fa-chart-pie"></i>
+                <h4>System Overview</h4>
+            </div>
+            <div class="info-card-body-modern">
+                <div class="overview-stats">
+                    <div class="overview-item">
+                        <span>Passing Rate</span>
+                        <strong>
+                            {% set total_passed = results|sum(attribute='passed') %}
+                            {% set total_students = results|sum(attribute='total_students') %}
+                            {% if total_students > 0 %}
+                                {{ (total_passed / total_students * 100)|round(1) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="overview-item">
+                        <span>Active Classes</span>
+                        <strong>{{ results|length }}</strong>
+                    </div>
+                    <div class="overview-item">
+                        <span>School Year</span>
+                        <strong>{{ now.year if now else '2024' }}-{{ (now.year + 1) if now else '2025' }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% block title %}Reports – Excel Export{% endblock %}
+{% block extra_css %}
+<style>
+    /* Force white background */
+    body,
+    .container-fluid,
+    .card,
+    .card-body,
+    .card-header {
+        background-color: #ffffff !important;
+    }
+
+    /* Card styling */
+    .card {
+        border-radius: 12px !important;
+        border: 1px solid #e2e8f0 !important;
+        margin-bottom: 20px;
+    }
+
+    /* Report header styling - NAVY BLUE */
+    .card-header {
+        background-color: #1e293b !important; /* Navy blue */
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 12px 20px !important;
+        color: white !important;
+    }
+
+    /* Icon and text in header - WHITE */
+    .card-header i,
+    .card-header .fas,
+    .card-header span,
+    .card-header {
+        color: #ffffff !important;
+    }
+
+    /* Card body */
+    .card-body {
+        padding: 20px !important;
+    }
+
+    .card-footer {
+        background-color: #ffffff !important;
+        border-top: 1px solid #e2e8f0 !important;
+        padding: 12px 20px !important;
+    }
+
+    /* Form labels */
+    .form-label {
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 5px !important;
+        color: #333;
+    }
+
+    /* Form selects */
+    .form-select {
+        font-size: 0.85rem !important;
+        padding: 6px 12px !important;
+        border-radius: 6px !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    /* NAVY BLUE BUTTONS */
+    .btn-navy {
+        background-color: #1e293b !important; /* Navy blue */
+        color: white !important;
+        border: none !important;
+        padding: 8px 20px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-navy:hover {
+        background-color: #1e40af !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+    }
+
+    .btn-navy i {
+        color: white !important;
+        margin-right: 5px;
+    }
+
+    /* 2 COLUMNS LAYOUT - 2 reports per row */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+    }
+
+    .col-md-6 {
+        width: 50%;
+        padding: 0 10px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    /* Make cards same height */
+    .h-100 {
+        height: 100%;
+    }
+
+    /* Responsive for mobile - 1 column */
+    @media (max-width: 768px) {
+        .col-md-6 {
+            width: 100%;
+        }
+
+        .container-fluid {
+            padding: 10px !important;
+        }
+    }
+
+    /* Small text */
+    .text-muted.small {
+        font-size: 0.75rem !important;
+        color: #666 !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* Remove default button success styling */
+    .btn-success {
+        background-color: #1e3a8a !important;
+        color: white !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+  <h2 class="mb-3"><i class="fas fa-file-excel me-2"></i>Excel Reports</h2>
+
+  <div class="row">
+    <!-- REPORT 1: Students -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <i class="fas fa-user-graduate me-2"></i> Student Report
+        </div>
+        <div class="card-body">
+          <p class="text-muted small">Complete profile of school students – a single student, entire class, or all students of the school.</p>
+
+          <div class="mb-3">
+            <label class="form-label">School</label>
+            <select class="form-select" id="st_school" onchange="loadClassesForStudents()">
+              <option value="">– Select School –</option>
+              {% for s in schools %}
+              <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Class (Optional)</label>
+            <select class="form-select" id="st_class">
+              <option value="">– All Classes –</option>
+              {% for c in classes %}
+              <option value="{{ c.id }}">{{ c.class_name }} {{ c.section }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Specific Student (Optional)</label>
+            <select class="form-select" id="st_student">
+              <option value="">– All Students –</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <button class="btn-navy" onclick="downloadReport('students')">
+            <i class="fas fa-download"></i> Download Excel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT 2: Teachers -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <i class="fas fa-chalkboard-teacher me-2"></i> Teacher Report
+        </div>
+        <div class="card-body">
+          <p class="text-muted small">Complete details of all teachers in the school – qualifications, assigned classes, and documents.</p>
+
+          <div class="mb-3">
+            <label class="form-label">School</label>
+            <select class="form-select" id="tc_school">
+              <option value="">– Select School –</option>
+              {% for s in schools %}
+              <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <button class="btn-navy" onclick="downloadReport('teachers')">
+            <i class="fas fa-download"></i> Download Excel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT 3: Fees -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <i class="fas fa-money-bill-wave me-2"></i> Fee Collection Report
+        </div>
+        <div class="card-body">
+          <p class="text-muted small">Record of collected fees for any month – by school or class.</p>
+
+          <div class="mb-3">
+            <label class="form-label">School</label>
+            <select class="form-select" id="fee_school" onchange="loadClassesForFees()">
+              <option value="">– Select School –</option>
+              {% for s in schools %}
+              <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Class (Optional)</label>
+            <select class="form-select" id="fee_class">
+              <option value="">– All Classes –</option>
+              {% for c in classes %}
+              <option value="{{ c.id }}">{{ c.class_name }} {{ c.section }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="col-6">
+              <label class="form-label">Month (Optional)</label>
+              <select class="form-select" id="fee_month">
+                <option value="">– All Months –</option>
+                {% set month_names = ["January","February","March","April","May","June","July","August","September","October","November","December"] %}
+                {% for m in month_names %}
+                <option value="{{ m }}">{{ m }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Year (Optional)</label>
+              <select class="form-select" id="fee_year">
+                <option value="">– All Years –</option>
+                {% for y in range(now.year, now.year-5, -1) %}
+                <option value="{{ y }}" {% if y == now.year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <button class="btn-navy" onclick="downloadReport('fees')">
+            <i class="fas fa-download"></i> Download Excel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT 4: Salary -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <i class="fas fa-wallet me-2"></i> Teacher Salary Report
+        </div>
+        <div class="card-body">
+          <p class="text-muted small">Salary details of school teachers – entire school or a specific teacher, with month/year filter.</p>
+
+          <div class="mb-3">
+            <label class="form-label">School</label>
+            <select class="form-select" id="sal_school" onchange="loadTeachersForSalary()">
+              <option value="">– Select School –</option>
+              {% for s in schools %}
+              <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Teacher (Optional)</label>
+            <select class="form-select" id="sal_teacher">
+              <option value="">– All Teachers –</option>
+              {% for t in teachers %}
+              <option value="{{ t.id }}">{{ t.full_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="col-6">
+              <label class="form-label">Month (Optional)</label>
+              <select class="form-select" id="sal_month">
+                <option value="">– All Months –</option>
+                {% for m in range(1,13) %}
+                <option value="{{ m }}">{{ ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Year (Optional)</label>
+              <select class="form-select" id="sal_year">
+                <option value="">– All Years –</option>
+                {% for y in range(now.year, now.year-5, -1) %}
+                <option value="{{ y }}" {% if y == now.year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <button class="btn-navy" onclick="downloadReport('salary')">
+            <i class="fas fa-download"></i> Download Excel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function buildUrl(base, params) {
+  const url = new URL(base, window.location.origin);
+  for (const [k, v] of Object.entries(params)) {
+    if (v) url.searchParams.set(k, v);
+  }
+  return url.toString();
+}
+
+function downloadReport(type) {
+  let url;
+  if (type === 'students') {
+    url = buildUrl('/reports/students/export', {
+      school_id:  document.getElementById('st_school').value,
+      class_id:   document.getElementById('st_class').value,
+      student_id: document.getElementById('st_student').value,
+    });
+  } else if (type === 'teachers') {
+    url = buildUrl('/reports/teachers/export', {
+      school_id: document.getElementById('tc_school').value,
+    });
+  } else if (type === 'fees') {
+    url = buildUrl('/reports/fees/export', {
+      school_id: document.getElementById('fee_school').value,
+      class_id:  document.getElementById('fee_class').value,
+      month:     document.getElementById('fee_month').value,
+      year:      document.getElementById('fee_year').value,
+    });
+  } else if (type === 'salary') {
+    url = buildUrl('/reports/salary/export', {
+      school_id:  document.getElementById('sal_school').value,
+      teacher_id: document.getElementById('sal_teacher').value,
+      month:      document.getElementById('sal_month').value,
+      year:       document.getElementById('sal_year').value,
+    });
+  }
+  if (url) window.location.href = url;
+}
+
+function loadClassesForStudents() {
+  const schoolId = document.getElementById('st_school').value;
+  if (!schoolId) return;
+  fetch(`/get_classes_by_school?school_id=${schoolId}`)
+    .then(r => r.json())
+    .then(data => {
+      const sel = document.getElementById('st_class');
+      sel.innerHTML = '<option value="">– All Classes –</option>';
+      data.forEach(c => {
+        sel.innerHTML += `<option value="${c.id}">${c.class_name} ${c.section||''}</option>`;
+      });
+      document.getElementById('st_student').innerHTML = '<option value="">– All Students –</option>';
+    });
+}
+
+function loadClassesForFees() {
+  const schoolId = document.getElementById('fee_school').value;
+  if (!schoolId) return;
+  fetch(`/get_classes_by_school?school_id=${schoolId}`)
+    .then(r => r.json())
+    .then(data => {
+      const sel = document.getElementById('fee_class');
+      sel.innerHTML = '<option value="">– All Classes –</option>';
+      data.forEach(c => {
+        sel.innerHTML += `<option value="${c.id}">${c.class_name} ${c.section||''}</option>`;
+      });
+    });
+}
+
+function loadTeachersForSalary() {
+  const schoolId = document.getElementById('sal_school').value;
+  if (!schoolId) return;
+  fetch(`/get_teachers_by_school?school_id=${schoolId}`)
+    .then(r => r.json())
+    .then(data => {
+      const sel = document.getElementById('sal_teacher');
+      sel.innerHTML = '<option value="">– All Teachers –</option>';
+      data.forEach(t => {
+        sel.innerHTML += `<option value="${t.id}">${t.full_name}</option>`;
+      });
+    });
+}
+
+document.getElementById('st_class').addEventListener('change', function() {
+  const classId = this.value;
+  const schoolId = document.getElementById('st_school').value;
+  if (!classId || !schoolId) return;
+  fetch(`/get_students/${classId}`)
+    .then(r => r.json())
+    .then(data => {
+      const sel = document.getElementById('st_student');
+      sel.innerHTML = '<option value="">– All Students –</option>';
+      data.forEach(s => {
+        sel.innerHTML += `<option value="${s.id}">${s.full_name} (${s.student_code})</option>`;
+      });
+    });
+});
+</script>
+{% endblock %}

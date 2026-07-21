@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block title %}Fee Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===== NAV BAR COLOR (matches your theme) ===== */
+  :root {
+    --navy-primary: #1e293b;      /* Dark navy/slate from nav bar */
+    --navy-light: #334155;         /* Slightly lighter for hover */
+    --card-radius: 0.875rem;
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  /* ===== CARD HEADER - ICON RIGHT NEXT TO TEXT ===== */
+  .fee-card .card-header {
+    background: var(--navy-primary) !important;
+    padding: 12px 16px;   /* Header height increase */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: var(--card-radius) var(--card-radius) 0 0 !important;
+    border-bottom: none;
+  }
+
+  .fee-card .card-header i {
+    color: #fbbf24;
+    font-size: 1rem;
+  }
+
+  .fee-card .card-header h5 {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.3px;
+  }
+
+
+  /* ===== CARDS ===== */
+  .fee-card {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: var(--card-radius) !important;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .fee-card .card-body {
+    padding: 0.9rem 1rem 1.1rem 1rem;
+  }
+
+  /* ===== FORM LABELS (compact) ===== */
+  .fee-card .form-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+  }
+  .fee-card .form-control {
+    font-size: 0.78rem;
+    padding: 10px 10px 10px 32px;
+    min-height: 42px;   /* Height increase */
+    border: 1.5px solid #e2e8f0;
+    background: #fafbfc;
+    border-radius: 6px;
+    transition: all 0.15s;
+}
+
+  .fee-card .form-control:focus {
+    border-color: var(--navy-primary);
+    box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
+    background: #fff;
+  }
+
+  .fee-card .input-wrap { position: relative; }
+  .fee-card .input-wrap .field-icon {
+    position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+    color: #94a3b8; font-size: 0.7rem; pointer-events: none;
+  }
+  .fee-card textarea.form-control { padding-left: 28px; }
+
+  /* ===== SECTION LABEL ===== */
+  .fee-card .section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1.5px solid #eef2ff;
+    padding-bottom: 4px;
+    margin: 10px 0 8px;
+  }
+
+  /* ===== 5-COLUMN GRID ===== */
+  .row-5col {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 1.2fr 1.5fr;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  @media (max-width: 1100px) {
+    .row-5col { grid-template-columns: 1fr 1fr; gap: 10px; }
+  }
+
+  /* ===== BUTTONS - SAME NAV BAR COLOR ===== */
+  .btn-primary {
+    background: var(--navy-primary) !important;
+    border: none !important;
+    font-weight: 500;
+    font-size: 0.73rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    background: var(--navy-light) !important;
+    transform: translateY(-1px);
+  }
+
+  /* ===== COLLECT FEE BUTTON - WHITE TEXT ===== */
+  .btn-success {
+    background: var(--navy-primary) !important;
+    border: none !important;
+    font-weight: 500;
+    font-size: 0.73rem;
+    padding: 7px 20px;
+    border-radius: 30px;
+    transition: all 0.2s;
+    color: #ffffff !important;  /* White text color */
+  }
+  .btn-success:hover {
+    background: var(--navy-light) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #ffffff !important;  /* Keep white on hover */
+  }
+
+  /* ===== SECOND CARD (Collect Fee) - MOVED SLIGHTLY LOWER ===== */
+  .col-md-9 {
+    margin-top: 6px;
+  }
+  @media (min-width: 768px) {
+    .col-md-9 {
+      margin-top: 10px;
+    }
+  }
+
+  /* ===== LEFT CARD STAYS NORMAL ===== */
+  .col-md-3 {
+    margin-top: 0;
+  }
+
+  /* ===== BUTTON ICONS ===== */
+  .btn i, .card-header i {
+    font-size: 0.75rem;
+  }
+
+  /* ===== HEADING STYLE ===== */
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ===== SELECT DROPDOWN TWEAKS ===== */
+  select.form-control {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h2>Fee Collection</h2>
+  <div class="row g-3 align-items-start">
+
+    <!-- LEFT CARD: Select Class -->
+    <div class="col-md-3">
+      <div class="card fee-card">
+        <div class="card-header">
+          <i class="fas fa-layer-group"></i>
+          <h5>Select Class</h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('fee_collection') }}">
+            <div class="mb-3">
+              <label class="form-label">Class</label>
+              <div class="input-wrap">
+                <i class="fas fa-school field-icon"></i>
+                <select name="class_id" class="form-control" required>
+                  <option value="">Select Class</option>
+                  {% for class in classes %}
+                  <option value="{{ class.id }}" {% if selected_class == class.id|string %}selected{% endif %}>
+                    {{ class.class_name }} - {{ class.section }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-users me-1"></i> Load Students
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT CARD: Collect Fee (positioned slightly lower) -->
+    <div class="col-md-9">
+      {% if students %}
+      <div class="card fee-card">
+        <div class="card-header">
+          <i class="fas fa-receipt"></i>
+          <h5>Collect Fee</h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('save_fee') }}">
+            <input type="hidden" name="class_id" value="{{ selected_class }}">
+
+            <div class="section-label"><i class="fas fa-info-circle me-1"></i> Payment Details</div>
+
+            <div class="row-5col mb-2">
+              <div>
+                <label class="form-label">Student</label>
+                <div class="input-wrap">
+                  <i class="fas fa-user-graduate field-icon"></i>
+                  <select name="student_id" class="form-control" required>
+                    <option value="">Select Student</option>
+                    {% for student in students %}
+                    <option value="{{ student.id }}">{{ student.full_name }} ({{ student.student_code }})</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Month</label>
+                <div class="input-wrap">
+                  <i class="fas fa-calendar-alt field-icon"></i>
+                  <select name="month" class="form-control" required>
+                    {% for m in ['January','February','March','April','May','June','July','August','September','October','November','December'] %}
+                    <option {% if m == 'January' %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Year</label>
+                <div class="input-wrap">
+                  <i class="fas fa-calendar field-icon"></i>
+                  <input type="number" name="year" class="form-control" value="{{ now.year }}" required>
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Amount</label>
+                <div class="input-wrap">
+                  <i class="fas fa-coins field-icon"></i>
+                  <input type="number" name="amount" class="form-control" step="0.01" placeholder="0.00" required>
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Payment Mode</label>
+                <div class="input-wrap">
+                  <i class="fas fa-credit-card field-icon"></i>
+                  <select name="payment_mode" class="form-control" required>
+                    <option>Cash</option>
+                    <option>Bank Transfer</option>
+                    <option>Cheque</option>
+                    <option>Online Payment</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-label"><i class="fas fa-file-alt me-1"></i> Additional Info</div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Transaction Reference</label>
+                <div class="input-wrap">
+                  <i class="fas fa-hashtag field-icon"></i>
+                  <input type="text" name="transaction_reference" class="form-control" placeholder="e.g. TXN-20240601">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Remarks</label>
+                <div class="input-wrap">
+                  <i class="fas fa-comment-alt field-icon" style="top: 10px; transform: none;"></i>
+                  <textarea name="remarks" class="form-control" rows="2" placeholder="Optional notes..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-success px-4">
+                <i class="fas fa-check-circle me-1"></i> Collect Fee
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

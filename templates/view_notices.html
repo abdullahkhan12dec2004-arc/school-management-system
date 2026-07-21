@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Notice Board{% endblock %}
+{% block content %}
+
+<style>
+body, .main-content, .content-wrapper, #main, #content {
+    background: #fff !important;
+}
+.notice-page-header {
+    background: linear-gradient(135deg, #1a2236 0%, #2d3a52 100%);
+    border-radius: 16px;
+    padding: 26px 30px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #2d3a52;
+}
+.notice-page-header .header-left {
+    display: flex; align-items: center; gap: 18px;
+}
+.notice-icon-box {
+    width: 58px; height: 58px;
+    background: rgba(245,166,35,0.15);
+    border: 1.5px solid rgba(245,166,35,0.4);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+}
+.notice-page-header h2 {
+    color: #fff; font-size: 22px; font-weight: 800; margin: 0; letter-spacing: -0.3px;
+}
+.notice-page-header p {
+    color: #8899bb; font-size: 13px; margin: 5px 0 0; font-weight: 500;
+}
+.notice-count-badge {
+    background: rgba(245,166,35,0.18);
+    color: #f5a623;
+    border: 1.5px solid rgba(245,166,35,0.4);
+    padding: 8px 18px;
+    border-radius: 22px;
+    font-size: 12px; font-weight: 700;
+}
+
+/* Card */
+.notice-card-pro {
+    background: #fff;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+.notice-card-pro:hover {
+    box-shadow: 0 10px 32px rgba(0,0,0,0.11);
+    transform: translateY(-2px);
+}
+.notice-card-inner { display: flex; }
+.accent-bar {
+    width: 5px;
+    background: linear-gradient(180deg, #f5a623, #e67e22);
+    flex-shrink: 0;
+}
+.card-right { flex: 1; }
+
+.notice-card-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 22px 14px;
+    border-bottom: 1.5px solid #f0f4f8;
+    background: #fafbfc;
+}
+.notice-type-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fff3e0; color: #d4690a;
+    border-radius: 7px; padding: 5px 13px;
+    font-size: 11px; font-weight: 800;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    border: 1px solid #fcd9a0;
+}
+.notice-date-label {
+    font-size: 12px; color: #7a8a9a; font-weight: 600;
+}
+.notice-card-title {
+    font-size: 18px; font-weight: 800;
+    color: #1a2236;
+    padding: 18px 22px 8px;
+    letter-spacing: -0.2px; line-height: 1.3;
+}
+.notice-card-body {
+    padding: 6px 22px 20px;
+    font-size: 14.5px;
+    color: #2d3748;
+    line-height: 1.8;
+    font-weight: 500;
+}
+.notice-card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 22px;
+    background: #f7f8fa;
+    border-top: 1.5px solid #f0f4f8;
+}
+.notice-poster { display: flex; align-items: center; gap: 10px; }
+.poster-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #f5a623, #e67e22);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 800;
+    box-shadow: 0 2px 8px rgba(245,166,35,0.35);
+}
+.poster-label { font-size: 13px; color: #3a4a5e; font-weight: 700; }
+
+.notice-empty {
+    text-align: center; padding: 80px 20px;
+    background: #fff; border-radius: 16px;
+    border: 1.5px solid #e2e8f0;
+}
+.notice-empty .empty-icon { font-size: 52px; margin-bottom: 16px; }
+.notice-empty h5 { color: #1a2236; font-size: 18px; font-weight: 800; }
+.notice-empty p { color: #8899aa; font-size: 14px; margin-top: 8px; font-weight: 500; }
+</style>
+
+<div class="container-fluid px-4 py-3">
+
+    <div class="notice-page-header">
+        <div class="header-left">
+            <div class="notice-icon-box">📢</div>
+            <div>
+                <h2>School Announcements</h2>
+                <p>Official notices from school administration</p>
+            </div>
+        </div>
+        <span class="notice-count-badge">
+            ✅ {{ notices|length }} Active Notice{{ 's' if notices|length != 1 else '' }}
+        </span>
+    </div>
+
+    {% if notices %}
+        {% for notice in notices %}
+        <div class="notice-card-pro">
+            <div class="notice-card-inner">
+                <div class="accent-bar"></div>
+                <div class="card-right">
+                    <div class="notice-card-top">
+                        <span class="notice-type-tag">⚠️ {{ notice.title }}</span>
+                        <span class="notice-date-label">📅 {{ notice.formatted_date }}</span>
+                    </div>
+                    <div class="notice-card-body">
+                        {{ notice.body | replace('\n', '<br>') | safe }}
+                    </div>
+                    {% if notice.image_path %}
+                    <div style="padding: 0 22px 18px;">
+                        <img src="{{ url_for('static', filename='uploads/notices/' + notice.image_path) }}"
+                             style="border-radius:10px; max-height:260px; object-fit:cover; width:100%;">
+                    </div>
+                    {% endif %}
+                    <div class="notice-card-footer">
+                        <div class="notice-poster">
+                            <div class="poster-avatar">
+                                {{ notice.creator_name[0]|upper }}{{ notice.creator_name.split(' ')[-1][0]|upper if notice.creator_name.split(' ')|length > 1 else '' }}
+                            </div>
+                            <span class="poster-label">Posted by: {{ notice.creator_name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="notice-empty">
+            <div class="empty-icon">📭</div>
+            <h5>No notices yet</h5>
+            <p>Check back later — announcements will appear here.</p>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

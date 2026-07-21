@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Receipt{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@600&display=swap');
+
+  .receipt-wrapper {
+    background: #f0f4fa;
+    min-height: 100vh;
+    padding: 32px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .receipt-card {
+    max-width: 520px;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  .receipt-header {
+    background: #1e3a5f;
+    padding: 18px 24px 14px 24px;
+    text-align: center;
+    color: white;
+  }
+
+  .school-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #cbe4fe;
+    margin-bottom: 6px;
+  }
+
+  .receipt-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 4px 0 2px 0;
+    color: white;
+  }
+
+  .receipt-sub {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #bdd9f0;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed rgba(255,255,255,0.2);
+    display: inline-block;
+    padding-bottom: 3px;
+  }
+
+  .receipt-number {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border-radius: 40px;
+    padding: 4px 14px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    font-family: monospace;
+    letter-spacing: 0.6px;
+    margin-top: 6px;
+    border: 0.5px solid rgba(255,255,255,0.25);
+  }
+
+  .receipt-divider {
+    height: 4px;
+    background: linear-gradient(90deg, #f4c542 0%, #1e3a5f 70%, #2c6e9e 100%);
+  }
+
+  .receipt-body {
+    padding: 22px 24px 16px 24px;
+  }
+
+  /* 🔥 CRITICAL FIX: Labels left-aligned exactly like your reference image */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .info-table tr {
+    border-bottom: 1px solid #e9edf2;
+  }
+
+  .info-table tr:last-child {
+    border-bottom: none;
+  }
+
+  .info-table th {
+    text-align: left;
+    width: 38%;
+    padding: 10px 8px 10px 0;
+    font-weight: 600;
+    color: #2c3e4e;
+    font-size: 0.85rem;
+    vertical-align: top;
+  }
+  .info-table td.numeric-value {
+    text-align: right !important;
+    padding-right: 150px !important;
+  }
+
+  .text-value {
+     text-align: left !important;
+  }
+  /* Colon after each label — just like your reference */
+  .info-table th::after {
+    content: ":";
+    margin-left: 2px;
+    color: #8c9aab;
+    font-weight: 500;
+  }
+
+  .info-table td {
+    text-align: left;
+    width: 62%;
+    padding: 10px 0 10px 4px;
+    color: #1f2f3b;
+    font-weight: 500;
+    vertical-align: top;
+    word-break: break-word;
+  }
+
+  .info-table .amount-row td {
+    font-weight: 700;
+    color: #1e3a5f;
+    font-size: 0.95rem;
+  }
+
+  .receipt-footer {
+    padding: 10px 24px 24px 24px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    background: #fefefe;
+  }
+
+  .btn-print, .btn-new, .btn-dash {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    border: none;
+    text-align: center;
+  }
+
+  .btn-print {
+    background: #1e3a5f;
+    color: white;
+  }
+  .btn-print:hover {
+    background: #0f2c48;
+    transform: translateY(-1px);
+  }
+
+  .btn-new {
+    background: #e9b13b;
+    color: #1e2f3c;
+  }
+  .btn-new:hover {
+    background: #daa12c;
+    transform: translateY(-1px);
+  }
+
+  .btn-dash {
+    background: transparent;
+    border: 1.5px solid #1e3a5f;
+    color: #1e3a5f;
+  }
+  .btn-dash:hover {
+    background: #1e3a5f;
+    color: white;
+  }
+
+  @media print {
+    .receipt-wrapper {
+      background: white;
+      padding: 0;
+    }
+    .receipt-card {
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .receipt-footer {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .receipt-body {
+      padding: 18px 16px;
+    }
+    .info-table th, .info-table td {
+      font-size: 0.8rem;
+      padding: 8px 4px 8px 0;
+    }
+  }
+</style>
+
+<div class="receipt-wrapper">
+  <div class="receipt-card">
+    <div class="receipt-header">
+      <div class="school-name">{{ receipt.school_name if receipt.school_name else 'School Name' }}</div>
+      <h2>Fee Receipt</h2>
+      <div class="receipt-sub">Fee Collection Receipt</div>
+      <span class="receipt-number">Receipt No: {{ receipt.receipt_number }}</span>
+    </div>
+
+    <div class="receipt-divider"></div>
+
+    <div class="receipt-body">
+      <table class="info-table">
+        <tr>
+          <th>Student Name</th>
+          <td class="text-value">{{ receipt.student_name }}</td>
+        </tr>
+        <tr>
+          <th>Student Code</th>
+          <td class="text-value">{{ receipt.student_code }}</td>
+        </tr>
+        <tr>
+          <th>Class</th>
+          <td class="numeric-value">{{ receipt.class_name }}</td>
+        </tr>
+        <tr>
+          <th>Month</th>
+          <td class="text-value">{{ receipt.month }}</td>
+        </tr>
+        <tr>
+          <th>Year</th>
+          <td class="numeric-value">{{ receipt.year }}</td>
+        </tr>
+        <tr class="amount-row">
+          <th>Amount</th>
+          <td class="numeric-value">Rs. {{ receipt.amount }}</td>
+        </tr>
+        <tr>
+          <th>Payment Mode</th>
+          <td class="text-value">{{ receipt.payment_mode }}</td>
+        </tr>
+        {% if receipt.transaction_reference %}
+        <tr>
+          <th>Transaction Ref</th>
+          <td class="numeric-value">{{ receipt.transaction_reference }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+          <th>Date</th>
+          <td class="numeric-value">{{ receipt.created_date | string | truncate(16, False, '') if receipt.created_date else 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>Collected By</th>
+          <td class="text-value">{{ receipt.collector_name }}</td>
+        </tr>
+        {% if receipt.remarks %}
+        <tr>
+          <th>Remarks</th>
+          <td class="text-value">{{ receipt.remarks }}</td>
+        </tr>
+        {% endif %}
+      </table>
+    </div>
+
+    <div class="receipt-footer">
+      <button onclick="window.print()" class="btn-print">🖨 Print Receipt</button>
+      <a href="{{ url_for('fee_collection') }}" class="btn-new">+ New Collection</a>
+      <a href="{{ url_for('dashboard') }}" class="btn-dash">Dashboard</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

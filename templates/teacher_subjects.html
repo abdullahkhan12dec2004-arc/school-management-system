@@ -1,0 +1,900 @@
+{% extends "base.html" %}
+{% block title %}Teacher Subject Assignment{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== PROFESSIONAL TEACHER SUBJECT ASSIGNMENT STYLES ===== */
+
+    :root {
+        --primary-dark: #0f2b3d;
+        --primary: #1a4a6f;
+        --primary-light: #2c6e9e;
+        --primary-bg: #e8f1f8;
+        --secondary: #c6a43b;
+        --secondary-dark: #a07d2a;
+        --secondary-light: #e0c87c;
+        --success: #10b981;
+        --success-light: #d1fae5;
+        --danger: #ef4444;
+        --danger-light: #fee2e2;
+        --warning: #f59e0b;
+        --warning-light: #fed7aa;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --radius-2xl: 1.5rem;
+    }
+
+    /* Page Container */
+    .assign-page {
+        padding: 1rem 0;
+    }
+
+    /* Page Header */
+    .page-header-modern {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .page-title-modern {
+        font-size: 1.75rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-sub-modern {
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    /* Info Note */
+    .info-note-modern {
+        background: linear-gradient(135deg, var(--primary-bg) 0%, white 100%);
+        border-left: 4px solid var(--secondary);
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.5rem;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Select Panel */
+    .select-panel-modern {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .select-row-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .field-modern {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .field-modern label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--gray-500);
+    }
+
+    .field-modern label i {
+        margin-right: 0.25rem;
+        color: var(--secondary);
+    }
+
+    .field-modern select,
+    .field-modern input {
+        padding: 0.625rem 0.875rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .field-modern select:focus,
+    .field-modern input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.1);
+    }
+
+    /* Teacher Card */
+    .teacher-card-modern {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        border-radius: var(--radius-xl);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .teacher-avatar-modern {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+    }
+
+    .teacher-meta-modern {
+        flex: 1;
+    }
+
+    .teacher-name-modern {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .teacher-detail-modern {
+        font-size: 0.75rem;
+        opacity: 0.8;
+    }
+
+    .teacher-stats-modern {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .t-stat-modern {
+        text-align: center;
+    }
+
+    .t-stat-val-modern {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--secondary-light);
+    }
+
+    .t-stat-lbl-modern {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        opacity: 0.7;
+    }
+
+    /* Existing Section */
+    .existing-section-modern {
+        background: white;
+        border-radius: var(--radius-xl);
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .section-header-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .section-title-modern {
+        font-weight: 600;
+        color: var(--gray-700);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .count-pill-modern {
+        background: var(--primary);
+        color: white;
+        padding: 0.125rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    .existing-grid-modern {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 1.25rem;
+    }
+
+    .subject-chip-modern {
+        background: var(--primary-bg);
+        border-radius: 40px;
+        padding: 0.5rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--primary);
+        transition: all 0.2s ease;
+    }
+
+    .subject-chip-modern:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    .chip-class-modern {
+        font-size: 0.7rem;
+        padding: 0.125rem 0.5rem;
+        background: rgba(0,0,0,0.1);
+        border-radius: 20px;
+    }
+
+    .subject-chip-modern button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.875rem;
+        color: inherit;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+
+    .subject-chip-modern button:hover {
+        opacity: 1;
+    }
+
+    /* Entry Section */
+    .entry-section-modern {
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        margin-bottom: 5rem;
+    }
+
+    /* Table Styles with Borders */
+    .assign-table-modern {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .assign-table-modern th,
+    .assign-table-modern td {
+        border: 1px solid var(--gray-200);
+        padding: 0.75rem;
+        vertical-align: middle;
+    }
+
+    .assign-table-modern thead th {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .assign-table-modern tbody tr {
+        transition: background 0.2s ease;
+    }
+
+    .assign-table-modern tbody tr:hover {
+        background-color: var(--gray-50);
+    }
+
+    .assign-table-modern tbody tr.empty-row {
+        opacity: 0.6;
+    }
+
+    .row-num-modern {
+        font-weight: 600;
+        color: var(--secondary);
+        text-align: center;
+    }
+
+    .cell-input-modern {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .cell-input-modern:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(26, 74, 111, 0.1);
+    }
+
+    .cell-input-modern.has-value {
+        border-color: var(--success);
+        background: var(--success-light);
+    }
+
+    select.cell-input-modern {
+        cursor: pointer;
+    }
+
+    .del-btn-modern {
+        background: var(--danger-light);
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        color: var(--danger);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .del-btn-modern:hover {
+        background: var(--danger);
+        color: white;
+    }
+
+    /* Add Row Button */
+    .add-row-btn-modern {
+        background: transparent;
+        border: 2px dashed var(--gray-300);
+        width: 100%;
+        padding: 0.75rem;
+        margin-top: 1rem;
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-500);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .add-row-btn-modern:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
+    }
+
+    /* Save Bar */
+    .save-bar-modern {
+        position: sticky;
+        bottom: 1rem;
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 0.875rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .save-info-modern {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+    }
+
+    .save-info-modern strong {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+
+    .save-actions-modern {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn-modern {
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary-modern {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+    }
+
+    .btn-success-modern {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-ghost-modern {
+        background: transparent;
+        border: 1px solid var(--gray-300);
+        color: var(--gray-600);
+    }
+
+    .btn-ghost-modern:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-danger-modern {
+        background: var(--danger-light);
+        color: var(--danger);
+        border: 1px solid var(--danger-light);
+    }
+
+    .btn-danger-modern:hover {
+        background: var(--danger);
+        color: white;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner-modern {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--gray-200);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        display: none;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .select-row-modern {
+            grid-template-columns: 1fr;
+        }
+
+        .teacher-card-modern {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .assign-table-modern th,
+        .assign-table-modern td {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .save-bar-modern {
+            flex-direction: column;
+        }
+
+        .save-actions-modern {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .save-actions-modern .btn-modern {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="assign-page">
+
+    <!-- Page Header -->
+    <div class="page-header-modern">
+        <div class="page-title-modern">
+            <i class="fas fa-chalkboard-teacher"></i> Teacher Subjects
+        </div>
+        <div class="page-sub-modern">
+            Select a teacher, then assign multiple subjects at once
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} mb-3">
+            <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- Info Note -->
+    <div class="info-note-modern">
+        <i class="fas fa-lightbulb" style="color: var(--secondary); font-size: 1.25rem;"></i>
+        <span>When a teacher is selected, their existing subjects will appear below. Add new subjects in the table rows.</span>
+    </div>
+
+    <!-- Select Panel -->
+    <div class="select-panel-modern">
+        <div class="select-row-modern">
+            <div class="field-modern">
+                <label><i class="fas fa-user"></i> Teacher</label>
+                <select id="sel-teacher" onchange="loadTeacher()">
+                    <option value="">— Select Teacher —</option>
+                    {% for t in teachers %}
+                    <option value="{{ t.id }}"
+                            data-name="{{ t.full_name }}"
+                            data-spec="{{ t.subject_specialization or '' }}"
+                            data-qual="{{ t.qualification or '' }}">
+                        {{ t.full_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field-modern">
+                <label><i class="fas fa-door-open"></i> Class Filter</label>
+                <select id="sel-class-filter">
+                    <option value="">— All Classes —</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}">
+                        {{ c.class_name }}{% if c.section %} - {{ c.section }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field-modern">
+                <label><i class="fas fa-calendar"></i> Academic Year</label>
+                <input type="number" id="sel-year" value="{{ current_year }}" min="2020" max="2035">
+            </div>
+
+            <div class="field-modern">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-modern btn-ghost-modern" onclick="loadTeacher()">
+                    <i class="fas fa-sync-alt"></i> Reload
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Card -->
+    <div class="teacher-card-modern" id="teacher-card" style="display: none;">
+        <div class="teacher-avatar-modern" id="t-avatar">?</div>
+        <div class="teacher-meta-modern">
+            <div class="teacher-name-modern" id="t-name">—</div>
+            <div class="teacher-detail-modern" id="t-detail">—</div>
+        </div>
+        <div class="teacher-stats-modern">
+            <div class="t-stat-modern">
+                <div class="t-stat-val-modern" id="t-existing-count">0</div>
+                <div class="t-stat-lbl-modern">Assigned</div>
+            </div>
+            <div class="t-stat-modern">
+                <div class="t-stat-val-modern" id="t-new-count">0</div>
+                <div class="t-stat-lbl-modern">New</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Subjects -->
+    <div class="existing-section-modern" id="existing-section" style="display: none;">
+        <div class="section-header-modern">
+            <div class="section-title-modern">
+                <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                Previously Assigned Subjects
+                <span class="count-pill-modern" id="existing-count-pill">0</span>
+            </div>
+            <button type="button" class="btn-modern btn-danger-modern" onclick="removeAllConfirm()">
+                <i class="fas fa-trash-alt"></i> Remove All
+            </button>
+        </div>
+        <div class="existing-grid-modern" id="existing-grid"></div>
+    </div>
+
+    <!-- Entry Section -->
+    <div class="entry-section-modern" id="entry-section" style="display: none;">
+        <div class="section-header-modern">
+            <div class="section-title-modern">
+                <i class="fas fa-plus-circle" style="color: var(--success);"></i>
+                Assign New Subjects
+                <span class="count-pill-modern" id="new-count-pill">0</span>
+            </div>
+        </div>
+
+        <form method="POST" id="subjects-form">
+            <input type="hidden" name="teacher_id" id="h-teacher">
+            <input type="hidden" name="academic_year" id="h-year">
+
+            <div style="overflow-x: auto;">
+                <table class="assign-table-modern">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th style="min-width: 200px;">Subject Name</th>
+                            <th style="min-width: 160px;">Class</th>
+                            <th style="min-width: 100px;">Total Marks</th>
+                            <th style="min-width: 100px;">Passing Marks</th>
+                            <th style="min-width: 100px;">Primary Teacher</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjects-body"></tbody>
+                </table>
+            </div>
+
+            <button type="button" class="add-row-btn-modern" onclick="addRow()">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+        </form>
+    </div>
+
+    <!-- Save Bar -->
+    <div class="save-bar-modern" id="save-bar" style="display: none;">
+        <div class="save-info-modern">
+            <strong id="sb-ready">0</strong> subject(s) ready to save
+        </div>
+        <div class="save-actions-modern">
+            <button type="button" class="btn-modern btn-ghost-modern" onclick="clearRows()">
+                <i class="fas fa-eraser"></i> Clear All
+            </button>
+            <button type="submit" form="subjects-form" class="btn-modern btn-success-modern" onclick="prepareSubmit()">
+                <i class="fas fa-save"></i> Save Subjects
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Classes data from Flask
+const classesData = [
+    {% for c in classes %}
+    { id: {{ c.id }}, name: "{{ c.class_name }}{% if c.section %} - {{ c.section }}{% endif %}" },
+    {% endfor %}
+];
+
+let rowCount = 0;
+let currentTeacherId = null;
+
+async function loadTeacher() {
+    const teacherId = document.getElementById('sel-teacher').value;
+    if (!teacherId) return;
+
+    currentTeacherId = teacherId;
+    const opt = document.getElementById('sel-teacher').options[document.getElementById('sel-teacher').selectedIndex];
+
+    // Update teacher card
+    const name = opt.dataset.name || '?';
+    document.getElementById('t-avatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('t-name').textContent = name;
+    document.getElementById('t-detail').textContent =
+        (opt.dataset.spec ? opt.dataset.spec + ' · ' : '') + (opt.dataset.qual || '');
+
+    document.getElementById('teacher-card').style.display = 'flex';
+
+    // Load existing subjects
+    try {
+        const res = await fetch(`/get_teacher_subjects/${teacherId}`);
+        const data = await res.json();
+        renderExisting(data);
+    } catch(e) {
+        renderExisting([]);
+    }
+
+    // Show entry section and save bar
+    document.getElementById('entry-section').style.display = 'block';
+    document.getElementById('save-bar').style.display = 'flex';
+
+    // Initialize rows if empty
+    if (document.getElementById('subjects-body').children.length === 0) {
+        for (let i = 0; i < 3; i++) addRow(false);
+    }
+    updateCounts();
+}
+
+function renderExisting(subjects) {
+    const grid = document.getElementById('existing-grid');
+    const section = document.getElementById('existing-section');
+
+    if (subjects.length === 0) {
+        section.style.display = 'none';
+        document.getElementById('t-existing-count').textContent = '0';
+        return;
+    }
+
+    section.style.display = 'block';
+    document.getElementById('existing-count-pill').textContent = subjects.length;
+    document.getElementById('t-existing-count').textContent = subjects.length;
+
+    grid.innerHTML = subjects.map(s => `
+        <div class="subject-chip-modern" id="chip-${s.id}">
+            <i class="fas fa-book"></i>
+            <span>${s.subject_name}</span>
+            <span class="chip-class-modern">${s.class_name || 'N/A'}</span>
+            <button type="button" onclick="removeSubject(${s.id})" title="Remove">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+async function removeSubject(subjectId) {
+    if (!confirm('Are you sure you want to remove this subject?')) return;
+    try {
+        const res = await fetch(`/remove_teacher_subject/${subjectId}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById(`chip-${subjectId}`)?.remove();
+            const remaining = document.querySelectorAll('#existing-grid .subject-chip-modern').length;
+            document.getElementById('existing-count-pill').textContent = remaining;
+            document.getElementById('t-existing-count').textContent = remaining;
+            if (remaining === 0) document.getElementById('existing-section').style.display = 'none';
+        }
+    } catch(e) {
+        alert('Error removing subject');
+    }
+}
+
+function removeAllConfirm() {
+    if (!confirm('Remove all assigned subjects for this teacher?')) return;
+    document.querySelectorAll('#existing-grid .subject-chip-modern').forEach(chip => {
+        const btn = chip.querySelector('button');
+        if (btn) {
+            const onclick = btn.getAttribute('onclick');
+            const match = onclick.match(/\d+/);
+            if (match) removeSubject(parseInt(match[0]));
+        }
+    });
+}
+
+function addRow(doFocus = true) {
+    rowCount++;
+    const tbody = document.getElementById('subjects-body');
+    const rowNum = tbody.rows.length + 1;
+    const tr = document.createElement('tr');
+    tr.className = 'empty-row';
+    tr.id = `srow-${rowCount}`;
+
+    const classOpts = classesData.map(c =>
+        `<option value="${c.id}">${c.name}</option>`
+    ).join('');
+
+    tr.innerHTML = `
+        <td class="row-num-modern">${rowNum}</td>
+        <td>
+            <input type="text" class="cell-input-modern" name="subject_name[]"
+                   placeholder="e.g., Mathematics" autocomplete="off"
+                   oninput="onInput(this,${rowCount})" onkeydown="onKey(event,this)">
+        </td>
+        <td>
+            <select class="cell-input-modern" name="class_id[]" onchange="onInput(this,${rowCount})">
+                <option value="">— Select Class —</option>
+                ${classOpts}
+            </select>
+        </td>
+        <td>
+            <input type="number" class="cell-input-modern" name="total_marks[]"
+                   placeholder="100" value="100" min="1" max="999"
+                   oninput="onInput(this,${rowCount})">
+        </td>
+        <td>
+            <input type="number" class="cell-input-modern" name="passing_marks[]"
+                   placeholder="40" value="40" min="1" max="999"
+                   oninput="onInput(this,${rowCount})">
+        </td>
+        <td style="text-align: center;">
+            <select class="cell-input-modern" name="is_primary[]" style="width: 80px;" onchange="onInput(this,${rowCount})">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+            </select>
+        </td>
+        <td>
+            <button type="button" class="del-btn-modern" onclick="deleteRow('srow-${rowCount}')" title="Delete Row">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+    if (doFocus) tr.querySelector('input').focus();
+    updateCounts();
+}
+
+function onInput(el, rId) {
+    const row = document.getElementById(`srow-${rId}`);
+    if (!row) return;
+    const nameIn = row.querySelector('input[name="subject_name[]"]');
+    const hasName = nameIn && nameIn.value.trim() !== '';
+    row.classList.toggle('empty-row', !hasName);
+    if (el.value.trim() !== '') el.classList.add('has-value');
+    else el.classList.remove('has-value');
+    updateCounts();
+}
+
+function onKey(e, el) {
+    if (e.key === 'Tab' && !e.shiftKey) {
+        const allInputs = [...document.querySelectorAll('#subjects-body .cell-input-modern')];
+        const idx = allInputs.indexOf(el);
+        if (idx === allInputs.length - 1) {
+            e.preventDefault();
+            addRow();
+        }
+    }
+}
+
+function deleteRow(id) {
+    document.getElementById(id)?.remove();
+    document.querySelectorAll('#subjects-body tr .row-num-modern').forEach((el, i) => {
+        el.textContent = i + 1;
+    });
+    updateCounts();
+}
+
+function clearRows() {
+    document.getElementById('subjects-body').innerHTML = '';
+    rowCount = 0;
+    updateCounts();
+    for (let i = 0; i < 3; i++) addRow(false);
+}
+
+function updateCounts() {
+    let ready = 0;
+    document.querySelectorAll('#subjects-body tr').forEach(row => {
+        const nameIn = row.querySelector('input[name="subject_name[]"]');
+        const classIn = row.querySelector('select[name="class_id[]"]');
+        if (nameIn && nameIn.value.trim() !== '' && classIn && classIn.value !== '') ready++;
+    });
+    document.getElementById('new-count-pill').textContent = ready;
+    document.getElementById('t-new-count').textContent = ready;
+    document.getElementById('sb-ready').textContent = ready;
+}
+
+function prepareSubmit() {
+    document.getElementById('h-teacher').value = document.getElementById('sel-teacher').value;
+    document.getElementById('h-year').value = document.getElementById('sel-year').value;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>{{ teacher.full_name }}</h1>
+    <p>Email: {{ teacher.email }}</p>
+    <p>Phone: {{ teacher.phone }}</p>
+    <a href="{{ url_for('edit_teacher', teacher_id=teacher.id) }}">Edit</a>
+</div>
+{% endblock %}

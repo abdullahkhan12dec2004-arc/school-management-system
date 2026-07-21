@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+{% block title %}Teacher Assignments{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom table styles with borders */
+    .table-bordered-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-bordered-custom th,
+    .table-bordered-custom td {
+        border: 1px solid #dee2e6 !important;
+        padding: 12px;
+        vertical-align: middle;
+    }
+
+    .table-bordered-custom thead th {
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        color: white;
+        border: 1px solid #2c6e9e !important;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-bordered-custom tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    .table-bordered-custom tbody tr:hover {
+        background-color: #e8f1f8;
+        cursor: pointer;
+    }
+
+    .table-bordered-custom td:first-child {
+        font-weight: 700;
+        color: #c6a43b;
+        text-align: center;
+        width: 50px;
+    }
+
+    /* Form Card Styling */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        color: white;
+        padding: 15px 20px;
+        border-bottom: 1px solid #2c6e9e;
+    }
+
+    .form-card-header h5 {
+        margin: 0;
+        color: white;
+    }
+
+    /* Badge Styles */
+    .badge-primary-teacher {
+        background: #fef3c7;
+        color: #d97706;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .badge-subject-teacher {
+        background: #e2e8f0;
+        color: #475569;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Select multiple styling */
+    select[multiple] {
+        min-height: 150px;
+    }
+
+    select[multiple] option {
+        padding: 8px 10px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    select[multiple] option:hover {
+        background: #e8f1f8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .table-bordered-custom th,
+        .table-bordered-custom td {
+            padding: 8px;
+            font-size: 12px;
+        }
+    }
+    .dashboard-container {
+        background-color: #ffffff !important;
+    }
+
+    body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">
+        <i class="fas fa-chalkboard-teacher" style="color: #c6a43b;"></i> Teacher-Class Assignments
+    </h2>
+    <div>
+        <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+            <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Assignment Form -->
+    <div class="col-md-4">
+        <div class="form-card">
+            <div class="form-card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-plus"></i> Assign Teacher to Class
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-user"></i> Teacher <span class="text-danger">*</span>
+                        </label>
+                        <select name="teacher_id" class="form-select" required>
+                            <option value="">-- Select Teacher --</option>
+                            {% for t in teachers %}
+                            <option value="{{ t.id }}">{{ t.full_name }} ({{ t.subject_specialization or 'General' }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-door-open"></i> Classes <span class="text-danger">*</span>
+                        </label>
+                        <select name="class_ids" class="form-select" multiple size="5" required>
+                            {% for c in classes %}
+                            <option value="{{ c.id }}">
+                                📚 {{ c.class_name }}{% if c.section %} - Section {{ c.section }}{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle"></i> Hold <kbd>Ctrl</kbd> to select multiple classes
+                        </div>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" name="is_primary" value="1" class="form-check-input" id="isPrimary">
+                        <label class="form-check-label fw-semibold" for="isPrimary">
+                            <i class="fas fa-star" style="color: #f59e0b;"></i> Set as Class Teacher (Primary)
+                        </label>
+                        <div class="form-text">Class Teacher will have additional responsibilities</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-link"></i> Assign Teacher
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card mt-3 bg-primary bg-opacity-10 border-0">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-2x text-primary mb-2 d-block"></i>
+                <h6 class="mb-0">Total Assignments</h6>
+                <h3 class="text-primary">{{ assignments|length }}</h3>
+                <small class="text-muted">{{ teachers|length }} Teachers | {{ classes|length }} Classes</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignments List with Borders -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="fas fa-list-check"></i> Current Assignments
+                </h5>
+                <span class="badge bg-primary rounded-pill">{{ assignments|length }} Total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table-bordered-custom">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Teacher</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Assignment Type</th>
+                                <th style="width: 100px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in assignments %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td class="fw-semibold">
+                                    <i class="fas fa-chalkboard-user" style="color: #c6a43b;"></i>
+                                    {{ a.teacher_name }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-door-open"></i>
+                                    {{ a.class_name }}
+                                </td>
+                                <td>{{ a.section or '—' }}</td>
+                                <td>
+                                    {% if a.is_primary %}
+                                    <span class="badge-primary-teacher">
+                                        <i class="fas fa-star"></i> Class Teacher
+                                    </span>
+                                    {% else %}
+                                    <span class="badge-subject-teacher">
+                                        <i class="fas fa-book"></i> Subject Teacher
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if a.is_primary %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i> Active
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-clock"></i> Assigned
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="fas fa-users-slash fa-3x text-muted mb-3 d-block"></i>
+                                    <p class="text-muted mb-0 fs-5">No assignments yet</p>
+                                    <small class="text-muted">Use the form to assign teachers to classes</small>
+                                    <div class="mt-3">
+                                        <i class="fas fa-arrow-left"></i> Select a teacher and classes above
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignment Summary Cards -->
+        {% if assignments %}
+        <div class="row mt-3 g-2">
+            <div class="col-6">
+                <div class="card border-0 bg-warning bg-opacity-10 text-center p-2">
+                    <small class="text-muted">Class Teachers</small>
+                    <h4 class="mb-0 text-warning">
+                        {{ assignments|selectattr('is_primary')|list|length }}
+                    </h4>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card border-0 bg-info bg-opacity-10 text-center p-2">
+                    <small class="text-muted">Subject Teachers</small>
+                    <h4 class="mb-0 text-info">
+                        {{ assignments|rejectattr('is_primary')|list|length }}
+                    </h4>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add hover effect on table rows
+    document.querySelectorAll('.table-bordered-custom tbody tr').forEach(row => {
+        row.addEventListener('click', function(e) {
+            if (!e.target.closest('.btn')) {
+                // Optional: Show assignment details
+                const teacherName = this.cells[1]?.innerText;
+                if (teacherName) {
+                    console.log('Selected assignment for:', teacherName);
+                }
+            }
+        });
+    });
+
+    // Show selected count for multiple select
+    const multiSelect = document.querySelector('select[name="class_ids"]');
+    if (multiSelect) {
+        multiSelect.addEventListener('change', function() {
+            const selected = Array.from(this.selectedOptions).map(opt => opt.text);
+            const count = selected.length;
+            const formText = this.nextElementSibling;
+            if (formText && count > 0) {
+                formText.innerHTML = `<i class="fas fa-check-circle"></i> ${count} class(es) selected: ${selected.join(', ').substring(0, 50)}${selected.join(', ').length > 50 ? '...' : ''}`;
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+{% block title %}Bulk Upload – {{ upload_type | title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Force white background */
+    body,
+    .container-fluid,
+    .card,
+    .card-body,
+    .card-header {
+        background-color: #ffffff !important;
+    }
+
+    /* Card styling */
+    .card {
+        border-radius: 12px !important;
+        border: 1px solid #e2e8f0 !important;
+        margin-bottom: 20px;
+    }
+
+    /* Card header styling - NAVY BLUE */
+    .card-header {
+        background-color: #1e293b !important; /* Slate/Navy blue */
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 12px 20px !important;
+        color: white !important;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    /* Icon and text in header - WHITE */
+    .card-header i,
+    .card-header .fas,
+    .card-header span,
+    .card-header {
+        color: #ffffff !important;
+    }
+
+    /* Card body */
+    .card-body {
+        padding: 20px !important;
+    }
+
+    /* Form labels */
+    .form-label {
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 5px !important;
+        color: #333;
+    }
+
+    /* Form selects/inputs */
+    .form-select, .form-control {
+        font-size: 0.85rem !important;
+        padding: 8px 12px !important;
+        border-radius: 6px !important;
+        border: 1px solid #cbd5e1 !important;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* NAVY BLUE BUTTONS */
+    .btn-navy {
+        background-color: #1e293b !important; /* Navy blue */
+        color: white !important;
+        border: none !important;
+        padding: 8px 20px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .btn-navy:hover {
+        background-color: #1e40af !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+        color: white !important;
+    }
+
+    .btn-navy:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #64748b !important;
+    }
+
+    .btn-navy i {
+        color: white !important;
+    }
+
+    .btn-outline-navy {
+        background-color: transparent !important;
+        color: #1e293b !important;
+        border: 1px solid #cbd5e1 !important;
+        padding: 8px 20px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .btn-outline-navy:hover {
+        background-color: #f1f5f9 !important;
+        border-color: #1e293b !important;
+        color: #1e293b !important;
+    }
+
+    /* Drop Zone styling */
+    .drop-zone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 8px;
+        background: #fafcff;
+        transition: all 0.2s;
+        cursor: pointer;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .drop-zone:hover {
+        border-color: #1e293b;
+        background: #f1f5f9;
+    }
+
+    .drop-zone.dragover {
+        border-color: #1e40af;
+        background: #e0f2fe;
+    }
+
+    /* Mandatory box */
+    .mandatory-box {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    .mandatory-title {
+        color: #991b1b;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+    }
+
+    /* Row / Col layout */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+    }
+
+    .col-12 {
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .col-md-8 {
+        width: 66.666%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .col-md-4 {
+        width: 33.333%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 768px) {
+        .col-md-8, .col-md-4 {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+  <!-- Heading in one line with icon -->
+  <h2 class="mb-4" style="font-weight: 700; color: #1e293b;"><i class="fas fa-file-upload me-2" style="color: #c6a43b;"></i>Bulk Upload — <span id="uploadTypeDisplay">{{ upload_type | title }}</span></h2>
+
+  <!-- 1 Card on top: Step A -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-download me-2"></i> Step A — Download Template
+        </div>
+        <div class="card-body">
+          <p class="text-muted small">Download the structured Excel template below, fill it with your data, then upload it in the form below.</p>
+
+          {% if upload_type == 'students' and classes %}
+          <div class="mb-3">
+            <label class="form-label">Class Select Karein (Class ID auto-fill ke liye)</label>
+            <select id="templateClassSelect" class="form-select" onchange="updateTemplateLink()">
+              <option value="">-- Sab Classes (manually Class ID fill karein) --</option>
+              {% for c in classes %}
+              <option value="{{ c.id }}">{{ c.class_name }} — {{ c.section }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="flex: 1; min-width: 250px;">
+              {% if upload_type == 'students' %}
+              <div style="font-size: 0.8rem; color: #1e3a8a; background: #eff6ff; padding: 10px 15px; border-radius: 6px; border: 1px solid #bfdbfe;">
+                <i class="fas fa-lightbulb me-1"></i><strong>Tip:</strong> Agar aapne upar class select ki hai, to Class ID khud-bakhud template mein bhar jayegi. Warna "Class Reference" sheet se manually copy karein.
+              </div>
+              {% endif %}
+            </div>
+            <div>
+              <a id="downloadTemplateLink"
+                 href="{{ url_for('download_' + upload_type + '_template') }}"
+                 data-base-url="{{ url_for('download_' + upload_type + '_template') }}"
+                 class="btn-navy">
+                <i class="fas fa-file-excel me-1"></i> Download {{ upload_type | title }} Template (.xlsx)
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 Cards below: Step B (Upload) and Guidelines (Mandatory Fields) -->
+  <div class="row">
+    <!-- Left Column: Upload Form -->
+    <div class="col-md-8">
+      <div class="card h-100">
+        <div class="card-header">
+          <i class="fas fa-upload me-2"></i> Step B — Upload Filled Template
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data">
+
+            <div id="dropZone" class="drop-zone mb-3" onclick="document.getElementById('fileInput').click()">
+              <i class="fas fa-cloud-upload-alt fa-3x mb-2" style="color: #64748b;"></i>
+              <p class="fw-semibold mb-1" style="color: #334155; font-size: 0.9rem;">Click to browse or drag & drop your Excel file here</p>
+              <p class="text-muted small mb-0">Supported: .xlsx, .xls</p>
+              <div id="fileNameDisplay" class="mt-2 fw-bold text-success" style="display:none; font-size: 0.85rem;"></div>
+            </div>
+
+            <input type="file" id="fileInput" name="file" accept=".xlsx,.xls" required style="display:none;" onchange="showFileName(this)">
+
+            {% if upload_type == 'students' and classes %}
+            <div class="mb-3">
+              <label class="form-label">Filter by Class (Optional)</label>
+              <select name="class_filter" class="form-select">
+                <option value="">All Classes</option>
+                {% for c in classes %}
+                <option value="{{ c.id }}">{{ c.class_name }} — {{ c.section }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
+              <button type="submit" class="btn-navy" id="uploadBtn" disabled>
+                <i class="fas fa-check-circle me-1"></i> Validate & Upload
+              </button>
+              <a href="{{ url_for('dashboard') }}" class="btn-outline-navy">
+                <i class="fas fa-times me-1"></i> Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Mandatory Fields -->
+    <div class="col-md-4">
+      <div class="card h-100" style="border-left: 4px solid #dc2626 !important;">
+        <div class="card-header" style="background-color: #dc2626 !important;">
+          <i class="fas fa-info-circle me-2"></i> Mandatory Fields
+        </div>
+        <div class="card-body">
+          <p class="text-muted small mb-3">Please ensure these fields are filled (marked <span class="text-danger fw-bold">RED</span> in the template):</p>
+
+          <div class="mandatory-box">
+            <ul class="mb-0 ps-3 small" style="line-height: 1.6; color: #4b5563;">
+              {% if upload_type == 'classes' %}
+              <li><span class="text-danger fw-bold">school_id</span> — from Schools page</li>
+              <li><span class="text-danger fw-bold">class_name</span> — e.g. Class 1</li>
+              <li><span class="text-danger fw-bold">section</span> — e.g. A, B</li>
+              {% elif upload_type == 'teachers' %}
+              <li><span class="text-danger fw-bold">school_id</span> — from Schools page</li>
+              <li><span class="text-danger fw-bold">full_name</span> — Teacher name</li>
+              <li><span class="text-danger fw-bold">username</span> — must be unique</li>
+              <li><span class="text-danger fw-bold">password</span> — login password</li>
+              {% elif upload_type == 'students' %}
+              <li><span class="text-danger fw-bold">school_id</span> — from Schools page</li>
+              <li><span class="text-danger fw-bold">class_id</span> — see "Class Reference" sheet</li>
+              <li><span class="text-danger fw-bold">full_name</span> — Student name</li>
+              <li><span class="text-danger fw-bold">username</span> — must be unique</li>
+              <li><span class="text-danger fw-bold">password</span> — login password</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .drop-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: var(--radius-lg);
+    background: var(--off-white);
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    padding: 3rem 1.5rem;
+  }
+  .drop-zone:hover {
+    border-color: var(--navy);
+    background: #eef4fe;
+  }
+  .drop-zone.dragover {
+    border-color: var(--navy);
+    background: #e2ecfc;
+  }
+  .form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-md);
+    background: white;
+    font-size: 0.9rem;
+    transition: var(--transition);
+  }
+  .form-control:focus {
+    border-color: var(--navy);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 27, 42, 0.1);
+  }
+</style>
+
+<script>
+  function showFileName(input) {
+    const btn = document.getElementById('uploadBtn');
+    const display = document.getElementById('fileNameDisplay');
+    const zone = document.getElementById('dropZone');
+    if (input.files && input.files[0]) {
+      display.textContent = '📎 ' + input.files[0].name;
+      display.style.display = 'block';
+      zone.style.borderColor = '#1a3b5d';
+      zone.style.background = '#eef4fe';
+      btn.disabled = false;
+    } else {
+      display.style.display = 'none';
+      zone.style.borderColor = '#cbd5e1';
+      zone.style.background = '#fafcff';
+      btn.disabled = true;
+    }
+  }
+  function updateTemplateLink() {
+    const sel = document.getElementById('templateClassSelect');
+    const link = document.getElementById('downloadTemplateLink');
+    if (!link) return;
+    const base = link.getAttribute('data-base-url');
+    if (sel && sel.value) {
+      link.href = base + '?class_id=' + encodeURIComponent(sel.value);
+    } else {
+      link.href = base;
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const zone = document.getElementById('dropZone');
+    if (zone) {
+      zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', () => { zone.classList.remove('dragover'); });
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        const fi = document.getElementById('fileInput');
+        fi.files = e.dataTransfer.files;
+        showFileName(fi);
+      });
+    }
+  });
+</script>
+{% endblock %}

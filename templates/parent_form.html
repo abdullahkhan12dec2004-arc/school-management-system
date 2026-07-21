@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+{% block title %}Parent Login Banayein{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        background: #f5f7fb !important;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-container-custom {
+        width: 100%;
+        max-width: 1100px;
+        margin: 1.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .page-header p {
+        color: #6c7a91;
+        font-size: 0.9rem;
+    }
+
+    .card-custom {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.05);
+        border: 1px solid #eef2f8;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-header-custom {
+        padding: 1.25rem 2rem;
+        color: white;
+    }
+
+    .card-header-custom.primary {
+        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+    }
+
+    .card-header-custom.success {
+        background: linear-gradient(98deg, #0f3d23 0%, #16a34a 100%);
+    }
+
+    .card-header-custom h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: white;
+        width: 100%;
+    }
+
+    .card-header-custom h3 span {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-header-custom h3 i {
+        color: #e0c87c;
+    }
+
+    .card-body-custom {
+        padding: 2rem;
+        flex-grow: 1;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #5b6e8c;
+        margin-bottom: 0.4rem;
+    }
+
+    .form-label i {
+        color: #c6a43b;
+        margin-right: 6px;
+        width: 14px;
+    }
+
+    .required {
+        color: #e05a5a;
+        margin-left: 3px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i.input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9aa9bf;
+        font-size: 0.9rem;
+        pointer-events: none;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1.5px solid #e5eaf0;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        transition: all 0.2s;
+    }
+
+    .input-wrapper input:focus {
+        outline: none;
+        border-color: #1a4a6f;
+        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+    }
+
+    .input-wrapper input::placeholder {
+        color: #b9c2d0;
+        font-size: 0.82rem;
+    }
+
+    .help-text {
+        font-size: 0.65rem;
+        color: #8a99b0;
+        margin-top: 5px;
+    }
+
+    /* Children Search & List */
+    .search-wrapper {
+        position: relative;
+        margin-bottom: 1.25rem;
+    }
+
+    .search-wrapper i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9aa9bf;
+    }
+
+    .search-wrapper input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1.5px solid #e5eaf0;
+        border-radius: 12px;
+        font-size: 0.85rem;
+    }
+
+    .students-list {
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .student-item {
+        background: #ffffff;
+        border: 1px solid #eef2f8;
+        border-radius: 16px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .student-item:hover {
+        background: #f5f8fc;
+        border-color: #1a4a6f;
+    }
+
+    .student-item.selected {
+        background: #f0fdf4;
+        border-color: #16a34a;
+    }
+
+    .avatar-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        background: linear-gradient(135deg, #1a4a6f 0%, #2c6e9e 100%);
+    }
+
+    .student-info {
+        margin-left: 12px;
+        flex-grow: 1;
+    }
+
+    .student-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1a2c3e;
+    }
+
+    .student-details {
+        font-size: 0.75rem;
+        color: #6c7c97;
+        margin-top: 2px;
+    }
+
+    .student-details i {
+        margin-right: 4px;
+    }
+
+    .badge-count {
+        background: white;
+        color: #16a34a;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .check-badge {
+        color: #16a34a;
+        font-size: 1.25rem;
+        margin-left: 10px;
+    }
+
+    /* Form Action Bar */
+    .action-bar {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #eef2f8;
+        padding: 1.25rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 2rem;
+        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.03);
+    }
+
+    .action-bar-text {
+        font-size: 0.8rem;
+        color: #6c7c97;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-group-custom {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-custom {
+        padding: 0.75rem 1.8rem;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-custom-primary {
+        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
+        color: white;
+    }
+
+    .btn-custom-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.2);
+    }
+
+    .btn-custom-secondary {
+        background: #f1f4f9;
+        color: #3a4b66;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-custom-secondary:hover {
+        background: #e9eef4;
+    }
+
+    .info-box {
+        background: #f4f8fb;
+        border: 1px solid #e5eff6;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 0.78rem;
+        color: #1a4a6f;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 1.25rem;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #8a99b0;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container-custom">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-user-plus"></i>
+            Create Parent Login
+        </h1>
+    </div>
+
+
+    <form method="POST" action="{{ url_for('add_parent') }}">
+        <div class="row g-4">
+
+            <!-- LEFT: Parent Info -->
+            <div class="col-lg-5">
+                <div class="card-custom">
+                    <div class="card-header-custom primary">
+                        <h3>
+                            <span><i class="fas fa-user"></i> Parent Details</span>
+                        </h3>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="form-group">
+                            <label class="form-label">Full Name <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user-tie input-icon"></i>
+                                <input type="text" name="full_name" placeholder="Mother or Father's Name" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-phone input-icon"></i>
+                                <input type="text" name="phone" placeholder="e.g. 0300-1234567">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" name="email" placeholder="parent@email.com">
+                            </div>
+                        </div>
+
+                        <hr style="border: none; border-top: 1px solid #eef2f6; margin: 1.5rem 0;">
+
+                        <div class="info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Provide these login details to the parent.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Username <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user-tag input-icon"></i>
+                                <input type="text" name="username" placeholder="parent_username" required>
+                            </div>
+                            <div class="help-text">Only lowercase letters, numbers, and underscores.</div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Password <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-key input-icon"></i>
+                                <input type="password" name="password" id="password" placeholder="Choose password" required style="padding-right: 2.8rem;">
+                                <button type="button" class="password-toggle-btn" onclick="togglePassword()">
+                                    <i class="fas fa-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Children Selection -->
+            <div class="col-lg-7">
+                <div class="card-custom">
+                    <div class="card-header-custom success">
+                        <h3>
+                            <span><i class="fas fa-child"></i> Link Children</span>
+                            <span class="badge-count" id="selectedCount">0 Selected</span>
+                        </h3>
+                    </div>
+                    <div class="card-body-custom">
+                        <!-- Search bar -->
+                        <div class="search-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="studentSearch" placeholder="Search student by name or code..." onkeyup="filterStudents()">
+                        </div>
+
+                        {% if students %}
+                            <div class="students-list">
+                                {% for student in students %}
+                                <div class="student-item" id="item_{{ student.id }}" onclick="toggleStudent({{ student.id }}, this)">
+                                    
+                                    <!-- Checkbox (Hidden from layout, handled via js toggle) -->
+                                    <input type="checkbox" name="child_ids" value="{{ student.id }}"
+                                           class="child-checkbox d-none" id="child_{{ student.id }}"
+                                           onchange="updateCount()">
+
+                                    <!-- Avatar -->
+                                    <div class="avatar-circle">
+                                        {{ student.full_name[0].upper() }}
+                                    </div>
+
+                                    <!-- Info -->
+                                    <div class="student-info">
+                                        <div class="student-name">{{ student.full_name }}</div>
+                                        <div class="student-details">
+                                            <i class="fas fa-id-card"></i>Code: {{ student.student_code }}
+                                            {% if student.class_name %}
+                                                &nbsp;|&nbsp;
+                                                <i class="fas fa-chalkboard"></i>Class: {{ student.class_name }}{% if student.section %} - {{ student.section }}{% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Checked Icon Badge -->
+                                    <div class="check-badge" id="badge_{{ student.id }}" style="display: none;">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div id="noResults" class="text-center text-muted py-5" style="display: none;">
+                                <i class="fas fa-search fa-2x mb-2" style="opacity: 0.3;"></i>
+                                <p>No student matches your search</p>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-user-graduate fa-3x mb-3" style="opacity: 0.3;"></i>
+                                <p>No students available in this school.</p>
+                                <a href="{{ url_for('add_student') }}" class="btn-custom btn-custom-secondary" style="font-size: 0.75rem; padding: 5px 15px;">
+                                    Add Student
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Submit Bar -->
+        <div class="action-bar">
+            <div class="action-bar-text">
+                <i class="fas fa-info-circle text-primary"></i>
+                <span>Parents can view attendance, marks, and fees after login.</span>
+            </div>
+            <div class="btn-group-custom">
+                <a href="{{ url_for('parents') }}" class="btn-custom btn-custom-secondary">Cancel</a>
+                <button type="submit" class="btn-custom btn-custom-primary">
+                    <i class="fas fa-save"></i> Create Parent Login
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleStudent(id, el) {
+    const cb = document.getElementById('child_' + id);
+    if (!cb) return;
+    cb.checked = !cb.checked;
+    
+    const badge = document.getElementById('badge_' + id);
+    if (cb.checked) {
+        el.classList.add('selected');
+        if (badge) badge.style.display = 'block';
+    } else {
+        el.classList.remove('selected');
+        if (badge) badge.style.display = 'none';
+    }
+    updateCount();
+}
+
+function updateCount() {
+    const count = document.querySelectorAll('.child-checkbox:checked').length;
+    document.getElementById('selectedCount').textContent = count + ' Selected';
+}
+
+function filterStudents() {
+    const search = document.getElementById('studentSearch').value.toLowerCase();
+    const items = document.querySelectorAll('.student-item');
+    let visible = 0;
+    
+    items.forEach(item => {
+        const name = item.querySelector('.student-name').textContent.toLowerCase();
+        const details = item.querySelector('.student-details').textContent.toLowerCase();
+        if (name.includes(search) || details.includes(search)) {
+            item.style.display = 'flex';
+            visible++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    const noResults = document.getElementById('noResults');
+    if (visible > 0) {
+        noResults.style.display = 'none';
+    } else {
+        noResults.style.display = 'block';
+    }
+}
+
+function togglePassword() {
+    const input = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+</script>
+{% endblock %}

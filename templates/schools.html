@@ -1,0 +1,638 @@
+{% extends "base.html" %}
+{% block title %}Schools{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== PROFESSIONAL SCHOOLS PAGE STYLES ===== */
+
+    :root {
+        --primary-dark: #0f2b3d;
+        --primary: #1a4a6f;
+        --primary-light: #2c6e9e;
+        --primary-bg: #e8f1f8;
+        --secondary: #c6a43b;
+        --secondary-dark: #a07d2a;
+        --secondary-light: #e0c87c;
+        --success: #10b981;
+        --success-light: #d1fae5;
+        --danger: #ef4444;
+        --danger-light: #fee2e2;
+        --warning: #f59e0b;
+        --warning-light: #fed7aa;
+        --info: #3b82f6;
+        --info-light: #dbeafe;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --radius-2xl: 1.5rem;
+    }
+
+    /* Page Container */
+    .schools-page {
+        padding: 1rem 0;
+    }
+
+    /* Page Header */
+    .page-header-modern {
+        margin-bottom: 1.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .page-title-modern {
+        font-size: 1.75rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-sub-modern {
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    /* Action Bar */
+    .action-bar-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .btn-add-modern {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        padding: 0.625rem 1.25rem;
+        border-radius: var(--radius-lg);
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-add-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Stats Cards */
+    .stats-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .stat-card-modern {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 1rem 1.25rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .stat-card-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon-modern {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .stat-icon-modern.primary {
+        background: var(--primary-bg);
+        color: var(--primary);
+    }
+
+    .stat-icon-modern.secondary {
+        background: rgba(198, 164, 59, 0.1);
+        color: var(--secondary-dark);
+    }
+
+    .stat-content-modern {
+        flex: 1;
+    }
+
+    .stat-number-modern {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        line-height: 1.2;
+    }
+
+    .stat-label-modern {
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+    }
+
+    /* Table Card */
+    .table-card-modern {
+        background: white;
+        border-radius: var(--radius-2xl);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .table-header-modern {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .table-title-modern {
+        color: white;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .table-badge-modern {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    /* Schools Table with Borders */
+    .schools-table-modern {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .schools-table-modern th,
+    .schools-table-modern td {
+        border: 1px solid var(--gray-200);
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .schools-table-modern thead th {
+        background: var(--gray-50);
+        color: var(--gray-600);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .schools-table-modern tbody tr {
+        transition: background 0.2s ease;
+    }
+
+    .schools-table-modern tbody tr:hover {
+        background-color: var(--gray-50);
+    }
+
+    .schools-table-modern td:first-child {
+        font-weight: 700;
+        color: var(--secondary);
+        text-align: center;
+        width: 50px;
+    }
+
+    /* School Logo */
+    .school-logo-modern {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .school-logo-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, var(--primary-bg) 0%, var(--gray-100) 100%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.25rem;
+        border: 1px solid var(--gray-200);
+    }
+
+    /* School Name */
+    .school-name-modern {
+        font-weight: 700;
+        color: var(--gray-800);
+        font-size: 0.95rem;
+    }
+
+    /* Contact Info */
+    .contact-info-modern {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .contact-item-modern {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+        color: var(--gray-500);
+    }
+
+    .contact-item-modern i {
+        font-size: 0.7rem;
+        color: var(--secondary);
+    }
+
+    /* Empty State */
+    .empty-state-modern {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-icon-modern {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-title-modern {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--gray-600);
+        margin-bottom: 0.25rem;
+    }
+
+    .empty-sub-modern {
+        font-size: 0.75rem;
+        color: var(--gray-400);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stats-grid-modern {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .schools-table-modern th,
+        .schools-table-modern td {
+            padding: 0.625rem;
+            font-size: 0.75rem;
+        }
+
+        .school-logo-modern,
+        .school-logo-placeholder {
+            width: 36px;
+            height: 36px;
+        }
+    }
+    .dashboard-container {
+        background-color: #ffffff !important;
+    }
+
+    body, .main-content, .container-fluid {
+        background-color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="schools-page">
+
+    <!-- Page Header -->
+    <div class="page-header-modern">
+        <div class="page-title-modern">
+            <i class="fas fa-school"></i> Schools
+        </div>
+        <div class="page-sub-modern">
+            Manage all schools in the system
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} fade-in">
+            <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- Action Bar -->
+    <div class="action-bar-modern">
+        <div></div>
+        <a href="{{ url_for('add_school') }}" class="btn-add-modern">
+            <i class="fas fa-plus"></i> Add New School
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid-modern">
+        <div class="stat-card-modern">
+            <div class="stat-icon-modern primary">
+                <i class="fas fa-school"></i>
+            </div>
+            <div class="stat-content-modern">
+                <div class="stat-number-modern">{{ schools|length }}</div>
+                <div class="stat-label-modern">Total Schools</div>
+            </div>
+        </div>
+
+        <div class="stat-card-modern">
+            <div class="stat-icon-modern secondary">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-content-modern">
+                <div class="stat-number-modern">{{ schools|selectattr('address')|list|length }}</div>
+                <div class="stat-label-modern">With Address</div>
+            </div>
+        </div>
+
+        <div class="stat-card-modern">
+            <div class="stat-icon-modern primary">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="stat-content-modern">
+                <div class="stat-number-modern">{{ schools|selectattr('email')|list|length }}</div>
+                <div class="stat-label-modern">With Email</div>
+            </div>
+        </div>
+
+        <div class="stat-card-modern">
+            <div class="stat-icon-modern secondary">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="stat-content-modern">
+                <div class="stat-number-modern">{{ schools|selectattr('phone')|list|length }}</div>
+                <div class="stat-label-modern">With Phone</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schools Table -->
+    <div class="table-card-modern">
+        <div class="table-header-modern">
+            <div class="table-title-modern">
+                <i class="fas fa-list"></i> Schools Directory
+            </div>
+            <div class="table-badge-modern">
+                <i class="fas fa-building"></i> {{ schools|length }} Schools
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            {% if schools %}
+            <table class="schools-table-modern">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th style="width: 80px;">Logo</th>
+                        <th>School Name</th>
+                        <th>Address</th>
+                        <th>Contact</th>
+                        <th style="width: 120px;">Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in schools %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            {% if s.logo %}
+                            <img src="{{ url_for('static', filename='uploads/logos/' + s.logo) }}"
+                                 class="school-logo-modern"
+                                 alt="{{ s.name }}"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'school-logo-placeholder\'><i class=\'fas fa-school\'></i></div>'">
+                            {% else %}
+                            <div class="school-logo-placeholder">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="school-name-modern">
+                                <i class="fas fa-landmark" style="color: var(--secondary); font-size: 0.7rem;"></i>
+                                {{ s.name }}
+                            </div>
+                            {% if s.address %}
+                            <div style="font-size: 0.7rem; color: var(--gray-400); margin-top: 0.25rem;">
+                                <i class="fas fa-location-dot"></i> {{ s.address[:50] }}{% if s.address|length > 50 %}...{% endif %}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if s.address %}
+                            <div class="contact-item-modern">
+                                <i class="fas fa-map-marker-alt"></i> {{ s.address[:40] }}{% if s.address|length > 40 %}...{% endif %}
+                            </div>
+                            {% else %}
+                            <div class="contact-item-modern">
+                                <i class="fas fa-map-marker-alt"></i> —
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="contact-info-modern">
+                                {% if s.phone %}
+                                <div class="contact-item-modern">
+                                    <i class="fas fa-phone"></i> {{ s.phone }}
+                                </div>
+                                {% endif %}
+                                {% if s.email %}
+                                <div class="contact-item-modern">
+                                    <i class="fas fa-envelope"></i> {{ s.email }}
+                                </div>
+                                {% endif %}
+                                {% if not s.phone and not s.email %}
+                                <div class="contact-item-modern">
+                                    <i class="fas fa-ban"></i> No contact info
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="color: var(--gray-500); font-size: 0.75rem;">
+                            <i class="fas fa-calendar-alt" style="font-size: 0.65rem;"></i>
+                            {{ s.created_at[:10] if s.created_at else '—' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state-modern">
+                <div class="empty-icon-modern">
+                    <i class="fas fa-school-circle-exclamation"></i>
+                </div>
+                <div class="empty-title-modern">No Schools Found</div>
+                <div class="empty-sub-modern">Click the "Add New School" button to get started</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Stats Footer -->
+    {% if schools %}
+    <div class="info-grid-modern" style="margin-top: 1.5rem;">
+        <div class="info-card-modern">
+            <div class="info-card-header-modern">
+                <i class="fas fa-chart-line"></i>
+                <h4>Quick Statistics</h4>
+            </div>
+            <div class="info-card-body-modern">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="color: var(--gray-500);">Schools with Logo:</span>
+                    <span style="font-weight: 700; color: var(--primary);">{{ schools|selectattr('logo')|list|length }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="color: var(--gray-500);">Schools with Complete Info:</span>
+                    <span style="font-weight: 700; color: var(--success);">{{ schools|selectattr('address')|selectattr('phone')|selectattr('email')|list|length }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--gray-500);">Recently Added:</span>
+                    <span style="font-weight: 700; color: var(--secondary);">{{ schools[:3]|length }} in last 3</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card-modern">
+            <div class="info-card-header-modern">
+                <i class="fas fa-lightbulb"></i>
+                <h4>School Management Tips</h4>
+            </div>
+            <div class="info-card-body-modern">
+                <div class="tip-item">
+                    <i class="fas fa-upload" style="color: var(--secondary);"></i>
+                    <span>Upload school logo for better branding</span>
+                </div>
+                <div class="tip-item">
+                    <i class="fas fa-phone-alt" style="color: var(--secondary);"></i>
+                    <span>Keep contact information up to date</span>
+                </div>
+                <div class="tip-item">
+                    <i class="fas fa-chalkboard" style="color: var(--secondary);"></i>
+                    <span>Add classes after creating school</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .fade-in {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .info-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .info-card-modern {
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .info-card-header-modern {
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        padding: 0.875rem 1.25rem;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-card-header-modern i {
+        color: var(--secondary);
+        font-size: 0.875rem;
+    }
+
+    .info-card-header-modern h4 {
+        margin: 0;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--gray-700);
+    }
+
+    .info-card-body-modern {
+        padding: 1rem 1.25rem;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 0.75rem;
+        color: var(--gray-600);
+    }
+
+    .tip-item:last-child {
+        border-bottom: none;
+    }
+
+    .tip-item i {
+        width: 20px;
+        color: var(--secondary);
+    }
+</style>
+
+{% endblock %}

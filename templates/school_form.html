@@ -1,0 +1,861 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+
+{% block title %}
+    {% if session.role == 'admin' %}
+        Add New School
+    {% else %}
+        Register Your School
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        background: #f5f7fb !important;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-container-custom {
+        width: 100%;
+        max-width: 950px;
+        margin: 1.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .page-header p {
+        color: #6c7a91;
+        font-size: 0.9rem;
+    }
+
+    .form-card {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.05);
+        border: 1px solid #eef2f8;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .card-header-custom {
+        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+        padding: 1.25rem 2rem;
+        color: white;
+    }
+
+    .card-header-custom h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+    }
+
+    .card-header-custom h3 i {
+        color: #e0c87c;
+    }
+
+    .card-body-custom {
+        padding: 2.2rem;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #1a4a6f;
+        margin-bottom: 1.25rem;
+        border-bottom: 2px solid #f0f4f8;
+        padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #5b6e8c;
+        margin-bottom: 0.4rem;
+    }
+
+    .form-label i {
+        color: #c6a43b;
+        margin-right: 6px;
+        width: 14px;
+    }
+
+    .required {
+        color: #e05a5a;
+        margin-left: 3px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i.input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9aa9bf;
+        font-size: 0.9rem;
+        pointer-events: none;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select,
+    .input-wrapper textarea {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1.5px solid #e5eaf0;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        transition: all 0.2s;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus,
+    .input-wrapper textarea:focus {
+        outline: none;
+        border-color: #1a4a6f;
+        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+    }
+
+    .input-wrapper input::placeholder {
+        color: #b9c2d0;
+        font-size: 0.82rem;
+    }
+
+    .btn-group-custom {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-custom {
+        padding: 0.75rem 1.8rem;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-custom-primary {
+        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
+        color: white;
+    }
+
+    .btn-custom-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.2);
+    }
+
+    .btn-custom-secondary {
+        background: #f1f4f9;
+        color: #3a4b66;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-custom-secondary:hover {
+        background: #e9eef4;
+    }
+
+    /* Map Styles */
+    .map-preview-box {
+        position: relative;
+        height: 250px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1.5px solid #e5eaf0;
+        margin-top: 0.5rem;
+    }
+
+    #schoolMap {
+        width: 100%;
+        height: 100%;
+    }
+
+    .map-my-loc-btn {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        z-index: 1000;
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #1a4a6f;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .map-my-loc-btn:hover {
+        background: #f8f9fa;
+        transform: translateY(-1px);
+    }
+
+    .map-selected-bar {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: #e8f5e9;
+        border: 1px solid #c8e6c9;
+        color: #2e7d32;
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .osm-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e5eaf0;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 180px;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .osm-item {
+        padding: 8px 12px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f4f8;
+        font-size: 0.8rem;
+        transition: background 0.2s;
+    }
+
+    .osm-item:last-child {
+        border-bottom: none;
+    }
+
+    .osm-item:hover {
+        background: #f4f8fb;
+    }
+
+    .osm-item i {
+        color: #ef4444;
+        margin-top: 3px;
+    }
+
+    .osm-item-main {
+        font-weight: 600;
+        color: #1a4a6f;
+    }
+
+    .osm-item-sub {
+        color: #8a99b0;
+        font-size: 0.75rem;
+    }
+
+    .osm-searching {
+        padding: 12px;
+        color: #8a99b0;
+        font-size: 0.8rem;
+        text-align: center;
+    }
+
+    .helper-text {
+        font-size: 0.65rem;
+        color: #8a99b0;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Preview Card */
+    .preview-card {
+        background: #f9fbfe;
+        border-radius: 16px;
+        padding: 0.8rem 1.2rem;
+        margin-top: 1.5rem;
+        border: 1px solid #eef2f8;
+    }
+
+    .preview-title {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6f7d98;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .preview-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .preview-avatar {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, var(--secondary, #c6a43b) 0%, var(--secondary-dark, #a07d2a) 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+    }
+
+    .preview-info h4 {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1a2c3e;
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .preview-info p {
+        font-size: 0.68rem;
+        color: #6c7c97;
+        margin: 0;
+    }
+
+    .form-alert {
+        padding: 0.8rem 1.2rem;
+        border-radius: 12px;
+        margin-top: 1.5rem;
+        font-size: 0.8rem;
+        background: #eef7ff;
+        border: 1px solid #d0e7ff;
+        color: #1a4a6f;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container-custom">
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-school"></i>
+            {% if session.role == 'admin' %}
+                Add New School
+            {% else %}
+                Register Your School
+            {% endif %}
+        </h1>
+        <p>Enter the details below to add or register a school in the system.</p>
+    </div>
+
+    <div class="form-card">
+        <div class="card-header-custom">
+            <h3>
+                <i class="fas fa-info-circle"></i>
+                {% if session.role == 'admin' %}
+                    School Information
+                {% else %}
+                    School Registration Details
+                {% endif %}
+            </h3>
+        </div>
+        <div class="card-body-custom">
+            <form method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+
+                <!-- SCHOOL INFORMATION SECTION -->
+                <div class="section-title">
+                    <i class="fas fa-school"></i> School Information
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">School Name <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-university input-icon"></i>
+                            <input type="text" name="name" id="schoolName" required
+                                   value="{{ request.form.get('name', '') }}" placeholder="Enter School Name" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <!-- ADDRESS WITH OPENSTREETMAP -->
+                    <div class="form-group full-width" style="position: relative;">
+                        <label class="form-label"><i class="fas fa-location-dot"></i> Address <span class="required">*</span></label>
+                        <div class="input-wrapper address-search-wrap">
+                            <i class="fas fa-map-marker-alt input-icon"></i>
+                            <input type="text" name="address" id="schoolAddress" required
+                                   placeholder="Type address or search on map..." autocomplete="off"
+                                   value="{{ request.form.get('address', '') }}" oninput="onAddressType(this)">
+                            <div class="osm-suggestions" id="osmSuggestions"></div>
+                        </div>
+
+                        <!-- Hidden lat/lng -->
+                        <input type="hidden" name="latitude" id="schoolLat" value="{{ request.form.get('latitude', '') }}">
+                        <input type="hidden" name="longitude" id="schoolLng" value="{{ request.form.get('longitude', '') }}">
+
+                        <!-- Map Box -->
+                        <div class="map-preview-box" id="mapBox">
+                            <div id="schoolMap"></div>
+                            <button type="button" class="map-my-loc-btn" onclick="useMyLocation()">
+                                <i class="fas fa-crosshairs"></i> Meri Location
+                            </button>
+                        </div>
+
+                        <!-- Confirmation bar -->
+                        <div class="map-selected-bar" id="mapBar">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="mapBarText">Location select ho gayi</span>
+                        </div>
+
+                        <div class="helper-text">
+                            <i class="fas fa-info-circle"></i>
+                            Type to get suggestions, or click/drag the marker on the map to pin location.
+                        </div>
+                    </div>
+                    <!-- END ADDRESS -->
+
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input type="text" name="phone" id="schoolPhone"
+                                   value="{{ request.form.get('phone', '') }}" placeholder="e.g. +92 300 1234567" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" name="email" id="schoolEmail"
+                                   value="{{ request.form.get('email', '') }}" placeholder="e.g. contact@school.com" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Logo</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-image input-icon" style="z-index: 5;"></i>
+                            <input type="file" name="logo" id="schoolLogo" accept="image/*" 
+                                   style="padding-left: 2.5rem;" onchange="previewLogo(this); updatePreview();">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Card -->
+                <div class="preview-card" id="previewCard" style="display: none;">
+                    <div class="preview-title">
+                        <i class="fas fa-eye"></i> Live Preview
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-avatar" id="previewLogo">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <div class="preview-info">
+                            <h4 id="previewName"><span>School Name</span> <span class="badge bg-gold" id="previewBadge" style="display: none; font-size: 10px; padding: 2px 6px;">New</span></h4>
+                            <p id="previewDetail">School details will appear here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADMIN INFORMATION SECTION (Only for non-admin users) -->
+                {% if session.role != 'admin' %}
+                <div class="section-title" style="margin-top: 2rem;">
+                    <i class="fas fa-user-shield"></i> School Admin Information
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Full Name <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" name="full_name" required
+                                   value="{{ request.form.get('full_name', '') }}" placeholder="Admin full name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Username <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user-tag input-icon"></i>
+                            <input type="text" name="username" required
+                                   value="{{ request.form.get('username', '') }}" placeholder="Choose username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-key input-icon"></i>
+                            <input type="password" name="password" required placeholder="Choose password">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" name="confirm_password" required placeholder="Confirm password">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Admin Phone</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-mobile-screen input-icon"></i>
+                            <input type="text" name="admin_phone"
+                                   value="{{ request.form.get('admin_phone', '') }}" placeholder="e.g. 0300 1234567">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Admin Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope-open input-icon"></i>
+                            <input type="email" name="admin_email"
+                                   value="{{ request.form.get('admin_email', '') }}" placeholder="e.g. admin@school.com">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-alert">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Registration will be approved by Super Admin. You can login after approval.</span>
+                </div>
+                {% endif %}
+
+                <div class="btn-group-custom">
+                    <button type="submit" class="btn-custom btn-custom-primary">
+                        <i class="fas fa-save"></i>
+                        {% if session.role == 'admin' %}
+                            Add School
+                        {% else %}
+                            Register School
+                        {% endif %}
+                    </button>
+                    <a href="{{ url_for('dashboard') }}" class="btn-custom btn-custom-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet JS — OpenStreetMap, koi API key nahi -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// ============================================================
+//  OPENSTREETMAP + NOMINATIM SEARCH (NO API KEY NEEDED)
+// ============================================================
+
+let osmMap = null;
+let osmMarker = null;
+let searchTimer = null;
+
+// Map initialize karna
+function initOSMMap(lat, lng, zoom) {
+    const mapBox = document.getElementById('mapBox');
+    mapBox.style.display = 'block';
+
+    if (!osmMap) {
+        osmMap = L.map('schoolMap').setView([lat, lng], zoom || 13);
+
+        // OpenStreetMap tiles — free, no key
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(osmMap);
+
+        // Custom marker icon
+        const icon = L.divIcon({
+            html: '<div style="background:#ef4444;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>',
+            iconSize: [20, 20],
+            iconAnchor: [10, 20],
+            className: ''
+        });
+
+        osmMarker = L.marker([lat, lng], { draggable: true, icon: icon }).addTo(osmMap);
+
+        // Marker drag hone par reverse geocode
+        osmMarker.on('dragend', function() {
+            const pos = osmMarker.getLatLng();
+            reverseGeocode(pos.lat, pos.lng);
+        });
+
+        // Map click par pin
+        osmMap.on('click', function(e) {
+            osmMarker.setLatLng(e.latlng);
+            reverseGeocode(e.latlng.lat, e.latlng.lng);
+        });
+
+    } else {
+        osmMap.setView([lat, lng], zoom || 16);
+        osmMarker.setLatLng([lat, lng]);
+        setTimeout(() => osmMap.invalidateSize(), 100);
+    }
+}
+
+// Address type hone par search
+function onAddressType(input) {
+    updatePreview();
+    clearTimeout(searchTimer);
+    const val = input.value.trim();
+    if (val.length < 3) {
+        document.getElementById('osmSuggestions').style.display = 'none';
+        return;
+    }
+    // 600ms baad search karo (har key par nahi)
+    searchTimer = setTimeout(() => searchAddress(val), 600);
+}
+
+// Nominatim API se address search (free)
+function searchAddress(query) {
+    const box = document.getElementById('osmSuggestions');
+    box.style.display = 'block';
+    box.innerHTML = '<div class="osm-searching"><span class="spinner-sm"></span> Searching...</div>';
+
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pk&limit=5&addressdetails=1`;
+
+    fetch(url, { headers: { 'Accept-Language': 'en' } })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.length) {
+                box.innerHTML = '<div class="osm-searching">Koi nateeja nahi mila</div>';
+                return;
+            }
+            box.innerHTML = data.map((item, i) => {
+                const parts = item.display_name.split(',');
+                const main = parts.slice(0, 2).join(',').trim();
+                const sub  = parts.slice(2, 5).join(',').trim();
+                return `<div class="osm-item" onclick="selectOSMResult(${i}, ${JSON.stringify(data).replace(/"/g,'&quot;')})">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <div class="osm-item-main">${main}</div>
+                        <div class="osm-item-sub">${sub}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        })
+        .catch(() => {
+            box.innerHTML = '<div class="osm-searching">Internet connection check karein</div>';
+        });
+}
+
+// Suggestion select karna
+function selectOSMResult(idx, data) {
+    const item = data[idx];
+    const lat = parseFloat(item.lat);
+    const lng = parseFloat(item.lon);
+    const addr = item.display_name;
+
+    document.getElementById('schoolAddress').value = addr.split(',').slice(0,4).join(',').trim();
+    document.getElementById('schoolLat').value = lat.toFixed(7);
+    document.getElementById('schoolLng').value = lng.toFixed(7);
+
+    document.getElementById('osmSuggestions').style.display = 'none';
+
+    initOSMMap(lat, lng, 16);
+    showConfirmBar(document.getElementById('schoolAddress').value);
+    updatePreview();
+}
+
+// Reverse geocoding — coordinates se address
+function reverseGeocode(lat, lng) {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=17&addressdetails=1`;
+
+    fetch(url, { headers: { 'Accept-Language': 'en' } })
+        .then(r => r.json())
+        .then(data => {
+            if (data.display_name) {
+                const addr = data.display_name.split(',').slice(0,4).join(',').trim();
+                document.getElementById('schoolAddress').value = addr;
+                document.getElementById('schoolLat').value = parseFloat(lat).toFixed(7);
+                document.getElementById('schoolLng').value = parseFloat(lng).toFixed(7);
+                showConfirmBar(addr);
+                updatePreview();
+            }
+        });
+}
+
+// GPS location
+function useMyLocation() {
+    if (!navigator.geolocation) {
+        alert('Browser location support nahi karta');
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            initOSMMap(lat, lng, 16);
+            document.getElementById('schoolLat').value = lat.toFixed(7);
+            document.getElementById('schoolLng').value = lng.toFixed(7);
+            reverseGeocode(lat, lng);
+        },
+        function() {
+            alert('Location allow karein browser mein');
+        }
+    );
+}
+
+// Confirmation bar
+function showConfirmBar(addr) {
+    const bar = document.getElementById('mapBar');
+    document.getElementById('mapBarText').textContent = addr;
+    bar.style.display = 'flex';
+}
+
+// Suggestions band karo bahar click par
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.address-search-wrap')) {
+        document.getElementById('osmSuggestions').style.display = 'none';
+    }
+});
+
+// ============================================================
+//  PREVIEW & VALIDATION
+// ============================================================
+
+function updatePreview() {
+    const name    = document.getElementById('schoolName')?.value;
+    const address = document.getElementById('schoolAddress')?.value;
+    const phone   = document.getElementById('schoolPhone')?.value;
+    const email   = document.getElementById('schoolEmail')?.value;
+    const card    = document.getElementById('previewCard');
+    const pName   = document.getElementById('previewName');
+    const pDetail = document.getElementById('previewDetail');
+    const pBadge  = document.getElementById('previewBadge');
+
+    if (name && name.trim()) {
+        card.style.display = 'block';
+        pName.querySelector('span:first-child').textContent = name;
+        pBadge.style.display = 'inline-block';
+        let parts = [];
+        if (address && address.trim()) parts.push(`📍 ${address.substring(0,50)}${address.length>50?'...':''}`);
+        if (phone   && phone.trim())   parts.push(`📞 ${phone}`);
+        if (email   && email.trim())   parts.push(`✉️ ${email}`);
+        pDetail.textContent = parts.length ? parts.join(' · ') : 'Complete the form above';
+    } else {
+        card.style.display = 'none';
+    }
+}
+
+// Logo preview
+function previewLogo(input) {
+    const logo = document.getElementById('previewLogo');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            logo.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`;
+            logo.style.background = 'transparent';
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        logo.innerHTML = '<i class="fas fa-school"></i>';
+        logo.style.background = 'linear-gradient(135deg, var(--secondary, #c6a43b) 0%, var(--secondary-dark, #a07d2a) 100%)';
+    }
+}
+
+function validateForm() {
+    const name = document.getElementById('schoolName')?.value;
+    if (!name || !name.trim()) {
+        alert('Please enter the school name');
+        document.getElementById('schoolName')?.focus();
+        return false;
+    }
+    const email = document.getElementById('schoolEmail')?.value;
+    if (email && email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert('Please enter a valid email address');
+        document.getElementById('schoolEmail')?.focus();
+        return false;
+    }
+    return true;
+}
+
+// Map trigger on load if lat/lng are set
+window.addEventListener('load', function() {
+    const latVal = document.getElementById('schoolLat').value;
+    const lngVal = document.getElementById('schoolLng').value;
+    if (latVal && lngVal) {
+        initOSMMap(parseFloat(latVal), parseFloat(lngVal), 16);
+    } else {
+        // Default Pakistan centring
+        initOSMMap(30.3753, 69.3451, 5);
+    }
+    updatePreview();
+});
+</script>
+{% endblock %}
