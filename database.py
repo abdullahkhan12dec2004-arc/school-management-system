@@ -11,7 +11,7 @@ import psycopg2.extras
 # defaults badal lein ya .env / system env vars set kar dein.
 
 DB_CONFIG = {
-    'host': os.environ.get('DB_HOST', 'localhost'),
+    'host': os.environ.get('DB_HOST', 'localhost').strip(),
     'port': os.environ.get('DB_PORT', '5432'),
     'dbname': os.environ.get('DB_NAME', 'shah_data'),
     'user': os.environ.get('DB_USER', 'postgres'),
