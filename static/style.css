@@ -1,18 +1,18 @@
 /* styles.css - Complete Professional Styling for School Management System */
-/* Modern Education Theme with Coral Pink & Peach Gold Accents */
+/* Modern Education Theme with Deep Blue & Gold Accents */
 
 :root {
-  /* Primary Color Palette - Coral Pink */
-  --primary-dark: #7a1f3d;
-  --primary: #d6446b;
-  --primary-light: #ec7f97;
-  --primary-bg: #fdeef2;
+  /* Primary Color Palette - Deep Blue & Gold */
+  --primary-dark: #0f2b3d;
+  --primary: #1a4a6f;
+  --primary-light: #2c6e9e;
+  --primary-bg: #e8f1f8;
 
-  /* Secondary Accent Colors - Warm Peach/Rose Gold */
-  --secondary: #e8935c;
-  --secondary-dark: #c96f3a;
-  --secondary-light: #f3bd8f;
-  --secondary-bg: #fdf1e6;
+  /* Secondary Accent Colors */
+  --secondary: #c6a43b;
+  --secondary-dark: #a07d2a;
+  --secondary-light: #e0c87c;
+  --secondary-bg: #fbf6e8;
 
   /* Neutral Colors */
   --gray-50: #f8fafc;
@@ -39,7 +39,7 @@
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
   --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
-  --gradient-hero: linear-gradient(135deg, #7a1f3d 0%, #d6446b 50%, #ec7f97 100%);
+  --gradient-hero: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 50%, #2c6e9e 100%);
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -203,7 +203,7 @@ a {
 }
 
 .school-badge {
-  background: linear-gradient(135deg, var(--primary-bg) 0%, #fce3ea 100%);
+  background: linear-gradient(135deg, var(--primary-bg) 0%, #e0edf8 100%);
   color: var(--primary);
   border: none;
   padding: var(--spacing-2) var(--spacing-3);
@@ -387,7 +387,7 @@ a {
 .form-control:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(214, 68, 107, 0.1);
+  box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.1);
 }
 
 .form-control:hover:not(:disabled) {
@@ -791,3 +791,5 @@ select.form-control {
 [data-tooltip]:hover::before {
   opacity: 1;
 }
+
+
