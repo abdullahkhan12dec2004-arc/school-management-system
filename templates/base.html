@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}EduManage Pro{% endblock %}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- In base.html, before </head> -->
@@ -18,10 +18,10 @@
 <style>
         /* ===== CSS VARIABLES ===== */
         :root {
-            --navy:        #0D1B2A;
-            --navy-light:  #162236;
-            --navy-mid:    #1E3250;
-            --navy-border: #2C4670;
+            --navy:        #4FC3F7;
+            --navy-light:  #6DD0F8;
+            --navy-mid:    #29ABE2;
+            --navy-border: #8FDBFA;
             --gold:        #F0A500;
             --gold-light:  #FFD166;
             --gold-muted:  #C4832A;
@@ -55,7 +55,7 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { font-size: 15px; }
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--off-white);
             color: var(--text-main);
             display: flex;
@@ -91,13 +91,13 @@
 
         .sidebar-logo-icon {
             width: 38px; height: 38px;
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-muted) 100%);
+            background: var(--white);
             border-radius: var(--radius-md);
             display: flex; align-items: center; justify-content: center;
             font-size: 18px;
-            color: var(--navy);
+            color: var(--navy-mid);
             flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(240,165,0,0.35);
+            box-shadow: 0 2px 8px rgba(41,171,226,0.35);
         }
 
         .sidebar-logo-text {
@@ -106,7 +106,7 @@
         }
 
         .sidebar-logo-text .brand {
-            font-family: 'Lora', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 16px;
             font-weight: 700;
             color: var(--white);
@@ -116,8 +116,9 @@
 
         .sidebar-logo-text .tagline {
             font-size: 10px;
-            font-weight: 400;
-            color: var(--text-light);
+            font-weight: 500;
+            color: var(--white);
+            opacity: 0.85;
             letter-spacing: 0.8px;
             text-transform: uppercase;
         }
@@ -130,10 +131,11 @@
 
         .nav-section {
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 1.2px;
             text-transform: uppercase;
-            color: var(--text-light);
+            color: var(--white);
+            opacity: 0.75;
             padding: 16px 22px 6px;
         }
 
@@ -142,10 +144,11 @@
             align-items: center;
             gap: 11px;
             padding: 10px 22px;
-            color: #A8B8CC;
+            color: var(--white);
+            opacity: 0.85;
             text-decoration: none;
             font-size: 13.5px;
-            font-weight: 400;
+            font-weight: 500;
             border-left: 3px solid transparent;
             transition: var(--transition);
             position: relative;
@@ -156,25 +159,28 @@
             text-align: center;
             font-size: 14px;
             flex-shrink: 0;
-            opacity: 0.8;
+            color: var(--white);
+            opacity: 0.9;
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.14);
             color: var(--white);
-            border-left-color: rgba(240,165,0,0.4);
+            opacity: 1;
+            border-left-color: rgba(255,255,255,0.55);
         }
 
         .nav-item.active {
-            background: rgba(240,165,0,0.1);
-            color: var(--gold-light);
-            border-left-color: var(--gold);
-            font-weight: 500;
+            background: rgba(255,255,255,0.22);
+            color: var(--white);
+            opacity: 1;
+            border-left-color: var(--white);
+            font-weight: 700;
         }
 
         .nav-item.active i {
             opacity: 1;
-            color: var(--gold);
+            color: var(--white);
         }
 
         /* Sidebar Footer */
@@ -189,17 +195,17 @@
             gap: 10px;
             padding: 10px 10px;
             border-radius: var(--radius-md);
-            background: var(--navy-light);
+            background: rgba(255,255,255,0.14);
         }
 
         .user-avatar {
             width: 34px; height: 34px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-muted));
+            background: var(--white);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: 700;
             font-size: 13px;
-            color: var(--navy);
+            color: var(--navy-mid);
             flex-shrink: 0;
         }
 
@@ -219,13 +225,15 @@
 
         .user-role {
             font-size: 11px;
-            color: var(--text-light);
+            color: var(--white);
+            opacity: 0.8;
             text-transform: capitalize;
             letter-spacing: 0.3px;
         }
 
         .logout-btn {
-            color: var(--text-light);
+            color: var(--white);
+            opacity: 0.8;
             font-size: 14px;
             padding: 5px;
             border-radius: var(--radius-sm);
@@ -236,7 +244,8 @@
 
         .logout-btn:hover {
             color: var(--danger);
-            background: rgba(220,38,38,0.1);
+            opacity: 1;
+            background: rgba(220,38,38,0.12);
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -270,7 +279,7 @@
         .topbar-left {}
 
         .page-title {
-            font-family: 'Lora', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 20px;
             font-weight: 700;
             color: var(--text-main);
@@ -304,9 +313,9 @@
             align-items: center;
             gap: 7px;
             background: var(--navy);
-            color: var(--gold-light);
+            color: var(--white);
             font-size: 12.5px;
-            font-weight: 500;
+            font-weight: 600;
             padding: 7px 14px;
             border-radius: var(--radius-xl);
             letter-spacing: 0.2px;
@@ -314,7 +323,7 @@
 
         .school-badge i {
             font-size: 13px;
-            color: var(--gold);
+            color: var(--white);
         }
 
         /* ===== CONTENT AREA ===== */
@@ -379,20 +388,21 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: var(--navy);
         }
 
         .card-title {
-            font-family: 'Lora', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 16px;
             font-weight: 600;
-            color: var(--text-main);
+            color: var(--white);
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .card-title i {
-            color: var(--gold);
+            color: var(--white);
             font-size: 16px;
         }
 
@@ -433,7 +443,7 @@
             flex-shrink: 0;
         }
 
-        .stat-icon.navy  { background: rgba(13,27,42,0.08);  color: var(--navy); }
+        .stat-icon.navy  { background: var(--navy);  color: var(--white); }
         .stat-icon.gold  { background: rgba(240,165,0,0.12); color: var(--gold-muted); }
         .stat-icon.green { background: var(--success-bg);    color: var(--success); }
         .stat-icon.blue  { background: var(--info-bg);       color: var(--info); }
@@ -443,7 +453,7 @@
 
         .stat-label {
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-light);
             text-transform: uppercase;
             letter-spacing: 0.6px;
@@ -451,7 +461,7 @@
         }
 
         .stat-value {
-            font-family: 'Lora', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 26px;
             font-weight: 700;
             color: var(--text-main);
@@ -479,15 +489,15 @@
         }
 
         .edu-table thead th {
-            background: var(--off-white);
-            color: var(--text-muted);
+            background: var(--navy);
+            color: var(--white);
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 0.8px;
             text-transform: uppercase;
             padding: 11px 16px;
             text-align: left;
-            border-bottom: 2px solid #E0E7EF;
+            border-bottom: 2px solid var(--navy-mid);
             white-space: nowrap;
         }
 
@@ -499,7 +509,7 @@
         .edu-table tbody tr:last-child { border-bottom: none; }
 
         .edu-table tbody tr:hover {
-            background: #F6F9FF;
+            background: #F0FAFF;
         }
 
         .edu-table tbody td {
@@ -524,7 +534,7 @@
         .badge-danger  { background: var(--danger-bg);  color: var(--danger);  }
         .badge-warning { background: var(--warning-bg); color: var(--warning); }
         .badge-info    { background: var(--info-bg);    color: var(--info);    }
-        .badge-navy    { background: rgba(13,27,42,0.08); color: var(--navy-mid); }
+        .badge-navy    { background: rgba(79,195,247,0.15); color: var(--navy-mid); }
         .badge-gold    { background: rgba(240,165,0,0.12); color: var(--gold-muted); }
 
         /* ===== BUTTONS ===== */
@@ -534,7 +544,7 @@
             gap: 7px;
             padding: 9px 18px;
             border-radius: var(--radius-md);
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 13.5px;
             font-weight: 600;
             cursor: pointer;
@@ -553,13 +563,13 @@
 
         .btn-primary:hover {
             background: var(--navy-mid);
-            box-shadow: 0 4px 12px rgba(13,27,42,0.25);
+            box-shadow: 0 4px 12px rgba(41,171,226,0.3);
             transform: translateY(-1px);
         }
 
         .btn-gold {
             background: var(--gold);
-            color: var(--navy);
+            color: var(--white);
         }
 
         .btn-gold:hover {
@@ -570,14 +580,14 @@
 
         .btn-outline {
             background: transparent;
-            color: var(--text-main);
-            border: 1.5px solid #CBD5E1;
+            color: var(--navy-mid);
+            border: 1.5px solid var(--navy-border);
         }
 
         .btn-outline:hover {
             border-color: var(--navy);
-            color: var(--navy);
-            background: rgba(13,27,42,0.04);
+            color: var(--navy-mid);
+            background: rgba(79,195,247,0.08);
         }
 
         .btn-danger {
@@ -604,8 +614,8 @@
         .form-label {
             display: block;
             font-size: 12.5px;
-            font-weight: 600;
-            color: var(--text-muted);
+            font-weight: 700;
+            color: var(--navy-mid);
             letter-spacing: 0.4px;
             text-transform: uppercase;
             margin-bottom: 6px;
@@ -616,7 +626,7 @@
             padding: 10px 14px;
             border: 1.5px solid #D8E1EE;
             border-radius: var(--radius-md);
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 14px;
             color: var(--text-main);
             background: var(--white);
@@ -625,12 +635,12 @@
         }
 
         .form-control:hover {
-            border-color: #B0BFD8;
+            border-color: var(--navy-border);
         }
 
         .form-control:focus {
-            border-color: var(--navy-mid);
-            box-shadow: 0 0 0 3px rgba(30,50,80,0.1);
+            border-color: var(--navy);
+            box-shadow: 0 0 0 3px rgba(79,195,247,0.15);
         }
 
         select.form-control {
@@ -659,7 +669,7 @@
         }
 
         .page-header-left h1 {
-            font-family: 'Lora', serif;
+            font-family: 'Poppins', sans-serif;
             font-size: 22px;
             font-weight: 700;
             color: var(--text-main);
@@ -676,7 +686,7 @@
             width: 36px; height: 36px;
             border-radius: 50%;
             background: var(--navy);
-            color: var(--gold-light);
+            color: var(--white);
             font-weight: 700;
             font-size: 13px;
             display: inline-flex;
