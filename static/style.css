@@ -1,18 +1,18 @@
 /* styles.css - Complete Professional Styling for School Management System */
-/* Modern Education Theme with Deep Blue & Gold Accents */
+/* Modern Education Theme with Light Sky Blue Accents */
 
 :root {
-  /* Primary Color Palette - Deep Blue & Gold */
-  --primary-dark: #0f2b3d;
-  --primary: #1a4a6f;
-  --primary-light: #2c6e9e;
-  --primary-bg: #e8f1f8;
+  /* Primary Color Palette - Light Sky Blue */
+  --primary-dark: #1E88C7;
+  --primary: #4FC3F7;
+  --primary-light: #81D4FA;
+  --primary-bg: #E6F7FF;
 
   /* Secondary Accent Colors */
-  --secondary: #c6a43b;
-  --secondary-dark: #a07d2a;
-  --secondary-light: #e0c87c;
-  --secondary-bg: #fbf6e8;
+  --secondary: #29ABE2;
+  --secondary-dark: #1E88C7;
+  --secondary-light: #8FDBFA;
+  --secondary-bg: #EEFBFF;
 
   /* Neutral Colors */
   --gray-50: #f8fafc;
@@ -39,7 +39,7 @@
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
   --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
-  --gradient-hero: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 50%, #2c6e9e 100%);
+  --gradient-hero: linear-gradient(135deg, #1E88C7 0%, #4FC3F7 50%, #81D4FA 100%);
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -74,16 +74,18 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   background: white;
   color: var(--gray-800);
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
+  font-size: 15.5px;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.25;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  line-height: 1.3;
   color: var(--gray-800);
 }
 
@@ -95,8 +97,7 @@ a {
 /* Sidebar Styles */
 .sidebar {
   background: var(--gradient-primary);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .sidebar-logo {
@@ -106,7 +107,7 @@ a {
 .sidebar-logo-icon {
   width: 48px;
   height: 48px;
-  background: var(--gradient-secondary);
+  background: #FFFFFF;
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -120,17 +121,17 @@ a {
 }
 
 .sidebar-logo-text .brand {
+  font-family: 'Poppins', sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #fff 0%, var(--secondary-light) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #FFFFFF;
 }
 
 .sidebar-logo-text .tagline {
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  color: #FFFFFF;
+  opacity: 0.85;
   letter-spacing: 1px;
 }
 
@@ -142,7 +143,9 @@ a {
   padding: var(--spacing-3) var(--spacing-4);
   margin: 0 var(--spacing-2);
   border-radius: var(--radius-md);
-  color: rgba(255, 255, 255, 0.8);
+  color: #FFFFFF;
+  opacity: 0.85;
+  font-weight: 500;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -155,19 +158,22 @@ a {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: var(--secondary);
+  background: #FFFFFF;
   transform: scaleY(0);
   transition: transform 0.3s ease;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: rgba(255, 255, 255, 0.14);
+  color: #FFFFFF;
+  opacity: 1;
 }
 
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+  background: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+  opacity: 1;
+  font-weight: 700;
 }
 
 .nav-item.active::before {
@@ -177,11 +183,14 @@ a {
 .nav-item i {
   width: 20px;
   font-size: 1rem;
+  color: #FFFFFF;
 }
 
 .nav-section {
-  color: rgba(255, 255, 255, 0.5);
+  color: #FFFFFF;
+  opacity: 0.7;
   font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -194,21 +203,19 @@ a {
 }
 
 .page-title {
+  font-family: 'Poppins', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--primary-dark);
 }
 
 .school-badge {
-  background: linear-gradient(135deg, var(--primary-bg) 0%, #e0edf8 100%);
-  color: var(--primary);
+  background: var(--primary);
+  color: #FFFFFF;
   border: none;
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius-xl);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Card Styles */
@@ -227,18 +234,23 @@ a {
 }
 
 .card-header {
-  background: white;
+  background: var(--primary);
   border-bottom: 1px solid var(--gray-100);
   padding: var(--spacing-5) var(--spacing-6);
 }
 
 .card-title {
+  font-family: 'Poppins', sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
-  color: var(--primary);
+  color: #FFFFFF;
+}
+
+.card-title i {
+  color: #FFFFFF;
 }
 
 .card-body {
@@ -279,22 +291,23 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-bg);
-  color: var(--primary);
+  background: var(--primary);
+  color: #FFFFFF;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--gray-500);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .stat-value {
+  font-family: 'Poppins', sans-serif;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-dark);
   line-height: 1.2;
 }
 
@@ -307,7 +320,8 @@ a {
 .btn {
   padding: var(--spacing-2) var(--spacing-4);
   border-radius: var(--radius-md);
-  font-weight: 500;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
   transition: all 0.3s ease;
   cursor: pointer;
   border: none;
@@ -319,7 +333,7 @@ a {
 
 .btn-primary {
   background: var(--gradient-primary);
-  color: white;
+  color: #FFFFFF;
   box-shadow: var(--shadow-sm);
 }
 
@@ -330,7 +344,7 @@ a {
 
 .btn-secondary {
   background: var(--gradient-secondary);
-  color: white;
+  color: #FFFFFF;
 }
 
 .btn-outline {
@@ -341,7 +355,7 @@ a {
 
 .btn-outline:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-dark);
   background: var(--primary-bg);
 }
 
@@ -368,8 +382,8 @@ a {
 .form-label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--gray-700);
+  font-weight: 700;
+  color: var(--primary-dark);
   margin-bottom: var(--spacing-2);
 }
 
@@ -387,7 +401,7 @@ a {
 .form-control:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.18);
 }
 
 .form-control:hover:not(:disabled) {
@@ -418,18 +432,18 @@ select.form-control {
 }
 
 .edu-table thead {
-  background: var(--gray-50);
-  border-bottom: 2px solid var(--gray-200);
+  background: var(--primary);
+  border-bottom: 2px solid var(--primary-dark);
 }
 
 .edu-table th {
   padding: var(--spacing-4);
   text-align: left;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--gray-600);
+  color: #FFFFFF;
 }
 
 .edu-table td {
@@ -443,7 +457,7 @@ select.form-control {
 }
 
 .edu-table tbody tr:hover {
-  background: var(--gray-50);
+  background: var(--primary-bg);
 }
 
 /* Badge Styles */
@@ -453,7 +467,7 @@ select.form-control {
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-xl);
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   gap: 0.25rem;
 }
 
@@ -479,7 +493,7 @@ select.form-control {
 
 .badge-primary {
   background: var(--primary-bg);
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 .badge-secondary {
@@ -549,15 +563,16 @@ select.form-control {
 }
 
 .result-header {
-  border-bottom: 2px solid var(--gray-200);
+  border-bottom: 2px solid var(--primary);
   padding-bottom: var(--spacing-4);
   margin-bottom: var(--spacing-4);
 }
 
 .school-name {
+  font-family: 'Poppins', sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 .result-title {
@@ -791,5 +806,3 @@ select.form-control {
 [data-tooltip]:hover::before {
   opacity: 1;
 }
-
-
