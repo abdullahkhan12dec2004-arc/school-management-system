@@ -1,132 +1,280 @@
 {% extends "base.html" %}
 {% block title %}Reports – Excel Export{% endblock %}
 {% block extra_css %}
-<style>
-    /* Force white background */
-    body,
-    .container-fluid,
-    .card,
-    .card-body,
-    .card-header {
-        background-color: #ffffff !important;
+  <style>
+    /* ----- global reset & base ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    /* Card styling */
-    .card {
-        border-radius: 12px !important;
-        border: 1px solid #e2e8f0 !important;
-        margin-bottom: 20px;
+    body {
+      background: #ffffff !important;
+      font-family: 'Inter', 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      font-size: 1rem;
+      line-height: 1.5;
+      padding: 24px 20px;
+      color: #0b1e33;
     }
 
-    /* Report header styling - NAVY BLUE */
-    .card-header {
-        background-color: #1e293b !important; /* Navy blue */
-        border-bottom: 1px solid #e2e8f0 !important;
-        padding: 12px 20px !important;
-        color: white !important;
+    /* force white backgrounds */
+    body, .container-fluid, .card, .card-body, .card-header, .card-footer {
+      background-color: #ffffff !important;
     }
 
-    /* Icon and text in header - WHITE */
-    .card-header i,
-    .card-header .fas,
-    .card-header span,
-    .card-header {
-        color: #ffffff !important;
+    .container-fluid {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 10px;
     }
 
-    /* Card body */
-    .card-body {
-        padding: 20px !important;
+    /* ----- top heading (sky blue) ----- */
+    .page-heading {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e6f0fa;
     }
 
-    .card-footer {
-        background-color: #ffffff !important;
-        border-top: 1px solid #e2e8f0 !important;
-        padding: 12px 20px !important;
+    .page-heading i {
+      font-size: 2.3rem;
+      color: #38bdf8; /* sky blue */
+      transition: transform 0.2s;
     }
 
-    /* Form labels */
-    .form-label {
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-        margin-bottom: 5px !important;
-        color: #333;
+    .page-heading h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #0b2b44;
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
     }
 
-    /* Form selects */
-    .form-select {
-        font-size: 0.85rem !important;
-        padding: 6px 12px !important;
-        border-radius: 6px !important;
-        border: 1px solid #cbd5e1 !important;
+    .page-heading h1 span {
+      color: #38bdf8; /* sky blue */
+      font-weight: 300;
+      margin-left: 6px;
     }
 
-    /* NAVY BLUE BUTTONS */
-    .btn-navy {
-        background-color: #1e293b !important; /* Navy blue */
-        color: white !important;
-        border: none !important;
-        padding: 8px 20px !important;
-        font-size: 0.85rem !important;
-        border-radius: 6px !important;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-navy:hover {
-        background-color: #1e40af !important;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
-    }
-
-    .btn-navy i {
-        color: white !important;
-        margin-right: 5px;
-    }
-
-    /* 2 COLUMNS LAYOUT - 2 reports per row */
+    /* ----- cards grid (2 columns) ----- */
     .row {
-        display: flex;
-        flex-wrap: wrap;
-        margin: 0 -10px;
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -12px;
     }
 
     .col-md-6 {
-        width: 50%;
-        padding: 0 10px;
-        margin-bottom: 20px;
-        box-sizing: border-box;
+      width: 50%;
+      padding: 0 12px;
+      margin-bottom: 28px;
+      box-sizing: border-box;
     }
 
-    /* Make cards same height */
-    .h-100 {
-        height: 100%;
+    /* card base */
+    .card {
+      border-radius: 16px !important;
+      border: 1px solid #e2edf7 !important;
+      background: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(0, 30, 60, 0.04);
+      transition: 0.2s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* Responsive for mobile - 1 column */
-    @media (max-width: 768px) {
-        .col-md-6 {
-            width: 100%;
-        }
-
-        .container-fluid {
-            padding: 10px !important;
-        }
+    .card:hover {
+      box-shadow: 0 10px 24px rgba(0, 60, 120, 0.06);
     }
 
-    /* Small text */
+    /* ----- card header : SKY BLUE ----- */
+    .card-header {
+      background-color: #38bdf8 !important;   /* sky blue */
+      border-bottom: 1px solid #b9def5 !important;
+      padding: 16px 22px !important;
+      border-radius: 16px 16px 0 0 !important;
+      color: #ffffff !important;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .card-header i,
+    .card-header .fas,
+    .card-header .fa-solid,
+    .card-header span {
+      color: #ffffff !important;
+    }
+
+    .card-header i {
+      font-size: 1.5rem;
+      width: 2rem;
+      text-align: center;
+    }
+
+    .card-header .header-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #ffffff !important;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    /* card body */
+    .card-body {
+      padding: 22px 22px 18px !important;
+      flex: 1;
+      font-size: 0.95rem;
+    }
+
+    .card-footer {
+      background: #ffffff !important;
+      border-top: 1px solid #e2edf7 !important;
+      padding: 14px 22px !important;
+      border-radius: 0 0 16px 16px;
+    }
+
+    /* ----- form elements (labels, selects) ----- */
+    .form-label {
+      font-size: 0.9rem !important;
+      font-weight: 600 !important;
+      margin-bottom: 4px !important;
+      color: #1a344c;
+      letter-spacing: -0.01em;
+      display: block;
+    }
+
+    .form-select {
+      font-size: 0.9rem !important;
+      padding: 8px 14px !important;
+      border-radius: 10px !important;
+      border: 1px solid #d4e2f0 !important;
+      background-color: #fafdff;
+      width: 100%;
+      transition: 0.15s;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    .form-select:focus {
+      border-color: #38bdf8;
+      outline: 0;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+
+    .mb-2 {
+      margin-bottom: 14px;
+    }
+
+    .mt-1 { margin-top: 6px; }
+    .mt-2 { margin-top: 12px; }
+
+    .d-flex { display: flex; }
+    .align-items-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .flex-wrap { flex-wrap: wrap; }
+
+    /* ----- SKY BLUE buttons (btn-sky) ----- */
+    .btn-sky {
+      background-color: #38bdf8 !important;
+      color: #ffffff !important;
+      border: none !important;
+      padding: 10px 26px !important;
+      font-size: 0.95rem !important;
+      font-weight: 500;
+      border-radius: 40px !important;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(56, 189, 248, 0.25);
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-sky:hover {
+      background-color: #1ea5e0 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(56, 189, 248, 0.35);
+    }
+
+    .btn-sky i {
+      color: #ffffff !important;
+      font-size: 1rem;
+    }
+
+    /* small muted text */
     .text-muted.small {
-        font-size: 0.75rem !important;
-        color: #666 !important;
-        margin-bottom: 15px !important;
+      font-size: 0.8rem !important;
+      color: #4d6a8a !important;
+      margin-bottom: 14px !important;
+      line-height: 1.4;
     }
 
-    /* Remove default button success styling */
-    .btn-success {
-        background-color: #1e3a8a !important;
-        color: white !important;
+    /* helper: inline flex for month/year */
+    .inline-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
     }
-</style>
+    .inline-group .form-group {
+      flex: 1 0 120px;
+      min-width: 100px;
+    }
+
+    /* responsive */
+    @media (max-width: 768px) {
+      .col-md-6 {
+        width: 100%;
+        padding: 0 6px;
+      }
+      .container-fluid {
+        padding: 0 6px !important;
+      }
+      .page-heading h1 {
+        font-size: 1.6rem;
+      }
+      .page-heading i {
+        font-size: 1.8rem;
+      }
+      .card-header .header-title {
+        font-size: 1.1rem;
+      }
+      .btn-sky {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* extra spacing and polish */
+    .fw-semibold { font-weight: 600; }
+    .text-secondary { color: #2c4b6b; }
+    .gap-1 { gap: 4px; }
+
+    /* improve readability */
+    .card-body .form-label i {
+      color: #38bdf8;
+      margin-right: 6px;
+      width: 1.2rem;
+    }
+
+    /* sequence fix: all cards have consistent fields */
+    .field-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 16px;
+      margin-bottom: 6px;
+    }
+    .field-row .field-group {
+      flex: 1 0 150px;
+      min-width: 130px;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
