@@ -112,10 +112,10 @@ def reports_index():
     c.execute("SELECT id, name FROM schools ORDER BY name")
     schools = fetchall_dict(c)
 
-    c.execute("SELECT id, class_name, section FROM classes WHERE school_id=? ORDER BY class_name", (school_id,))
+    c.execute("SELECT id, class_name, section FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
     classes = fetchall_dict(c)
 
-    c.execute("SELECT id, full_name FROM teachers WHERE school_id=? ORDER BY full_name", (school_id,))
+    c.execute("SELECT id, full_name FROM teachers WHERE school_id=%s ORDER BY full_name", (school_id,))
     teachers = fetchall_dict(c)
 
     conn.close()
@@ -143,7 +143,7 @@ def export_students():
     c    = conn.cursor()
 
     # School info
-    c.execute("SELECT name FROM schools WHERE id=?", (school_id,))
+    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
     school_row = c.fetchone()
     school_name = school_row[0] if school_row else "School"
 
@@ -154,7 +154,7 @@ def export_students():
             FROM students st
             LEFT JOIN classes c ON st.class_id = c.id
             JOIN schools s ON st.school_id = s.id
-            WHERE st.id = ?
+            WHERE st.id = %s
         """, (student_id_single,))
         students = fetchall_dict(c)
     elif class_id:
@@ -163,7 +163,7 @@ def export_students():
             FROM students st
             LEFT JOIN classes c ON st.class_id = c.id
             JOIN schools s ON st.school_id = s.id
-            WHERE st.school_id = ? AND st.class_id = ?
+            WHERE st.school_id = %s AND st.class_id = %s
             ORDER BY st.full_name
         """, (school_id, class_id))
         students = fetchall_dict(c)
@@ -173,7 +173,7 @@ def export_students():
             FROM students st
             LEFT JOIN classes c ON st.class_id = c.id
             JOIN schools s ON st.school_id = s.id
-            WHERE st.school_id = ?
+            WHERE st.school_id = %s
             ORDER BY c.class_name, st.full_name
         """, (school_id,))
         students = fetchall_dict(c)
@@ -183,13 +183,13 @@ def export_students():
     all_siblings = {}
     for s in students:
         sid = s['id']
-        c.execute("SELECT * FROM student_parents WHERE student_id=?", (sid,))
+        c.execute("SELECT * FROM student_parents WHERE student_id=%s", (sid,))
         all_parents[sid] = fetchall_dict(c)
         c.execute("""
             SELECT ss.*, st2.full_name as linked_name
             FROM student_siblings ss
             LEFT JOIN students st2 ON ss.sibling_student_id = st2.id
-            WHERE ss.student_id = ?
+            WHERE ss.student_id = %s
         """, (sid,))
         all_siblings[sid] = fetchall_dict(c)
 
@@ -343,18 +343,18 @@ def export_teachers():
     conn = get_db()
     c    = conn.cursor()
 
-    c.execute("SELECT name FROM schools WHERE id=?", (school_id,))
+    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
     school_row  = c.fetchone()
     school_name = school_row[0] if school_row else "School"
 
     c.execute("""
         SELECT t.*,
-               (SELECT STRING_AGG(c.class_name + ' ' + c.section, ', ')
+               (SELECT STRING_AGG(c.class_name || ' ' || c.section, ', ')
                 FROM teacher_classes tc
                 JOIN classes c ON tc.class_id = c.id
                 WHERE tc.teacher_id = t.id) AS assigned_classes
         FROM teachers t
-        WHERE t.school_id = ?
+        WHERE t.school_id = %s
         ORDER BY t.full_name
     """, (school_id,))
     teachers = fetchall_dict(c)
@@ -362,7 +362,7 @@ def export_teachers():
     # Fetch documents per teacher
     all_docs = {}
     for t in teachers:
-        c.execute("SELECT document_type, document_name FROM teacher_documents WHERE teacher_id=?", (t['id'],))
+        c.execute("SELECT document_type, document_name FROM teacher_documents WHERE teacher_id=%s", (t['id'],))
         all_docs[t['id']] = fetchall_dict(c)
 
     conn.close()
@@ -444,7 +444,7 @@ def export_fees():
     conn = get_db()
     c    = conn.cursor()
 
-    c.execute("SELECT name FROM schools WHERE id=?", (school_id,))
+    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
     school_row  = c.fetchone()
     school_name = school_row[0] if school_row else "School"
 
@@ -457,18 +457,18 @@ def export_fees():
         JOIN students s  ON fc.student_id = s.id
         LEFT JOIN classes cl  ON fc.class_id   = cl.id
         LEFT JOIN users u     ON fc.collected_by = u.id
-        WHERE fc.school_id = ?
+        WHERE fc.school_id = %s
     """
     params = [school_id]
 
     if class_id:
-        query += " AND fc.class_id = ?"
+        query += " AND fc.class_id = %s"
         params.append(class_id)
     if month:
-        query += " AND fc.month = ?"
+        query += " AND fc.month = %s"
         params.append(month)
     if year:
-        query += " AND fc.year = ?"
+        query += " AND fc.year = %s"
         params.append(year)
 
     query += " ORDER BY cl.class_name, s.full_name, fc.year, fc.month"
@@ -565,7 +565,7 @@ def export_salary():
     conn = get_db()
     c    = conn.cursor()
 
-    c.execute("SELECT name FROM schools WHERE id=?", (school_id,))
+    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
     school_row  = c.fetchone()
     school_name = school_row[0] if school_row else "School"
 
@@ -579,17 +579,17 @@ def export_salary():
             FROM teacher_salary_payments tsp
             JOIN teachers t ON tsp.teacher_id = t.id
             LEFT JOIN users u ON tsp.paid_by = u.id
-            WHERE tsp.school_id = ?
+            WHERE tsp.school_id = %s
         """
         params = [school_id]
         if teacher_id:
-            query += " AND tsp.teacher_id = ?"
+            query += " AND tsp.teacher_id = %s"
             params.append(teacher_id)
         if month:
-            query += " AND tsp.month = ?"
+            query += " AND tsp.month = %s"
             params.append(month)
         if year:
-            query += " AND tsp.year = ?"
+            query += " AND tsp.year = %s"
             params.append(year)
         query += " ORDER BY t.full_name, tsp.year, tsp.month"
         c.execute(query, params)
@@ -602,10 +602,10 @@ def export_salary():
 
     if mode == "base" or not salary_rows:
         # Just show teacher base salaries
-        q = "SELECT * FROM teachers WHERE school_id=?"
+        q = "SELECT * FROM teachers WHERE school_id=%s"
         params = [school_id]
         if teacher_id:
-            q += " AND id=?"
+            q += " AND id=%s"
             params.append(teacher_id)
         q += " ORDER BY full_name"
         c.execute(q, params)
