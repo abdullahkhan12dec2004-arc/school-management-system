@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask import request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
 from functools import wraps
-
+import datetime
 import os
 import psycopg2
 from database import get_db, fetchall_dict, fetchone_dict, hash_password, init_db
@@ -41,11 +41,7 @@ def get_active_school_id():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-from datetime import datetime
 
-@app.context_processor
-def inject_now():
-    return {'now': datetime.now()}
 # ========== DECORATORS ==========
 def login_required(f):
     @wraps(f)
