@@ -13,7 +13,7 @@
     }
 
     body {
-        background: #eef2f8 !important;
+        background: #ffffff !important;
         font-family: 'Inter', sans-serif;
     }
 
@@ -21,12 +21,12 @@
     .student-reg-page {
         width: 100%;
         min-height: calc(100vh - 60px);
-        padding: 2.2rem;
-        background: #eef2f8;
+        padding: 1.4rem;
+        background: #ffffff;
     }
 
     .form-container {
-        max-width: 1180px;
+        max-width: 900px;
         width: 100%;
         margin: 0 auto;
     }
@@ -34,41 +34,36 @@
     /* Page Header */
     .page-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.3rem;
     }
 
     .page-header h1 {
-        font-size: 2.1rem;
+        font-size: 1.5rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #1a4a6f 0%, #2c6e9e 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        margin-bottom: 0.5rem;
+        color: #0284c7;
+        margin-bottom: 0.3rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 14px;
+        gap: 10px;
         letter-spacing: -0.02em;
     }
 
     .page-header h1 i {
-        background: none;
-        color: #1a4a6f;
-        -webkit-text-fill-color: #1a4a6f;
+        color: #0284c7;
     }
 
     .page-header p {
         color: #6c7a91;
-        font-size: 1rem;
+        font-size: 0.85rem;
     }
 
-    /* Two-card-per-row layout, matching the reference dashboard grid */
+    /* Two-card-per-row layout: equal width AND equal height */
     .sections-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        align-items: start;
+        gap: 1rem;
+        align-items: stretch;
     }
 
     .sections-grid .span-2 {
@@ -78,12 +73,15 @@
     /* Individual Section Card */
     .section-card {
         background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
+        border-radius: 14px;
+        box-shadow: 0 4px 12px -6px rgba(2, 132, 199, 0.15);
         overflow: hidden;
-        border: 1px solid #eef2f8;
-        margin-bottom: 1.5rem;
+        border: 1px solid #e0f2fe;
+        margin-bottom: 1rem;
         transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
     .sections-grid .section-card {
@@ -91,46 +89,51 @@
     }
 
     .section-card:hover {
-        box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 8px 18px -8px rgba(2, 132, 199, 0.25);
     }
 
     .card-header {
-        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
-        padding: 1.05rem 1.6rem;
+        background: #0ea5e9;
+        padding: 0.75rem 1.2rem;
+        flex-shrink: 0;
     }
 
     .card-header h3 {
-        color: white;
-        font-size: 1.15rem;
+        color: #ffffff;
+        font-size: 0.95rem;
         font-weight: 700;
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         letter-spacing: 0.02em;
     }
 
     .card-header h3 i {
-        color: #e0c87c;
-        font-size: 1.2rem;
+        color: #ffffff;
+        font-size: 1rem;
     }
 
     .card-header .optional-tag {
-        font-size: 0.8rem;
+        font-size: 0.72rem;
         font-weight: 500;
-        opacity: 0.8;
+        opacity: 0.85;
         margin-left: 4px;
+        color: #ffffff;
     }
 
     .card-body {
-        padding: 1.7rem;
+        padding: 1.1rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
 
     /* Form Grid - 2 Columns */
     .form-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1.2rem;
+        gap: 0.9rem;
     }
 
     .full-width {
@@ -142,20 +145,20 @@
     }
 
     .form-label {
-        font-size: 0.78rem;
+        font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.6px;
+        letter-spacing: 0.5px;
         color: #4b5c78;
-        margin-bottom: 0.45rem;
+        margin-bottom: 0.35rem;
         display: block;
     }
 
     .form-label i {
         margin-right: 6px;
-        color: #c6a43b;
-        width: 15px;
-        font-size: 0.78rem;
+        color: #0ea5e9;
+        width: 14px;
+        font-size: 0.7rem;
     }
 
     .required {
@@ -169,11 +172,11 @@
 
     .input-wrapper i.input-icon {
         position: absolute;
-        left: 13px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
         color: #9aa9bf;
-        font-size: 0.95rem;
+        font-size: 0.85rem;
         pointer-events: none;
     }
 
@@ -181,10 +184,10 @@
     .input-wrapper select,
     .input-wrapper textarea {
         width: 100%;
-        padding: 0.75rem 0.9rem 0.75rem 2.5rem;
+        padding: 0.6rem 0.8rem 0.6rem 2.3rem;
         border: 1.5px solid #e5eaf0;
-        border-radius: 12px;
-        font-size: 0.95rem;
+        border-radius: 10px;
+        font-size: 0.86rem;
         font-family: 'Inter', sans-serif;
         background: #ffffff;
         color: #22314a;
@@ -192,7 +195,7 @@
     }
 
     .input-wrapper textarea {
-        padding: 0.75rem 0.9rem;
+        padding: 0.6rem 0.8rem;
         resize: vertical;
     }
 
@@ -200,20 +203,20 @@
     .input-wrapper select:focus,
     .input-wrapper textarea:focus {
         outline: none;
-        border-color: #1a4a6f;
-        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.1);
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
     }
 
     .input-wrapper input::placeholder,
     .input-wrapper textarea::placeholder {
         color: #b9c2d0;
-        font-size: 0.88rem;
+        font-size: 0.8rem;
     }
 
     .help-text {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         color: #8a99b0;
-        margin-top: 5px;
+        margin-top: 4px;
         display: flex;
         align-items: center;
         gap: 5px;
@@ -221,32 +224,32 @@
 
     /* Entry Cards (Parents & Siblings) */
     .entry-card {
-        background: #f9fbfe;
-        border-radius: 16px;
-        padding: 1.1rem;
-        margin-bottom: 1rem;
-        border: 1px solid #eef2f8;
+        background: #f0f9ff;
+        border-radius: 12px;
+        padding: 0.9rem;
+        margin-bottom: 0.8rem;
+        border: 1px solid #e0f2fe;
         transition: all 0.2s;
     }
 
     .entry-card:hover {
         background: #ffffff;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
     }
 
     .entry-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0.8rem;
-        padding-bottom: 0.6rem;
-        border-bottom: 1px solid #eef2f6;
+        margin-bottom: 0.7rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e0f2fe;
     }
 
     .entry-title {
-        font-size: 0.88rem;
+        font-size: 0.82rem;
         font-weight: 700;
-        color: #1a4a6f;
+        color: #0284c7;
     }
 
     .entry-title i {
@@ -258,8 +261,8 @@
         border: none;
         color: #dc3545;
         cursor: pointer;
-        font-size: 0.78rem;
-        padding: 5px 9px;
+        font-size: 0.72rem;
+        padding: 4px 8px;
         border-radius: 8px;
         transition: all 0.2s;
     }
@@ -269,49 +272,49 @@
     }
 
     .btn-add {
-        background: #f1f4f9;
-        border: 1px solid #e2e8f0;
-        padding: 0.6rem 1.1rem;
+        background: #0ea5e9;
+        border: 1px solid #0ea5e9;
+        padding: 0.55rem 1rem;
         border-radius: 40px;
-        font-size: 0.8rem;
+        font-size: 0.76rem;
         font-weight: 700;
-        color: #1a4a6f;
+        color: #ffffff;
         cursor: pointer;
         transition: all 0.2s;
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        margin-top: 0.5rem;
+        gap: 6px;
+        margin-top: 0.4rem;
     }
 
     .btn-add:hover {
-        background: #e9eef4;
+        background: #0284c7;
         transform: translateY(-1px);
     }
 
     /* Nested grid for entries */
     .entry-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 0.9rem;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
     }
 
     .entry-field label {
-        font-size: 0.7rem;
+        font-size: 0.66rem;
         font-weight: 700;
         text-transform: uppercase;
         color: #8a99b0;
         display: block;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.3rem;
     }
 
     .entry-field input,
     .entry-field select {
         width: 100%;
-        padding: 0.6rem 0.75rem;
+        padding: 0.5rem 0.65rem;
         border: 1.5px solid #e5eaf0;
-        border-radius: 10px;
-        font-size: 0.88rem;
+        border-radius: 9px;
+        font-size: 0.82rem;
         font-family: 'Inter', sans-serif;
         color: #22314a;
     }
@@ -319,41 +322,42 @@
     .entry-field input:focus,
     .entry-field select:focus {
         outline: none;
-        border-color: #1a4a6f;
+        border-color: #0ea5e9;
     }
 
     /* Profile Picture */
     .profile-upload {
         text-align: center;
+        margin: auto 0;
     }
 
     .avatar-placeholder {
-        background: #f8f9fa;
+        background: #f0f9ff;
         border-radius: 50%;
-        width: 110px;
-        height: 110px;
+        width: 90px;
+        height: 90px;
         margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px dashed #dee2e6;
+        border: 2px dashed #7dd3fc;
         transition: all 0.3s ease;
     }
 
     .avatar-placeholder:hover {
-        border-color: #1a4a6f;
+        border-color: #0ea5e9;
     }
 
     .profile-preview-img {
-        width: 110px;
-        height: 110px;
+        width: 90px;
+        height: 90px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid #1a4a6f;
+        border: 3px solid #0ea5e9;
     }
 
     .profile-upload input[type="file"] {
-        font-size: 0.85rem;
+        font-size: 0.78rem;
     }
 
     /* Password Strength */
@@ -362,7 +366,7 @@
         background: #e2e8f0;
         border-radius: 3px;
         overflow: hidden;
-        margin-top: 7px;
+        margin-top: 6px;
     }
 
     .strength-fill {
@@ -372,71 +376,73 @@
     }
 
     .strength-text {
-        font-size: 0.72rem;
-        margin-top: 5px;
+        font-size: 0.68rem;
+        margin-top: 4px;
         font-weight: 600;
     }
 
     /* Buttons */
     .btn-group {
         display: flex;
-        gap: 1rem;
-        margin-top: 0.5rem;
+        gap: 0.8rem;
+        margin-top: auto;
+        padding-top: 0.8rem;
         flex-wrap: wrap;
         justify-content: flex-end;
     }
 
     .btn {
-        padding: 0.8rem 2rem;
+        padding: 0.68rem 1.6rem;
         border-radius: 40px;
         font-weight: 700;
-        font-size: 0.92rem;
+        font-size: 0.84rem;
         cursor: pointer;
         border: none;
         display: inline-flex;
         align-items: center;
-        gap: 9px;
+        gap: 8px;
         font-family: 'Inter', sans-serif;
         transition: all 0.2s;
         text-decoration: none;
     }
 
     .btn-primary {
-        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
-        color: white;
+        background: #0ea5e9;
+        color: #ffffff;
     }
 
     .btn-primary:hover {
+        background: #0284c7;
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.25);
+        box-shadow: 0 8px 18px rgba(14, 165, 233, 0.3);
     }
 
     .btn-secondary {
-        background: #f1f4f9;
-        color: #3a4b66;
-        border: 1px solid #e2e8f0;
+        background: #38bdf8;
+        color: #ffffff;
+        border: 1px solid #38bdf8;
     }
 
     .btn-secondary:hover {
-        background: #e9eef4;
+        background: #0ea5e9;
     }
 
     /* Preview Card */
     .preview-card {
-        background: #f9fbfe;
-        border-radius: 16px;
-        padding: 1rem 1.3rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #eef2f8;
+        background: #f0f9ff;
+        border-radius: 12px;
+        padding: 0.85rem 1.1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #e0f2fe;
     }
 
     .preview-title {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: #6f7d98;
-        margin-bottom: 10px;
+        color: #0284c7;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 6px;
@@ -445,47 +451,47 @@
     .preview-content {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
         flex-wrap: wrap;
     }
 
     .preview-avatar {
-        width: 46px;
-        height: 46px;
-        background: linear-gradient(145deg, #1a4a6f, #0f2b3d);
+        width: 40px;
+        height: 40px;
+        background: #0ea5e9;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: 700;
-        font-size: 1.2rem;
+        font-size: 1.05rem;
         text-transform: uppercase;
     }
 
     .preview-info h4 {
-        font-size: 0.98rem;
+        font-size: 0.88rem;
         font-weight: 700;
         color: #1a2c3e;
         margin-bottom: 2px;
     }
 
     .preview-info p {
-        font-size: 0.78rem;
+        font-size: 0.74rem;
         color: #6c7c97;
         margin: 0;
     }
 
     /* Alert */
     .alert {
-        padding: 0.8rem 1.1rem;
-        border-radius: 14px;
-        margin-bottom: 1.5rem;
+        padding: 0.7rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
         display: flex;
         align-items: center;
         gap: 10px;
         border-left: 3px solid;
-        font-size: 0.9rem;
+        font-size: 0.84rem;
     }
 
     .alert-success {
@@ -512,7 +518,7 @@
 
     @media (max-width: 768px) {
         .student-reg-page {
-            padding: 1rem;
+            padding: 0.9rem;
         }
         .form-grid {
             grid-template-columns: 1fr;
@@ -521,7 +527,7 @@
             grid-column: span 1;
         }
         .card-body {
-            padding: 1.1rem;
+            padding: 0.9rem;
         }
         .btn-group {
             flex-direction: column;
@@ -533,7 +539,7 @@
             grid-template-columns: 1fr;
         }
         .page-header h1 {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
         }
     }
 
@@ -570,8 +576,8 @@
                 </div>
             </div>
 
-            <!-- ==================== SECTION 1: PERSONAL INFORMATION (full width) ==================== -->
-            <div class="section-card">
+            <!-- ==================== ROW 1: PERSONAL INFORMATION (full width) ==================== -->
+            <div class="section-card" style="margin-bottom: 1rem;">
                 <div class="card-header">
                     <h3>
                         <i class="fas fa-id-card"></i>
@@ -650,9 +656,9 @@
                 </div>
             </div>
 
-            <!-- ==================== ROW: ADDRESS DETAILS + PARENTS/GUARDIANS ==================== -->
-            <div class="sections-grid">
-                <!-- SECTION 2: ADDRESS DETAILS -->
+            <!-- ==================== ROW 2: ADDRESS DETAILS + PARENTS/GUARDIANS ==================== -->
+            <div class="sections-grid" style="margin-bottom: 1rem;">
+                <!-- Card 2: ADDRESS DETAILS -->
                 <div class="section-card">
                     <div class="card-header">
                         <h3>
@@ -701,7 +707,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION 3: PARENTS / GUARDIANS -->
+                <!-- Card 3: PARENTS / GUARDIANS -->
                 <div class="section-card">
                     <div class="card-header">
                         <h3>
@@ -753,9 +759,9 @@
                 </div>
             </div>
 
-            <!-- ==================== ROW: SIBLINGS + MEDICAL DETAILS ==================== -->
-            <div class="sections-grid" style="margin-top: 1.5rem;">
-                <!-- SECTION 4: SIBLINGS -->
+            <!-- ==================== ROW 3: SIBLINGS + MEDICAL DETAILS ==================== -->
+            <div class="sections-grid" style="margin-bottom: 1rem;">
+                <!-- Card 4: SIBLINGS -->
                 <div class="section-card">
                     <div class="card-header">
                         <h3>
@@ -809,7 +815,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION 5: MEDICAL DETAILS -->
+                <!-- Card 5: MEDICAL DETAILS -->
                 <div class="section-card">
                     <div class="card-header">
                         <h3>
@@ -819,9 +825,9 @@
                         </h3>
                     </div>
                     <div class="card-body">
-                        <div class="form-group full-width">
-                            <div class="input-wrapper">
-                                <textarea name="medical_details" rows="6" placeholder="Any medical conditions, allergies, medications, blood group, etc.&#10;Example: Allergic to penicillin, Asthma, Blood group B+"></textarea>
+                        <div class="form-group full-width" style="flex:1; display:flex; flex-direction:column;">
+                            <div class="input-wrapper" style="flex:1;">
+                                <textarea name="medical_details" rows="6" style="height:100%;" placeholder="Any medical conditions, allergies, medications, blood group, etc.&#10;Example: Allergic to penicillin, Asthma, Blood group B+"></textarea>
                             </div>
                             <div class="help-text"><i class="fas fa-lock"></i> This information is confidential and only visible to authorized staff</div>
                         </div>
@@ -829,9 +835,9 @@
                 </div>
             </div>
 
-            <!-- ==================== ROW: PROFILE PICTURE + LOGIN CREDENTIALS ==================== -->
-            <div class="sections-grid" style="margin-top: 1.5rem;">
-                <!-- SECTION 6: PROFILE PICTURE -->
+            <!-- ==================== ROW 4: PROFILE PICTURE + LOGIN CREDENTIALS ==================== -->
+            <div class="sections-grid">
+                <!-- Card 6: PROFILE PICTURE -->
                 <div class="section-card">
                     <div class="card-header">
                         <h3>
@@ -843,15 +849,15 @@
                     <div class="card-body">
                         <div class="profile-upload">
                             <div id="imagePreview" class="avatar-placeholder">
-                                <i class="fas fa-user-graduate fa-3x text-muted"></i>
+                                <i class="fas fa-user-graduate fa-2x text-muted"></i>
                             </div>
-                            <input type="file" name="profile_pic" class="form-control" accept="image/jpeg,image/png,image/gif" style="margin-top: 1rem; width: auto; display: inline-block;" onchange="previewImage(this)">
-                            <div class="help-text" style="margin-top: 0.5rem; justify-content: center;"><i class="fas fa-info-circle"></i> JPG, PNG, GIF (Max 5MB)</div>
+                            <input type="file" name="profile_pic" class="form-control" accept="image/jpeg,image/png,image/gif" style="margin-top: 0.9rem; width: auto; display: inline-block;" onchange="previewImage(this)">
+                            <div class="help-text" style="margin-top: 0.4rem; justify-content: center;"><i class="fas fa-info-circle"></i> JPG, PNG, GIF (Max 5MB)</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION 7: LOGIN CREDENTIALS -->
+                <!-- Card 7: LOGIN CREDENTIALS -->
                 <div class="section-card">
                     <div class="card-header">
                         <h3>
@@ -1013,7 +1019,7 @@
             }
             reader.readAsDataURL(input.files[0]);
         } else {
-            preview.innerHTML = '<i class="fas fa-user-graduate fa-3x text-muted"></i>';
+            preview.innerHTML = '<i class="fas fa-user-graduate fa-2x text-muted"></i>';
         }
     }
 
@@ -1055,7 +1061,7 @@
         let percent = 0, color = '#e05a5a', text = 'Weak';
         if (strength <= 2) { percent = 25; color = '#e05a5a'; text = 'Weak password'; }
         else if (strength <= 4) { percent = 55; color = '#f0b341'; text = 'Medium password'; }
-        else if (strength <= 5) { percent = 80; color = '#2c6e9e'; text = 'Strong password'; }
+        else if (strength <= 5) { percent = 80; color = '#0ea5e9'; text = 'Strong password'; }
         else { percent = 100; color = '#10b981'; text = 'Very strong password'; }
 
         container.innerHTML = `
