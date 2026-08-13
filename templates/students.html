@@ -17,9 +17,9 @@
     }
 
     .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
         color: white;
-        border: 1px solid #2c6e9e !important;
+        border: 1px solid #38bdf8 !important;
         font-weight: 600;
         font-size: 13px;
         text-transform: uppercase;
@@ -123,6 +123,36 @@
         box-shadow: 0 2px 8px rgba(26, 74, 111, 0.3);
     }
 
+    /* Page Header Row: icon + heading + Add Student button */
+    .students-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 1.75rem;
+    }
+
+    .students-page-header h2 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+    }
+
+    .students-page-header h2 i {
+        color: #38bdf8;
+    }
+
+    .students-page-header h2 .heading-text {
+        color: #38bdf8;
+    }
+
+    /* Push the students table card down a bit from the header row */
+    .students-table-card {
+        margin-top: 1.5rem;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .table-bordered-custom th,
@@ -140,6 +170,10 @@
             padding: 3px 8px;
             font-size: 10px;
         }
+
+        .students-page-header {
+            gap: 10px;
+        }
     }
     .dashboard-container {
         background-color: #ffffff !important;
@@ -153,9 +187,9 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <h2 class="fw-bold mb-0">
-        <i class="fas fa-user-graduate" style="color: #c6a43b;"></i> Students
+<div class="students-page-header">
+    <h2 class="fw-bold">
+        <i class="fas fa-user-graduate"></i> <span class="heading-text">Students</span>
     </h2>
     <div>
         <a href="{{ url_for('add_student') }}" class="btn btn-primary">
@@ -165,7 +199,7 @@
 </div>
 
 <!-- Students Table Card -->
-<div class="card shadow-sm">
+<div class="card shadow-sm students-table-card">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table-bordered-custom">
