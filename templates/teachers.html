@@ -73,6 +73,20 @@
         border-radius: 6px;
         font-weight: 500;
     }
+
+    /* Empty state icon (matches "No students found" style in screenshot) */
+    .empty-state-icon {
+        color: #c9a227;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        display: block;
+    }
+    .empty-state-title {
+        font-weight: 700;
+        color: #334155;
+        font-size: 1.05rem;
+        margin-bottom: 12px;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -130,9 +144,12 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="9" class="text-center text-muted py-4">
-                            <i class="fas fa-user-graduate fa-2x mb-2 d-block"></i>
-                            No teachers found
+                        <td colspan="9" class="text-center py-4">
+                            <i class="fas fa-user-graduate empty-state-icon"></i>
+                            <div class="empty-state-title">No teachers found</div>
+                            <a href="{{ url_for('add_teacher') }}" class="btn btn-dark btn-sm">
+                                <i class="fas fa-plus"></i> Add First Teacher
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
