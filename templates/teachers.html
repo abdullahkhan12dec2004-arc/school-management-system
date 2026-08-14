@@ -48,15 +48,25 @@
         background-color: #ffffff !important;
     }
 
-    /* Heading + icon spacing and color */
+    /* Heading + icon row */
     .page-heading {
         display: flex;
         align-items: center;
         gap: 12px;
+        color: #0ea5e9 !important;   /* sky blue heading text */
     }
     .page-heading i {
         color: #0ea5e9 !important;
         font-size: 1.3rem;
+    }
+
+    /* Header row: heading on left, buttons pushed to right corner, one row */
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+        margin-bottom: 24px;
     }
 
     /* Top-right action buttons */
@@ -64,6 +74,7 @@
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
+        margin-left: auto;
     }
     .top-actions .btn {
         display: inline-flex;
@@ -72,6 +83,19 @@
         padding: 8px 16px;
         border-radius: 6px;
         font-weight: 500;
+        background-color: #1a2332;
+        border-color: #1a2332;
+        color: #ffffff;
+    }
+    .top-actions .btn:hover {
+        background-color: #0f1621;
+        border-color: #0f1621;
+        color: #ffffff;
+    }
+
+    /* Push table card down a bit, like the screenshot */
+    .table-card {
+        margin-top: 28px;
     }
 
     /* Empty state icon (matches "No students found" style in screenshot) */
@@ -90,22 +114,22 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="header-row">
     <h2 class="fw-bold mb-0 page-heading">
         <i class="fas fa-chalkboard-teacher"></i> Teachers
     </h2>
     <div class="top-actions">
-        <a href="{{ url_for('assignments') }}" class="btn btn-secondary">
+        <a href="{{ url_for('assignments') }}" class="btn">
             <i class="fas fa-book"></i> Subjects Assign Karen
         </a>
-        <a href="{{ url_for('add_teacher') }}" class="btn btn-primary">
+        <a href="{{ url_for('add_teacher') }}" class="btn">
             <i class="fas fa-plus"></i> Add Teacher
         </a>
     </div>
 </div>
 
 
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm table-card">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table-bordered-custom">
