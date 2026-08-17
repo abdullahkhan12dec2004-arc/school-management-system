@@ -106,19 +106,11 @@ def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'user_id' not in session:
-            flash('Pehle login karein', 'errordef school_admin_only_required(f):
-    """Sirf School Admin access kar sakta hai — Super Admin (admin) nahi."""
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if session.get('role') != 'school_admin':
-            flash('Yeh option sirf School Admin ke liye hai', 'error')
-            return redirect(url_for('dashboard'))
-        return f(*args, **kwargs)
-    return decorated')
+            flash('Pehle login karein', 'error')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
-
     return decorated
+
 
 
 def admin_required(f):
@@ -1161,14 +1153,14 @@ def result_card(student_id):
 
 
     elif role == 'parent':
-       c.execute("""
-                SELECT id FROM parent_children 
-                WHERE parent_user_id=%s AND student_id=%s
-       """, (session['user_id'], student_id))
-    if not c.fetchone():
-        flash('Aap is student ka result nahi dekh sakte', 'error')
-        conn.close()
-        return redirect(url_for('parent_dashboard'))
+           c.execute("""
+              SELECT id FROM parent_children 
+              WHERE parent_user_id=%s AND student_id=%s
+           """, (session['user_id'], student_id))
+           if not c.fetchone():
+              flash('Aap is student ka result nahi dekh sakte', 'error')
+              conn.close()
+              return redirect(url_for('parent_dashboard'))
     exam_type = request.args.get('exam_type', 'Annual')
     academic_year = request.args.get('academic_year', str(datetime.datetime.now().year))
 
@@ -2514,7 +2506,9 @@ def pending_admins():
                s.phone as school_phone, s.email as school_email, s.city as school_city
         FROM users u
         JOIN schools s ON u.school_id = s.id
-        WHERE u.role = 'school_admin_pending' AND u.is_active = FALSE
+        WHERE u.role = 'school_admin_pending'
+          AND u.is_active = FALSE
+          AND u.email_verified = TRUE
         ORDER BY u.created_date DESC
     """)
     pending_list = fetchall_dict(c)
