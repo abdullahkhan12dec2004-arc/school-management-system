@@ -944,69 +944,21 @@
     </a>
 
     <!-- ===== SUPER ADMIN ===== -->
-    {% if session.role == 'admin' %}
-        <div class="nav-section">MANAGEMENT</div>
-        <a href="{{ url_for('schools') }}" class="nav-item {% if request.endpoint == 'schools' %}active{% endif %}">
-            <i class="fas fa-school"></i> Schools
-        </a>
-        <a href="{{ url_for('users') }}" class="nav-item {% if request.endpoint == 'users' %}active{% endif %}">
-            <i class="fas fa-users-cog"></i> Users
-        </a>
-        <a href="{{ url_for('pending_admins') }}" class="nav-item {% if request.endpoint == 'pending_admins' %}active{% endif %}">
-            <i class="fas fa-clock"></i> Pending Admins
-        </a>
-         <!-- School Admin / Super Admin ke liye bulk upload dropdown -->
-
-        <div class="nav-section">ACADEMICS</div>
-        <a href="{{ url_for('teachers') }}" class="nav-item {% if request.endpoint == 'teachers' %}active{% endif %}">
-            <i class="fas fa-chalkboard-teacher"></i> Teachers
-        </a>
-        <a href="{{ url_for('students') }}" class="nav-item {% if request.endpoint == 'students' %}active{% endif %}">
-            <i class="fas fa-user-graduate"></i> Students
-        </a>
-        <a href="{{ url_for('parents') }}" class="nav-item {% if request.endpoint == 'parents' %}active{% endif %}">
-            <i class="fas fa-user-friends"></i> Parents
-        </a>
-        <a href="{{ url_for('classes') }}" class="nav-item {% if request.endpoint == 'classes' %}active{% endif %}">
-            <i class="fas fa-door-open"></i> Classes
-        </a>
-        <a href="{{ url_for('subjects') }}" class="nav-item {% if request.endpoint == 'subjects' %}active{% endif %}">
-            <i class="fas fa-book"></i> Subjects
-        </a>
-        <a href="{{ url_for('assignments') }}" class="nav-item {% if request.endpoint == 'assignments' %}active{% endif %}">
-            <i class="fas fa-tasks"></i> Assignments
-        </a>
-        <a href="{{ url_for('marks') }}" class="nav-item {% if request.endpoint == 'marks' %}active{% endif %}">
-            <i class="fas fa-chart-line"></i> Marks Entry
-        </a>
-
-        <div class="nav-section">ATTENDANCE</div>
-        <a href="{{ url_for('student_attendance') }}" class="nav-item {% if request.endpoint == 'student_attendance' %}active{% endif %}">
-            <i class="fas fa-calendar-check"></i> Student Attendance
-        </a>
-        <a href="{{ url_for('teacher_attendance') }}" class="nav-item {% if request.endpoint == 'teacher_attendance' %}active{% endif %}">
-            <i class="fas fa-user-clock"></i> Teacher Attendance
-        </a>
-        <a href="{{ url_for('teacher_attendance_report') }}" class="nav-item {% if request.endpoint == 'teacher_attendance_report' %}active{% endif %}">
-            <i class="fas fa-chart-bar"></i> Attendance Report
-        </a>
-
-        <div class="nav-section">FINANCE</div>
-        <a href="{{ url_for('fee_collection') }}" class="nav-item {% if request.endpoint == 'fee_collection' %}active{% endif %}">
-            <i class="fas fa-money-bill-wave"></i> Fee Collection
-        </a>
-        <a href="/reports" class="nav-item {% if request.endpoint == 'reports' %}active{% endif %}">
-            <i class="fas fa-file-excel"></i> Reports
-        </a>
-
-        <div class="nav-section">NOTICES</div>
-        <a href="{{ url_for('manage_notices') }}" class="nav-item {% if request.endpoint == 'manage_notices' %}active{% endif %}">
-            <i class="fas fa-bullhorn"></i> Manage Notices
-        </a>
-        <a href="{{ url_for('view_notices') }}" class="nav-item {% if request.endpoint == 'view_notices' %}active{% endif %}">
-            <i class="fas fa-bell"></i> Notice Board
-        </a>
-    {% endif %}
+{% if session.role == 'admin' %}
+    <div class="nav-section">MANAGEMENT</div>
+    <a href="{{ url_for('schools') }}" class="nav-item {% if request.endpoint == 'schools' %}active{% endif %}">
+        <i class="fas fa-school"></i> Schools
+    </a>
+    <a href="{{ url_for('users') }}" class="nav-item {% if request.endpoint == 'users' %}active{% endif %}">
+        <i class="fas fa-users-cog"></i> Users
+    </a>
+    <a href="{{ url_for('add_school_admin') }}" class="nav-item {% if request.endpoint == 'add_school_admin' %}active{% endif %}">
+        <i class="fas fa-user-shield"></i> Add School Admin
+    </a>
+    <a href="{{ url_for('pending_admins') }}" class="nav-item {% if request.endpoint == 'pending_admins' %}active{% endif %}">
+        <i class="fas fa-clock"></i> Pending Admins
+    </a>
+{% endif %}
 
     <!-- ===== SCHOOL ADMIN ===== -->
     {% if session.role == 'school_admin' %}
@@ -1129,7 +1081,7 @@
      {% endif %}
      {% endif %}
         <!-- ===== BULK UPLOAD (Admin & School Admin Only) ===== -->
-    {% if session.role in ['admin', 'school_admin'] %}
+    {% if session.role == 'school_admin' %}
         <div class="nav-section">BULK UPLOAD</div>
         <a href="{{ url_for('bulk_upload_classes') }}" class="nav-item {% if request.endpoint == 'bulk_upload_classes' %}active{% endif %}">
             <i class="fas fa-upload"></i> 📚 Upload Classes
