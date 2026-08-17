@@ -12,15 +12,12 @@ import psycopg2.extras
 
 
 DB_CONFIG = {
-    'host': os.environ.get('DB_HOST').strip(),
+    'host': os.environ.get('DB_HOST', 'localhost').strip(),
     'port': os.environ.get('DB_PORT', '5432'),
-    'dbname': os.environ.get('DB_NAME'),
-    'user': os.environ.get('DB_USER'),
-    'password': os.environ.get('DB_PASSWORD'),
+    'dbname': os.environ.get('DB_NAME', 'shah_data'),
+    'user': os.environ.get('DB_USER', 'postgres'),
+    'password': os.environ.get('DB_PASSWORD', 'abdu'),
 }
-
-if not all([DB_CONFIG['host'], DB_CONFIG['dbname'], DB_CONFIG['user'], DB_CONFIG['password']]):
-    raise Exception("Database environment variables set nahi hain! .env file check karein.")
 
 
 def get_connection_string():
