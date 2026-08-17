@@ -26,12 +26,14 @@ UPLOAD_FOLDER = 'static/uploads/logos'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')       # e.g. yourapp@gmail.com
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')       # app password, NOT your real password
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
+def env(key, default=''):
+    return (os.environ.get(key) or default).strip()
+
+app.config['MAIL_SERVER'] = env('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(env('MAIL_PORT', '587'))
+app.config['MAIL_USERNAME'] = env('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = env('MAIL_PASSWORD').replace(' ', '')
+app.config['MAIL_DEFAULT_SENDER'] = env('MAIL_USERNAME')
 
 mail = Mail(app)
 def generate_otp():
