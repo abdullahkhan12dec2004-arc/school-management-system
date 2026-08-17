@@ -43,11 +43,29 @@ def allowed_file(filename):
 
 
 # ========== DECORATORS ==========
+def school_admin_only_required(f):
+    """Sirf School Admin access kar sakta hai — Super Admin (admin) nahi."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if session.get('role') != 'school_admin':
+            flash('Yeh option sirf School Admin ke liye hai', 'error')
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    return decorated
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'user_id' not in session:
-            flash('Pehle login karein', 'error')
+            flash('Pehle login karein', 'errordef school_admin_only_required(f):
+    """Sirf School Admin access kar sakta hai — Super Admin (admin) nahi."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if session.get('role') != 'school_admin':
+            flash('Yeh option sirf School Admin ke liye hai', 'error')
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    return decorated')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
 
@@ -598,7 +616,7 @@ def teachers():
 
 @app.route('/teachers/add', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def add_teacher():
     school_id = session.get('active_school_id', session.get('school_id'))
     conn = get_db()
@@ -699,7 +717,7 @@ def students():
 
 @app.route('/students/add', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def add_student():
     school_id = session.get('active_school_id', session.get('school_id'))
     conn = get_db()
@@ -1201,7 +1219,7 @@ def my_result():
 # ========== OTHER ROUTES (Admin Only) ==========
 @app.route('/users')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def users():
     conn = get_db()
     c = conn.cursor()
@@ -1247,7 +1265,7 @@ def toggle_user(user_id):
 
 @app.route('/assignments', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def assignments():
     school_id = session.get('active_school_id', session.get('school_id'))
     conn = get_db()
@@ -1355,7 +1373,7 @@ def get_subjects(class_id):
 # ========== TEACHER SUBJECTS ASSIGNMENT ==========
 @app.route('/teacher_subjects', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def teacher_subjects():
     school_id = session.get('active_school_id', session.get('school_id'))
     conn = get_db()
@@ -1414,7 +1432,7 @@ def teacher_subjects():
 
 @app.route('/classes/add', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def add_class():
     school_id = session.get('active_school_id', session.get('school_id'))
     conn = get_db()
@@ -1496,7 +1514,7 @@ def class_students(class_id):
 # ========== STUDENT ENHANCED ROUTES ==========
 @app.route('/students/<int:student_id>/edit', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def edit_student(student_id):
     conn = get_db()
     c = conn.cursor()
@@ -1644,7 +1662,7 @@ def edit_student(student_id):
 # ========== TEACHER ENHANCED ROUTES ==========
 @app.route('/teachers/<int:teacher_id>/edit', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def edit_teacher(teacher_id):
     conn = get_db()
     c = conn.cursor()
@@ -1746,7 +1764,7 @@ def edit_teacher(teacher_id):
 
 @app.route('/teachers/document/delete/<int:doc_id>')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def delete_teacher_document(doc_id):
     conn = get_db()
     c = conn.cursor()
@@ -1766,7 +1784,7 @@ def delete_teacher_document(doc_id):
 # ========== TEACHER ATTENDANCE (Admin only, all schools) ==========
 @app.route('/attendance/teacher', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def teacher_attendance():
     school_id = session.get('active_school_id', session.get('school_id'))
     today = datetime.date.today()
@@ -1799,7 +1817,7 @@ def teacher_attendance():
 
 @app.route('/attendance/teacher/save', methods=['POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def save_teacher_attendance():
     school_id = session.get('active_school_id', session.get('school_id'))
     attendance_date = request.form.get('attendance_date')
@@ -1845,7 +1863,7 @@ def save_teacher_attendance():
 # Teacher attendance history / report
 @app.route('/attendance/teacher/report')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def teacher_attendance_report():
     school_id = session.get('active_school_id', session.get('school_id'))
     month = request.args.get('month', datetime.date.today().strftime('%Y-%m'))
@@ -1997,7 +2015,7 @@ def save_student_attendance():
 # ========== FEE COLLECTION ROUTE ==========
 @app.route('/fee_collection', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def fee_collection():
     school_id = session.get('active_school_id', session.get('school_id'))
     conn = get_db()
@@ -2029,7 +2047,7 @@ def fee_collection():
 
 @app.route('/fee_collection/save', methods=['POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def save_fee():
     student_id = request.form.get('student_id')
     class_id = request.form.get('class_id')
@@ -2134,7 +2152,7 @@ def get_teachers_by_school():
 
 @app.route('/notices/manage', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def manage_notices():
     school_id = session.get('active_school_id') or session.get('school_id')
 
@@ -2226,7 +2244,7 @@ def view_notices():
 
 @app.route('/notices/delete/<int:notice_id>')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def delete_notice(notice_id):
     conn = get_db()
     c = conn.cursor()
@@ -2418,7 +2436,7 @@ def reject_admin(user_id):
 
 @app.route('/parents', methods=['GET'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def parents():
     school_id = session.get('active_school_id') or session.get('school_id')
     conn = get_db()
@@ -2439,7 +2457,7 @@ def parents():
 
 @app.route('/parents/add', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def add_parent():
     school_id = session.get('active_school_id') or session.get('school_id')
     conn = get_db()
@@ -2660,7 +2678,7 @@ def add_school_admin():
 # CLASSES BULK UPLOAD
 @app.route('/bulk/classes', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def bulk_upload_classes():
     if request.method == 'POST':
         file = request.files.get('file')
@@ -2724,7 +2742,7 @@ def bulk_upload_classes():
 
 @app.route('/bulk/teachers', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def bulk_upload_teachers():
     if request.method == 'POST':
         file = request.files.get('file')
@@ -2819,7 +2837,7 @@ def bulk_upload_teachers():
 
 @app.route('/bulk/students', methods=['GET', 'POST'])
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def bulk_upload_students():
 
     from datetime import datetime
@@ -2955,7 +2973,7 @@ def bulk_upload_students():
 
 @app.route('/bulk/<upload_type>/download_report')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def download_validation_report(upload_type):
     """Download staging table as Excel validation report."""
     from flask import send_file
@@ -2991,7 +3009,7 @@ def download_validation_report(upload_type):
 
 @app.route('/bulk/classes/review')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def review_classes_upload():
     conn = get_db()
     c = conn.cursor()
@@ -3009,7 +3027,7 @@ def review_classes_upload():
 
 @app.route('/bulk/classes/confirm')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def confirm_classes_upload():
     conn = get_db()
     c = conn.cursor()
@@ -3032,7 +3050,7 @@ def confirm_classes_upload():
 
 @app.route('/bulk/teachers/review')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def review_teachers_upload():
     conn = get_db()
     c = conn.cursor()
@@ -3050,7 +3068,7 @@ def review_teachers_upload():
 
 @app.route('/bulk/teachers/confirm')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def confirm_teachers_upload():
     conn = get_db()
     c = conn.cursor()
@@ -3089,7 +3107,7 @@ def confirm_teachers_upload():
 
 @app.route('/bulk/students/review')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def review_students_upload():
     conn = get_db()
     c = conn.cursor()
@@ -3108,7 +3126,7 @@ def review_students_upload():
 
 @app.route('/bulk/students/confirm')
 @login_required
-@school_admin_or_super_admin_required
+@school_admin_only_required
 def confirm_students_upload():
     conn = get_db()
     c = conn.cursor()
