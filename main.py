@@ -18,6 +18,7 @@ import hashlib
 from flask_mail import Mail, Message
 import random
 import string
+import requests
 
 
 app = Flask(__name__)
