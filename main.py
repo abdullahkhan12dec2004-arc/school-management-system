@@ -36,6 +36,26 @@ app.config['MAIL_PASSWORD'] = env('MAIL_PASSWORD').replace(' ', '')
 app.config['MAIL_DEFAULT_SENDER'] = env('MAIL_USERNAME')
 
 mail = Mail(app)
+@app.route('/debug_smtp')
+def debug_smtp():
+    import socket, time
+    out = []
+    for port in (587, 465, 25):
+        t = time.time()
+        try:
+            socket.create_connection(('smtp.gmail.com', port), timeout=8).close()
+            out.append(f"port {port}: OPEN ({time.time()-t:.1f}s)")
+        except Exception as e:
+            out.append(f"port {port}: {type(e).__name__} ({time.time()-t:.1f}s)")
+    return "<pre>" + "\n".join(out) + "</pre>"
+
+
+
+
+
+
+
+
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
