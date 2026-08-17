@@ -10,13 +10,17 @@ import psycopg2.extras
 # Agar env var set nahi hai to neeche wali default value use hogi - LOCAL DEV ke liye
 # defaults badal lein ya .env / system env vars set kar dein.
 
+
 DB_CONFIG = {
-    'host': os.environ.get('DB_HOST', 'localhost').strip(),
+    'host': os.environ.get('DB_HOST'),
     'port': os.environ.get('DB_PORT', '5432'),
-    'dbname': os.environ.get('DB_NAME', 'shah_data'),
-    'user': os.environ.get('DB_USER', 'postgres'),
-    'password': os.environ.get('DB_PASSWORD', 'abdu'),
+    'dbname': os.environ.get('DB_NAME'),
+    'user': os.environ.get('DB_USER'),
+    'password': os.environ.get('DB_PASSWORD'),
 }
+
+if not all([DB_CONFIG['host'], DB_CONFIG['dbname'], DB_CONFIG['user'], DB_CONFIG['password']]):
+    raise Exception("Database environment variables set nahi hain! .env file check karein.")
 
 
 def get_connection_string():
