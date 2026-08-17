@@ -19,6 +19,7 @@ from flask_mail import Mail, Message
 import random
 import string
 
+
 app = Flask(__name__)
 app.secret_key = 'school_mgmt_secret_2024'
 app.register_blueprint(reports_bp)
@@ -52,10 +53,20 @@ def generate_otp():
 def send_otp_email(to_email, otp, full_name):
     """Returns True if email sent successfully, False otherwise."""
     try:
-        msg = Message(
-            subject='School Registration - Email Verification OTP',
-            recipients=[to_email],
-            body=f"""Assalam-o-Alaikum {full_name},
+        r = requests.post(
+            'https://api.brevo.com/v3/smtp/email',
+            timeout=15,
+            headers={
+                'api-key': env('BREVO_API_KEY'),
+                'content-type': 'application/json',
+                'accept': 'application/json',
+            },
+            json={
+                'sender': {'name': 'School Management System',
+                           'email': env('MAIL_SENDER')},
+                'to': [{'email': to_email, 'name': full_name}],
+                'subject': 'School Registration - Email Verification OTP',
+                'textContent': f"""Assalam-o-Alaikum {full_name},
 
 Aapka School Management System registration ke liye OTP code hai: {otp}
 
@@ -64,12 +75,15 @@ Yeh code 10 minute ke liye valid hai. Kisi ke saath share na karein.
 Agar aapne registration nahi ki, is email ko ignore karein.
 
 Regards,
-School Management System"""
+School Management System""",
+            },
         )
-        mail.send(msg)
-        return True
+        if r.status_code in (200, 201):
+            return True
+        print(f"OTP email send failed: {r.status_code} {r.text}")
+        return False
     except Exception as e:
-        print(f"OTP email send error: {e}")
+        print(f"OTP email send error: {type(e).__name__}: {e}")
         return False
 
 
