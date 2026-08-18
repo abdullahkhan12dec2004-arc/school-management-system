@@ -2395,6 +2395,7 @@ def delete_notice(notice_id):
 
 
 # ========== SCHOOL ADMIN SIGNUP (Public - koi bhi access kar sakta hai) ==========
+# ========== SCHOOL ADMIN SIGNUP (Public - koi bhi access kar sakta hai) ==========
 @app.route('/school_admin_signup', methods=['GET', 'POST'])
 def school_admin_signup():
     if 'user_id' in session and session.get('role') == 'admin':
@@ -2406,10 +2407,6 @@ def school_admin_signup():
         school_phone = request.form.get('phone', '')
         school_email = request.form.get('email', '')
         school_city = request.form.get('city', '')
-        country = request.form.get('country', '')
-        area = request.form.get('area', '')
-        latitude = request.form.get('latitude', '')
-        longitude = request.form.get('longitude', '')
 
         full_name = request.form.get('full_name', '').strip()
         admin_email = request.form.get('admin_email', '') or school_email
@@ -2429,6 +2426,11 @@ def school_admin_signup():
         conn = get_db()
         c = conn.cursor()
         try:
+            c.execute("SELECT id FROM users WHERE username=%s", (username,))
+            if c.fetchone():
+                flash('Yeh username pehle se exist karta hai!', 'error')
+                return render_template('school_form.html')
+
             logo = None
             if 'logo' in request.files:
                 file = request.files['logo']
@@ -2438,140 +2440,128 @@ def school_admin_signup():
                     file.save(os.path.join(UPLOAD_FOLDER, filename))
                     logo = filename
 
-            c.execute("""
-                INSERT INTO schools (name, address, phone, email, city, logo, is_active)
-                VALUES (%s, %s, %s, %s, %s, %s, FALSE) RETURNING id
-            """, (school_name, school_address, school_phone, school_email, school_city, logo))
-            school_id = c.fetchone()[0]
-
             otp = generate_otp()
             otp_expiry = datetime.datetime.now() + datetime.timedelta(minutes=10)
 
-            c.execute("""
-                INSERT INTO users
-                  (school_id, username, password, role, full_name, email, phone,
-                   is_active, email_verified, otp_code, otp_expires_at)
-                VALUES (%s, %s, %s, 'school_admin_pending', %s, %s, %s, FALSE, FALSE, %s, %s)
-                RETURNING id
-            """, (
-                school_id, username, hash_password(password), full_name,
-                admin_email, admin_phone, otp, otp_expiry
-            ))
-            new_user_id = c.fetchone()[0]
-
-            conn.commit()
+            # Koi bhi DB insert nahi — sara data OTP verify hone tak session mein rehta hai
+            session['pending_signup'] = {
+                'school_name': school_name,
+                'school_address': school_address,
+                'school_phone': school_phone,
+                'school_email': school_email,
+                'school_city': school_city,
+                'logo': logo,
+                'full_name': full_name,
+                'admin_email': admin_email,
+                'admin_phone': admin_phone,
+                'username': username,
+                'password_hash': hash_password(password),
+                'otp': otp,
+                'otp_expiry': otp_expiry.isoformat(),
+                'otp_attempts': 0,
+            }
 
             email_sent = send_otp_email(admin_email, otp, full_name)
-
-            session['otp_verify_user_id'] = new_user_id
-            session['otp_verify_email'] = admin_email
 
             if email_sent:
                 flash(f'An OTP has been sent to your email ({admin_email}). Please check your inbox and verify it.', 'success')
             else:
-                flash('Registration was successful, but there was an issue sending the OTP email. Please try "Resend OTP".', 'error')
+                flash('OTP email send nahi ho saka. Please try "Resend OTP".', 'error')
 
             return redirect(url_for('verify_otp'))
 
-        except psycopg2.IntegrityError:
-            conn.rollback()
-            flash('Yeh username pehle se exist karta hai!', 'error')
         except Exception as e:
-            conn.rollback()
             flash(f'Error: {str(e)}', 'error')
         finally:
             conn.close()
 
     return render_template('school_form.html')
 
+
 @app.route('/verify_otp', methods=['GET', 'POST'])
 def verify_otp():
-    user_id = session.get('otp_verify_user_id')
-    email = session.get('otp_verify_email')
+    pending = session.get('pending_signup')
 
-    if not user_id:
+    if not pending:
         flash('Your session has expired. Please register again.', 'error')
         return redirect(url_for('school_admin_signup'))
 
-    conn = get_db()
-    c = conn.cursor()
+    email = pending['admin_email']
 
     if request.method == 'POST':
         entered_otp = request.form.get('otp', '').strip()
 
-        c.execute("""
-            SELECT otp_code, otp_expires_at, otp_attempts, full_name
-            FROM users WHERE id=%s
-        """, (user_id,))
-        row = c.fetchone()
-
-        if not row:
-            flash('User not found.', 'error')
-            conn.close()
-            return redirect(url_for('school_admin_signup'))
-
-        stored_otp, expiry, attempts, full_name = row
-
-        if attempts is not None and attempts >= 5:
+        if pending.get('otp_attempts', 0) >= 5:
             flash('Too many incorrect attempts. Please request a new OTP.', 'error')
-            conn.close()
             return render_template('verify_otp.html', email=email)
 
-        if not stored_otp or (expiry and datetime.datetime.now() > expiry):
+        expiry = datetime.datetime.fromisoformat(pending['otp_expiry'])
+        if datetime.datetime.now() > expiry:
             flash('The OTP has expired. Please request a new OTP.', 'error')
-            conn.close()
             return render_template('verify_otp.html', email=email)
 
-        if entered_otp == stored_otp:
-            c.execute("""
-                UPDATE users
-                SET email_verified=TRUE, otp_code=NULL, otp_expires_at=NULL, otp_attempts=0
-                WHERE id=%s
-            """, (user_id,))
-            conn.commit()
-            conn.close()
+        if entered_otp == pending['otp']:
+            conn = get_db()
+            c = conn.cursor()
+            try:
+                c.execute("""
+                    INSERT INTO schools (name, address, phone, email, city, logo, is_active)
+                    VALUES (%s, %s, %s, %s, %s, %s, FALSE) RETURNING id
+                """, (pending['school_name'], pending['school_address'], pending['school_phone'],
+                      pending['school_email'], pending['school_city'], pending['logo']))
+                school_id = c.fetchone()[0]
 
-            session.pop('otp_verify_user_id', None)
-            session.pop('otp_verify_email', None)
+                c.execute("""
+                    INSERT INTO users
+                      (school_id, username, password, role, full_name, email, phone,
+                       is_active, email_verified)
+                    VALUES (%s, %s, %s, 'school_admin_pending', %s, %s, %s, FALSE, TRUE)
+                """, (
+                    school_id, pending['username'], pending['password_hash'], pending['full_name'],
+                    pending['admin_email'], pending['admin_phone']
+                ))
 
-            flash('Email verified successfully! Please wait for Super Admin approval.', 'success')
-            return redirect(url_for('login'))
+                conn.commit()
+                session.pop('pending_signup', None)
+
+                flash('Email verified successfully! Please wait for Super Admin approval.', 'success')
+                return redirect(url_for('login'))
+
+            except psycopg2.IntegrityError:
+                conn.rollback()
+                flash('Yeh username pehle se exist karta hai!', 'error')
+                return render_template('verify_otp.html', email=email)
+            except Exception as e:
+                conn.rollback()
+                flash(f'Error: {str(e)}', 'error')
+                return render_template('verify_otp.html', email=email)
+            finally:
+                conn.close()
         else:
-            c.execute("UPDATE users SET otp_attempts=COALESCE(otp_attempts,0)+1 WHERE id=%s", (user_id,))
-            conn.commit()
+            pending['otp_attempts'] = pending.get('otp_attempts', 0) + 1
+            session['pending_signup'] = pending
             flash('Incorrect OTP. Please try again.', 'error')
 
-    conn.close()
     return render_template('verify_otp.html', email=email)
 
 
 @app.route('/resend_otp')
 def resend_otp():
-    user_id = session.get('otp_verify_user_id')
-    email = session.get('otp_verify_email')
+    pending = session.get('pending_signup')
 
-    if not user_id:
+    if not pending:
         flash('Your session has expired. Please register again.', 'error')
         return redirect(url_for('school_admin_signup'))
-
-    conn = get_db()
-    c = conn.cursor()
 
     otp = generate_otp()
     otp_expiry = datetime.datetime.now() + datetime.timedelta(minutes=10)
 
-    c.execute("""
-        UPDATE users SET otp_code=%s, otp_expires_at=%s, otp_attempts=0
-        WHERE id=%s
-    """, (otp, otp_expiry, user_id))
-    conn.commit()
+    pending['otp'] = otp
+    pending['otp_expiry'] = otp_expiry.isoformat()
+    pending['otp_attempts'] = 0
+    session['pending_signup'] = pending
 
-    c.execute("SELECT full_name FROM users WHERE id=%s", (user_id,))
-    row = c.fetchone()
-    full_name = row[0] if row else ''
-    conn.close()
-
-    send_otp_email(email, otp, full_name)
+    send_otp_email(pending['admin_email'], otp, pending['full_name'])
     flash('A new OTP has been sent.', 'success')
     return redirect(url_for('verify_otp'))
 
