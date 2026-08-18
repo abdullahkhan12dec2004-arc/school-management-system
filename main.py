@@ -437,21 +437,65 @@ def select_school():
     conn.close()
     return render_template('select_school.html', schools=schools, role=session['role'])
 @app.route('/school/edit/<int:school_id>', methods=['GET', 'POST'])
+
+@app.route('/school/edit/<int:school_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def edit_school(school_id):
-    school = School.query.get_or_404(school_id)   # apna model use karo
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM schools WHERE id=%s", (school_id,))
+    school = fetchone_dict(c)
+
+    if not school:
+        flash('School nahi mila', 'error')
+        conn.close()
+        return redirect(url_for('schools'))
+
     if request.method == 'POST':
-        school.name = request.form.get('name')
-        school.address = request.form.get('address')
-        school.phone = request.form.get('phone')
-        school.email = request.form.get('email')
-        school.latitude = request.form.get('latitude')
-        school.longitude = request.form.get('longitude')
-        if 'logo' in request.files and request.files['logo'].filename:
-            # naya logo save karo, purana rehne do agar upload nahi hui
-            pass
-        db.session.commit()
-        return redirect(url_for('dashboard'))
+        name = request.form.get('name', '').strip()
+        address = request.form.get('address', '')
+        phone = request.form.get('phone', '')
+        email = request.form.get('email', '')
+        latitude = request.form.get('latitude', '')
+        longitude = request.form.get('longitude', '')
+
+        if not name:
+            flash('School ka naam zaruri hai', 'error')
+            conn.close()
+            return render_template('school_form.html', school=school)
+
+        # Agar nayi logo upload nahi hui to purani wali rehne do
+        logo = school.get('logo')
+        if 'logo' in request.files:
+            file = request.files['logo']
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                logo = filename
+
+        c.execute("""
+            UPDATE schools
+            SET name=%s, address=%s, phone=%s, email=%s, logo=%s,
+                latitude=%s, longitude=%s
+            WHERE id=%s
+        """, (name, address, phone, email, logo,
+              latitude if latitude else None,
+              longitude if longitude else None,
+              school_id))
+        conn.commit()
+        conn.close()
+
+        flash('School details update ho gaye!', 'success')
+        return redirect(url_for('schools'))
+
+    conn.close()
     return render_template('school_form.html', school=school)
+
+
+
 
 # ========== DASHBOARD (Role Based) ==========
 @app.route('/dashboard')
