@@ -291,6 +291,36 @@
         color: var(--secondary);
     }
 
+    /* Action Buttons in Table */
+    .row-actions-modern {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-row-edit {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+        color: white;
+        padding: 0.45rem 0.9rem;
+        border-radius: var(--radius-md);
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-row-edit:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+        color: white;
+    }
+
     /* Empty State */
     .empty-state-modern {
         text-align: center;
@@ -331,6 +361,11 @@
         .school-logo-placeholder {
             width: 36px;
             height: 36px;
+        }
+
+        .btn-row-edit {
+            padding: 0.4rem 0.7rem;
+            font-size: 0.68rem;
         }
     }
     .dashboard-container {
@@ -440,6 +475,7 @@
                         <th>Address</th>
                         <th>Contact</th>
                         <th style="width: 120px;">Created</th>
+                        <th style="width: 100px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -502,6 +538,13 @@
                         <td style="color: var(--gray-500); font-size: 0.75rem;">
                             <i class="fas fa-calendar-alt" style="font-size: 0.65rem;"></i>
                             {{ s.created_at[:10] if s.created_at else '—' }}
+                        </td>
+                        <td>
+                            <div class="row-actions-modern">
+                                <a href="{{ url_for('edit_school', school_id=s.id) }}" class="btn-row-edit">
+                                    <i class="fas fa-pen"></i> Edit
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
