@@ -437,7 +437,8 @@ def select_school():
     conn.close()
     return render_template('select_school.html', schools=schools, role=session['role'])
 
-    
+
+
 @app.route('/school/edit/<int:school_id>', methods=['GET', 'POST'])
 @login_required
 @school_admin_or_super_admin_required
