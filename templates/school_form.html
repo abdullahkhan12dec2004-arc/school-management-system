@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
+{% set is_edit = school is defined and school %}
+
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
 {% block title %}
-    {% if session.role == 'admin' %}
+    {% if is_edit %}
+        Edit School
+    {% elif session.role == 'admin' %}
         Add New School
     {% else %}
         Register Your School
@@ -373,6 +377,14 @@
         justify-content: center;
         color: white;
         font-size: 1.3rem;
+        overflow: hidden;
+    }
+
+    .preview-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
     }
 
     .preview-info h4 {
@@ -403,6 +415,21 @@
         align-items: center;
         gap: 8px;
     }
+
+    .edit-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fff3cd;
+        color: #8a6416;
+        border: 1px solid #ffe3a3;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
 </style>
 {% endblock %}
 
@@ -411,20 +438,31 @@
     <div class="page-header">
         <h1>
             <i class="fas fa-school"></i>
-            {% if session.role == 'admin' %}
+            {% if is_edit %}
+                Edit School
+            {% elif session.role == 'admin' %}
                 Add New School
             {% else %}
                 Register Your School
             {% endif %}
+            {% if is_edit %}<span class="edit-badge"><i class="fas fa-pen"></i> Editing</span>{% endif %}
         </h1>
-        <p>Enter the details below to add or register a school in the system.</p>
+        <p>
+            {% if is_edit %}
+                Update the school details below and save your changes.
+            {% else %}
+                Enter the details below to add or register a school in the system.
+            {% endif %}
+        </p>
     </div>
 
     <div class="form-card">
         <div class="card-header-custom">
             <h3>
                 <i class="fas fa-info-circle"></i>
-                {% if session.role == 'admin' %}
+                {% if is_edit %}
+                    Edit School Information
+                {% elif session.role == 'admin' %}
                     School Information
                 {% else %}
                     School Registration Details
@@ -432,7 +470,14 @@
             </h3>
         </div>
         <div class="card-body-custom">
-            <form method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <form method="POST"
+                  enctype="multipart/form-data"
+                  onsubmit="return validateForm()"
+                  action="{% if is_edit %}{{ url_for('edit_school', school_id=school.id) }}{% else %}{{ request.path }}{% endif %}">
+
+                {% if is_edit %}
+                <input type="hidden" name="school_id" value="{{ school.id }}">
+                {% endif %}
 
                 <!-- SCHOOL INFORMATION SECTION -->
                 <div class="section-title">
@@ -445,7 +490,8 @@
                         <div class="input-wrapper">
                             <i class="fas fa-university input-icon"></i>
                             <input type="text" name="name" id="schoolName" required
-                                   value="{{ request.form.get('name', '') }}" placeholder="Enter School Name" oninput="updatePreview()">
+                                   value="{{ request.form.get('name', school.name if is_edit else '') }}"
+                                   placeholder="Enter School Name" oninput="updatePreview()">
                         </div>
                     </div>
 
@@ -456,13 +502,16 @@
                             <i class="fas fa-map-marker-alt input-icon"></i>
                             <input type="text" name="address" id="schoolAddress" required
                                    placeholder="Type address or search on map..." autocomplete="off"
-                                   value="{{ request.form.get('address', '') }}" oninput="onAddressType(this)">
+                                   value="{{ request.form.get('address', school.address if is_edit else '') }}"
+                                   oninput="onAddressType(this)">
                             <div class="osm-suggestions" id="osmSuggestions"></div>
                         </div>
 
                         <!-- Hidden lat/lng -->
-                        <input type="hidden" name="latitude" id="schoolLat" value="{{ request.form.get('latitude', '') }}">
-                        <input type="hidden" name="longitude" id="schoolLng" value="{{ request.form.get('longitude', '') }}">
+                        <input type="hidden" name="latitude" id="schoolLat"
+                               value="{{ request.form.get('latitude', school.latitude if is_edit else '') }}">
+                        <input type="hidden" name="longitude" id="schoolLng"
+                               value="{{ request.form.get('longitude', school.longitude if is_edit else '') }}">
 
                         <!-- Map Box -->
                         <div class="map-preview-box" id="mapBox">
@@ -490,7 +539,8 @@
                         <div class="input-wrapper">
                             <i class="fas fa-phone input-icon"></i>
                             <input type="text" name="phone" id="schoolPhone"
-                                   value="{{ request.form.get('phone', '') }}" placeholder="e.g. +92 300 1234567" oninput="updatePreview()">
+                                   value="{{ request.form.get('phone', school.phone if is_edit else '') }}"
+                                   placeholder="e.g. +92 300 1234567" oninput="updatePreview()">
                         </div>
                     </div>
 
@@ -499,38 +549,43 @@
                         <div class="input-wrapper">
                             <i class="fas fa-envelope input-icon"></i>
                             <input type="email" name="email" id="schoolEmail"
-                                   value="{{ request.form.get('email', '') }}" placeholder="e.g. contact@school.com" oninput="updatePreview()">
+                                   value="{{ request.form.get('email', school.email if is_edit else '') }}"
+                                   placeholder="e.g. contact@school.com" oninput="updatePreview()">
                         </div>
                     </div>
 
                     <div class="form-group full-width">
-                        <label class="form-label">Logo</label>
+                        <label class="form-label">Logo {% if is_edit %}<span style="text-transform:none;font-weight:400;color:#9aa9bf;">(leave empty to keep current logo)</span>{% endif %}</label>
                         <div class="input-wrapper">
                             <i class="fas fa-image input-icon" style="z-index: 5;"></i>
-                            <input type="file" name="logo" id="schoolLogo" accept="image/*" 
+                            <input type="file" name="logo" id="schoolLogo" accept="image/*"
                                    style="padding-left: 2.5rem;" onchange="previewLogo(this); updatePreview();">
                         </div>
                     </div>
                 </div>
 
                 <!-- Preview Card -->
-                <div class="preview-card" id="previewCard" style="display: none;">
+                <div class="preview-card" id="previewCard" style="display: {{ 'block' if is_edit else 'none' }};">
                     <div class="preview-title">
                         <i class="fas fa-eye"></i> Live Preview
                     </div>
                     <div class="preview-content">
                         <div class="preview-avatar" id="previewLogo">
-                            <i class="fas fa-school"></i>
+                            {% if is_edit and school.logo %}
+                                <img src="{{ school.logo }}" alt="logo">
+                            {% else %}
+                                <i class="fas fa-school"></i>
+                            {% endif %}
                         </div>
                         <div class="preview-info">
-                            <h4 id="previewName"><span>School Name</span> <span class="badge bg-gold" id="previewBadge" style="display: none; font-size: 10px; padding: 2px 6px;">New</span></h4>
+                            <h4 id="previewName"><span>{{ school.name if is_edit else 'School Name' }}</span> <span class="badge bg-gold" id="previewBadge" style="display: {{ 'inline-block' if is_edit else 'none' }}; font-size: 10px; padding: 2px 6px;">{{ 'Editing' if is_edit else 'New' }}</span></h4>
                             <p id="previewDetail">School details will appear here</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- ADMIN INFORMATION SECTION (Only for non-admin users) -->
-                {% if session.role != 'admin' %}
+                <!-- ADMIN INFORMATION SECTION (Only shown when a non-admin registers a NEW school) -->
+                {% if session.role != 'admin' and not is_edit %}
                 <div class="section-title" style="margin-top: 2rem;">
                     <i class="fas fa-user-shield"></i> School Admin Information
                 </div>
@@ -597,8 +652,10 @@
 
                 <div class="btn-group-custom">
                     <button type="submit" class="btn-custom btn-custom-primary">
-                        <i class="fas fa-save"></i>
-                        {% if session.role == 'admin' %}
+                        <i class="fas {{ 'fa-save' if not is_edit else 'fa-check' }}"></i>
+                        {% if is_edit %}
+                            Update School
+                        {% elif session.role == 'admin' %}
                             Add School
                         {% else %}
                             Register School
