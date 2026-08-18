@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% set is_edit = school is defined and school %}
@@ -431,6 +430,55 @@
         margin-left: 10px;
         vertical-align: middle;
     }
+
+    .input-wrapper input:disabled,
+    .input-wrapper select:disabled {
+        background: #f4f6f9;
+        color: #8a97ac;
+        cursor: not-allowed;
+        border-style: dashed;
+    }
+
+    .edit-trigger-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fff8e8;
+        border: 1px solid #ffe3a3;
+        border-radius: 12px;
+        padding: 10px 16px;
+        margin-bottom: 1.5rem;
+        font-size: 0.8rem;
+        color: #8a6416;
+    }
+
+    .btn-edit-trigger {
+        background: linear-gradient(105deg, #c6a43b, #a07d2a);
+        color: white;
+        border: none;
+        padding: 0.55rem 1.3rem;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.78rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s;
+    }
+
+    .btn-edit-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(198, 164, 59, 0.3);
+    }
+
+    .btn-custom-primary:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+    }
 </style>
 {% endblock %}
 
@@ -471,7 +519,18 @@
             </h3>
         </div>
         <div class="card-body-custom">
+
+            {% if is_edit %}
+            <div class="edit-trigger-bar" id="editTriggerBar">
+                <span><i class="fas fa-lock"></i> Fields are locked to avoid accidental changes.</span>
+                <button type="button" class="btn-edit-trigger" id="enableEditBtn" onclick="enableEditing()">
+                    <i class="fas fa-pen"></i> Edit Details
+                </button>
+            </div>
+            {% endif %}
+
             <form method="POST"
+                  id="editableForm"
                   enctype="multipart/form-data"
                   onsubmit="return validateForm()"
                   action="{% if is_edit %}{{ url_for('edit_school', school_id=school.id) }}{% else %}{{ request.path }}{% endif %}">
@@ -492,7 +551,8 @@
                             <i class="fas fa-university input-icon"></i>
                             <input type="text" name="name" id="schoolName" required
                                    value="{{ request.form.get('name', school.name if is_edit else '') }}"
-                                   placeholder="Enter School Name" oninput="updatePreview()">
+                                   placeholder="Enter School Name" oninput="updatePreview()"
+                                   {{ 'disabled' if is_edit }}>
                         </div>
                     </div>
 
@@ -504,7 +564,8 @@
                             <input type="text" name="address" id="schoolAddress" required
                                    placeholder="Type address or search on map..." autocomplete="off"
                                    value="{{ request.form.get('address', school.address if is_edit else '') }}"
-                                   oninput="onAddressType(this)">
+                                   oninput="onAddressType(this)"
+                                   {{ 'disabled' if is_edit }}>
                             <div class="osm-suggestions" id="osmSuggestions"></div>
                         </div>
 
@@ -541,7 +602,8 @@
                             <i class="fas fa-phone input-icon"></i>
                             <input type="text" name="phone" id="schoolPhone"
                                    value="{{ request.form.get('phone', school.phone if is_edit else '') }}"
-                                   placeholder="e.g. +92 300 1234567" oninput="updatePreview()">
+                                   placeholder="e.g. +92 300 1234567" oninput="updatePreview()"
+                                   {{ 'disabled' if is_edit }}>
                         </div>
                     </div>
 
@@ -551,7 +613,8 @@
                             <i class="fas fa-envelope input-icon"></i>
                             <input type="email" name="email" id="schoolEmail"
                                    value="{{ request.form.get('email', school.email if is_edit else '') }}"
-                                   placeholder="e.g. contact@school.com" oninput="updatePreview()">
+                                   placeholder="e.g. contact@school.com" oninput="updatePreview()"
+                                   {{ 'disabled' if is_edit }}>
                         </div>
                     </div>
 
@@ -560,7 +623,8 @@
                         <div class="input-wrapper">
                             <i class="fas fa-image input-icon" style="z-index: 5;"></i>
                             <input type="file" name="logo" id="schoolLogo" accept="image/*"
-                                   style="padding-left: 2.5rem;" onchange="previewLogo(this); updatePreview();">
+                                   style="padding-left: 2.5rem;" onchange="previewLogo(this); updatePreview();"
+                                   {{ 'disabled' if is_edit }}>
                         </div>
                     </div>
                 </div>
@@ -652,7 +716,7 @@
                 {% endif %}
 
                 <div class="btn-group-custom">
-                    <button type="submit" class="btn-custom btn-custom-primary">
+                    <button type="submit" class="btn-custom btn-custom-primary" id="submitBtn" {{ 'disabled' if is_edit }}>
                         <i class="fas {{ 'fa-save' if not is_edit else 'fa-check' }}"></i>
                         {% if is_edit %}
                             Update School
@@ -884,6 +948,27 @@ function previewLogo(input) {
     } else {
         logo.innerHTML = '<i class="fas fa-school"></i>';
         logo.style.background = 'linear-gradient(135deg, var(--secondary, #c6a43b) 0%, var(--secondary-dark, #a07d2a) 100%)';
+    }
+}
+
+// Edit Details button — unlock the locked fields for editing
+function enableEditing() {
+    const form = document.getElementById('editableForm');
+    if (!form) return;
+
+    form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(el => {
+        el.disabled = false;
+    });
+
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) submitBtn.disabled = false;
+
+    const bar = document.getElementById('editTriggerBar');
+    if (bar) {
+        bar.innerHTML = '<span><i class="fas fa-unlock"></i> Fields unlocked — you can now edit and save.</span>';
+        bar.style.background = '#e8f5e9';
+        bar.style.borderColor = '#c8e6c9';
+        bar.style.color = '#2e7d32';
     }
 }
 
