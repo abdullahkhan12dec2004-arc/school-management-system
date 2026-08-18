@@ -436,12 +436,19 @@ def select_school():
 
     conn.close()
     return render_template('select_school.html', schools=schools, role=session['role'])
-@app.route('/school/edit/<int:school_id>', methods=['GET', 'POST'])
 
+    
 @app.route('/school/edit/<int:school_id>', methods=['GET', 'POST'])
 @login_required
-@admin_required
+@school_admin_or_super_admin_required
 def edit_school(school_id):
+    # School admin sirf apna school edit kar sakta hai
+    if session.get('role') == 'school_admin' and school_id != session.get('school_id'):
+        flash('Aap sirf apna school edit kar sakte hain', 'error')
+        return redirect(url_for('dashboard'))
+
+    back_url = url_for('schools') if session.get('role') == 'admin' else url_for('dashboard')
+
     conn = get_db()
     c = conn.cursor()
 
@@ -451,7 +458,7 @@ def edit_school(school_id):
     if not school:
         flash('School nahi mila', 'error')
         conn.close()
-        return redirect(url_for('schools'))
+        return redirect(back_url)
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
@@ -489,11 +496,10 @@ def edit_school(school_id):
         conn.close()
 
         flash('School details update ho gaye!', 'success')
-        return redirect(url_for('schools'))
+        return redirect(back_url)
 
     conn.close()
     return render_template('school_form.html', school=school)
-
 
 
 
