@@ -969,6 +969,9 @@
         <a href="{{ url_for('add_school_admin') }}" class="nav-item {% if request.endpoint == 'add_school_admin' %}active{% endif %}">
             <i class="fas fa-user-shield"></i> Add Admin
         </a>
+        <a href="{{ url_for('edit_school', school_id=session.get('school_id')) }}" class="nav-item {% if request.endpoint == 'edit_school' %}active{% endif %}">
+            <i class="fas fa-pen"></i> Edit School
+        </a>
 
         <div class="nav-section">ACADEMICS</div>
         <a href="{{ url_for('teachers') }}" class="nav-item {% if request.endpoint == 'teachers' %}active{% endif %}">
