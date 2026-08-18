@@ -1351,7 +1351,7 @@ def my_result():
 # ========== OTHER ROUTES (Admin Only) ==========
 @app.route('/users')
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def users():
     conn = get_db()
     c = conn.cursor()
