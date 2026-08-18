@@ -39,14 +39,6 @@ app.config['MAIL_DEFAULT_SENDER'] = env('MAIL_USERNAME')
 
 mail = Mail(app)
 
-
-
-
-
-
-
-
-
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
