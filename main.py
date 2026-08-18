@@ -1570,11 +1570,10 @@ def add_class():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("SELECT id, name FROM schools ORDER BY name")
+    c.execute("SELECT id, name FROM schools WHERE id = %s", (school_id,))
     schools_list = fetchall_dict(c)
 
     if request.method == 'POST':
-        school_id = request.form.get('school_id')
         class_name = request.form.get('class_name', '').strip()
         section = request.form.get('section', '')
         academic_year = request.form.get('academic_year', '')
