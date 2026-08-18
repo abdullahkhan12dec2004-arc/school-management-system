@@ -444,7 +444,22 @@ def select_school():
 
     conn.close()
     return render_template('select_school.html', schools=schools, role=session['role'])
-
+@app.route('/school/edit/<int:school_id>', methods=['GET', 'POST'])
+def edit_school(school_id):
+    school = School.query.get_or_404(school_id)   # apna model use karo
+    if request.method == 'POST':
+        school.name = request.form.get('name')
+        school.address = request.form.get('address')
+        school.phone = request.form.get('phone')
+        school.email = request.form.get('email')
+        school.latitude = request.form.get('latitude')
+        school.longitude = request.form.get('longitude')
+        if 'logo' in request.files and request.files['logo'].filename:
+            # naya logo save karo, purana rehne do agar upload nahi hui
+            pass
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+    return render_template('school_form.html', school=school)
 
 # ========== DASHBOARD (Role Based) ==========
 @app.route('/dashboard')
