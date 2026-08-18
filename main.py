@@ -437,8 +437,6 @@ def select_school():
     conn.close()
     return render_template('select_school.html', schools=schools, role=session['role'])
 
-
-
 @app.route('/school/edit/<int:school_id>', methods=['GET', 'POST'])
 @login_required
 @school_admin_or_super_admin_required
@@ -468,6 +466,10 @@ def edit_school(school_id):
         email = request.form.get('email', '')
         latitude = request.form.get('latitude', '')
         longitude = request.form.get('longitude', '')
+        if latitude in ('', 'None'):
+            latitude = None
+        if longitude in ('', 'None'):
+            longitude = None
 
         if not name:
             flash('School ka naam zaruri hai', 'error')
@@ -484,24 +486,29 @@ def edit_school(school_id):
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 logo = filename
 
-        c.execute("""
-            UPDATE schools
-            SET name=%s, address=%s, phone=%s, email=%s, logo=%s,
-                latitude=%s, longitude=%s
-            WHERE id=%s
-        """, (name, address, phone, email, logo,
-              latitude if latitude else None,
-              longitude if longitude else None,
-              school_id))
-        conn.commit()
-        conn.close()
+        try:
+            c.execute("""
+                UPDATE schools
+                SET name=%s, address=%s, phone=%s, email=%s, logo=%s,
+                    latitude=%s, longitude=%s
+                WHERE id=%s
+            """, (name, address, phone, email, logo,
+                  latitude, longitude, school_id))
+            conn.commit()
+        except psycopg2.Error as e:
+            conn.rollback()
+            print(f"edit_school UPDATE error: {e}")
+            flash(f'School update nahi ho saka: {e}', 'error')
+            conn.close()
+            return render_template('school_form.html', school=school)
+        finally:
+            conn.close()
 
         flash('School details update ho gaye!', 'success')
         return redirect(back_url)
 
     conn.close()
     return render_template('school_form.html', school=school)
-
 
 
 # ========== DASHBOARD (Role Based) ==========
