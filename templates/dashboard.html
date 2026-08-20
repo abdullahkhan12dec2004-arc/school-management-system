@@ -755,21 +755,8 @@
             {% endif %}
         </div>
     </div>
-    <!-- School Admin / Super Admin ke liye bulk upload dropdown -->
-{% if session.role in ['admin', 'school_admin'] %}
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="bulkUploadDropdown" role="button" data-toggle="dropdown">
-        📤 Bulk Upload
-    </a>
-    <div class="dropdown-menu">
-        <a class="dropdown-item" href="{{ url_for('bulk_upload_classes') }}">📚 Upload Classes</a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="{{ url_for('bulk_upload_teachers') }}">👨‍🏫 Upload Teachers</a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="{{ url_for('bulk_upload_students') }}">🎓 Upload Students</a>
-    </div>
-</li>
-{% endif %}
+  
+
     <!-- Three Column Grid: Quick Actions, Fee Collection, System Overview -->
     <div class="info-grid-modern">
         <!-- Quick Actions Card -->
