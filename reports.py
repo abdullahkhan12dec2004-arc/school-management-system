@@ -41,16 +41,6 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated
 
-
-def school_admin_or_super_admin_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        role = session.get('role')
-        if role not in ['admin', 'school_admin']:
-            flash('Sirf Admin ya School Admin access kar sakta hai', 'error')
-            return redirect(url_for('dashboard'))
-        return f(*args, **kwargs)
-    return decorate
   
 def teacher_required(f):
     @wraps(f)
@@ -348,7 +338,7 @@ def export_students():
 
 @reports_bp.route('/reports/teachers/export')
 @login_required
-@school_admin_or_super_admin_required
+@admin_required
 def export_teachers():
     school_id = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
 
@@ -446,7 +436,7 @@ def export_teachers():
 
 @reports_bp.route('/reports/fees/export')
 @login_required
-@school_admin_or_super_admin_required
+@admin_required
 def export_fees():
     school_id = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
     class_id  = request.args.get('class_id')
@@ -567,7 +557,7 @@ def export_fees():
 
 @reports_bp.route('/reports/salary/export')
 @login_required
-@school_admin_or_super_admin_required
+@admin_required
 def export_salary():
     school_id  = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
     teacher_id = request.args.get('teacher_id')   # optional: specific teacher
