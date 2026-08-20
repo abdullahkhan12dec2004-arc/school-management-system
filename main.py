@@ -3019,12 +3019,18 @@ def bulk_upload_teachers():
                 'joining_date',
                 'JoiningDate'
             )
-
             if pd.notna(joining_date) and joining_date:
-                try:
-                    joining_date = pd.to_datetime(joining_date).date()
-                except Exception:
+              try:
+                 joining_date = pd.to_datetime(joining_date, dayfirst=True, errors='coerce')
+                 if pd.isna(joining_date):
                     joining_date = None
+                 else:
+                    joining_date = joining_date.date()
+              except Exception:
+                    joining_date = None
+            else:
+                   joining_date = None
+
 
             errors    = validate_teacher_row(row_dict, conn)
             status    = 'VALID' if not errors else 'INVALID'
