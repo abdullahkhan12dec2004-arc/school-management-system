@@ -142,7 +142,6 @@ def admin_required(f):
 
     return decorated
 
-
 def school_admin_or_super_admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
