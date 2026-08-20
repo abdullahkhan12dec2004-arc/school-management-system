@@ -35,7 +35,7 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if session.get('role') != 'admin':
+        if session.get('role') not in ['super_admin', 'school_admin']:
             flash('Sirf Admin access kar sakta hai', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
