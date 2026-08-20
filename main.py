@@ -2969,42 +2969,40 @@ def bulk_upload_classes():
 
     return render_template('bulk_upload_updated.html', upload_type='classes')
 
-
 @app.route('/bulk/teachers', methods=['GET', 'POST'])
 @login_required
 @school_admin_only_required
 def bulk_upload_teachers():
     if request.method == 'POST':
+        import sys
         file = request.files.get('file')
         if not file or not file.filename or \
            not file.filename.lower().endswith(('.xlsx', '.xls')):
             flash('Please upload a valid Excel file (.xlsx or .xls)', 'error')
             return redirect(request.url)
-
         try:
+            sys.stderr.write("DEBUG: before read_excel\n"); sys.stderr.flush()
             df = pd.read_excel(file, header=2)
+            sys.stderr.write(f"DEBUG: read_excel done, shape={df.shape}\n"); sys.stderr.flush()
         except Exception as e:
             flash(f'Error reading file: {str(e)}', 'error')
             return redirect(request.url)
 
         df.columns = [str(col).strip().rstrip('*').strip() for col in df.columns]
+        sys.stderr.write(f"DEBUG: columns={list(df.columns)}\n"); sys.stderr.flush()
 
         conn = get_db()
         c = conn.cursor()
         school_id = session.get('active_school_id') or session.get('school_id')
-
         c.execute("DELETE FROM staging_teachers WHERE school_id=%s AND uploaded_by=%s",
                   (school_id, session['user_id']))
-
         valid_count = 0
         invalid_count = 0
-
         for idx, row in df.iterrows():
+            sys.stderr.write(f"DEBUG: start row {idx}\n"); sys.stderr.flush()
             row_dict = {str(k).strip().rstrip('*').strip(): v for k, v in row.items()}
-
             if is_row_empty(row_dict):
                 continue
-
             full_name     = get_col(row_dict, 'Full Name', 'full_name', 'FullName')
             username      = get_col(row_dict, 'Username', 'username')
             password      = get_col(row_dict, 'Password', 'password')
@@ -3012,13 +3010,13 @@ def bulk_upload_teachers():
             phone         = get_col(row_dict, 'Phone', 'phone')
             subject_spec  = get_col(row_dict, 'Subject Specialization', 'subject_specialization')
             qualification = get_col(row_dict, 'Qualification', 'qualification')
-
             joining_date = get_col(
                 row_dict,
                 'Joining Date',
                 'joining_date',
                 'JoiningDate'
             )
+            sys.stderr.write(f"DEBUG: row {idx} raw joining_date={joining_date!r} type={type(joining_date)}\n"); sys.stderr.flush()
             if pd.notna(joining_date) and joining_date:
               try:
                  joining_date = pd.to_datetime(joining_date, dayfirst=True, errors='coerce')
@@ -3030,14 +3028,14 @@ def bulk_upload_teachers():
                     joining_date = None
             else:
                    joining_date = None
-
+            sys.stderr.write(f"DEBUG: row {idx} parsed joining_date={joining_date}\n"); sys.stderr.flush()
 
             errors    = validate_teacher_row(row_dict, conn)
+            sys.stderr.write(f"DEBUG: row {idx} validated, errors={errors}\n"); sys.stderr.flush()
             status    = 'VALID' if not errors else 'INVALID'
             error_msg = '; '.join(errors) if errors else None
-
             hashed_pwd = hash_password(password) if password else ''
-
+            sys.stderr.write(f"DEBUG: row {idx} before insert\n"); sys.stderr.flush()
             c.execute("""
                 INSERT INTO staging_teachers
                 (school_id, full_name, email, phone, subject_specialization,
@@ -3058,18 +3056,17 @@ def bulk_upload_teachers():
                 error_msg,
                 session['user_id']
             ))
-
+            sys.stderr.write(f"DEBUG: row {idx} inserted\n"); sys.stderr.flush()
             if status == 'VALID':
                 valid_count += 1
             else:
                 invalid_count += 1
-
         conn.commit()
         conn.close()
         flash(f'✅ {valid_count} valid | ❌ {invalid_count} invalid rows found', 'info')
         return redirect(url_for('review_teachers_upload'))
-
     return render_template('bulk_upload_updated.html', upload_type='teachers')
+
 
 @app.route('/bulk/students', methods=['GET', 'POST'])
 @login_required
