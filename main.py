@@ -8,6 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask import request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
 from functools import wraps
+from datetime import datetime
 import datetime
 import os
 import psycopg2
@@ -3018,16 +3019,16 @@ def bulk_upload_teachers():
             )
             sys.stderr.write(f"DEBUG: row {idx} raw joining_date={joining_date!r} type={type(joining_date)}\n"); sys.stderr.flush()
             if pd.notna(joining_date) and joining_date:
-              try:
-                 joining_date = pd.to_datetime(joining_date, dayfirst=True, errors='coerce')
-                 if pd.isna(joining_date):
-                    joining_date = None
-                 else:
-                    joining_date = joining_date.date()
-              except Exception:
-                    joining_date = None
+               joining_date_str = str(joining_date).strip()
+               joining_date = None
+               for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
+                  try:
+                     joining_date = datetime.strptime(joining_date_str, fmt).date()
+                     break
+                  except (ValueError, TypeError):
+                     continue
             else:
-                   joining_date = None
+               joining_date = None
             sys.stderr.write(f"DEBUG: row {idx} parsed joining_date={joining_date}\n"); sys.stderr.flush()
 
             errors    = validate_teacher_row(row_dict, conn)
