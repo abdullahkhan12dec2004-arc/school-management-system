@@ -1,6 +1,7 @@
 """
 reports.py - Excel Export Routes
 School Management System
+
 4 Reports:
   1. Student Profile Report (single student OR all students by school/class)
   2. Teacher Report (all teachers by school)
