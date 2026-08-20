@@ -46,7 +46,7 @@ def admin_required(f):
 def teacher_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if session.get('role') not in ['admin', 'teacher']:
+        if session.get('role') not in ['super_admin', 'school_admin', 'teacher']:
             flash('Aapko is page ka access nahi hai', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
