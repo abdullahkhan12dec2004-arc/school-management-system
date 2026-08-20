@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask import request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
 from functools import wraps
-from datetime import datetime
+
 import datetime
 import os
 import psycopg2
@@ -3023,7 +3023,7 @@ def bulk_upload_teachers():
                joining_date = None
                for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
                   try:
-                     joining_date = datetime.strptime(joining_date_str, fmt).date()
+                     joining_date = datetime.datetime.strptime(joining_date_str, fmt).date()
                      break
                   except (ValueError, TypeError):
                      continue
