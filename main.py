@@ -1514,56 +1514,111 @@ def teacher_subjects():
     c.execute("SELECT * FROM teachers WHERE school_id=%s ORDER BY full_name", (school_id,))
     teachers_list = fetchall_dict(c)
 
-    # ✅ Classes fetch karke dropdown ke liye
     c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name, section", (school_id,))
     classes_list = fetchall_dict(c)
 
-    c.execute("""
-        SELECT sub.*, c.class_name, c.section
-        FROM subjects sub
-        JOIN classes c ON sub.class_id = c.id
-        WHERE sub.school_id = %s
-        ORDER BY c.class_name, sub.subject_name
-    """, (school_id,))
-    subjects_list = fetchall_dict(c)
-
     if request.method == 'POST':
         teacher_id = request.form.get('teacher_id')
-        subject_ids = request.form.getlist('subject_ids')
-        if not teacher_id or not subject_ids:
-            flash('Teacher aur subject dono select karein', 'error')
+        subject_names   = request.form.getlist('subject_name[]')
+        class_ids       = request.form.getlist('class_id[]')
+        total_marks_l   = request.form.getlist('total_marks[]')
+        passing_marks_l = request.form.getlist('passing_marks[]')
+
+        if not teacher_id:
+            flash('Teacher select karna zaruri hai', 'error')
+            conn.close()
+            return redirect(url_for('teacher_subjects'))
+
+        saved = 0
+        for i in range(len(subject_names)):
+            name = subject_names[i].strip() if i < len(subject_names) else ''
+            class_id = class_ids[i] if i < len(class_ids) else ''
+            if not name or not class_id:
+                continue  # incomplete row, skip karo
+
+            total_marks = total_marks_l[i] if i < len(total_marks_l) and total_marks_l[i] else 100
+            passing_marks = passing_marks_l[i] if i < len(passing_marks_l) and passing_marks_l[i] else 40
+
+            # Subject already is class ke liye exist karta hai?
+            c.execute("""
+                SELECT id FROM subjects
+                WHERE school_id=%s AND class_id=%s AND LOWER(subject_name)=LOWER(%s)
+            """, (school_id, class_id, name))
+            existing_subject = c.fetchone()
+
+            if existing_subject:
+                subject_id = existing_subject[0]
+            else:
+                c.execute("""
+                    INSERT INTO subjects (school_id, class_id, subject_name, total_marks, passing_marks)
+                    VALUES (%s,%s,%s,%s,%s) RETURNING id
+                """, (school_id, class_id, name, total_marks, passing_marks))
+                subject_id = c.fetchone()[0]
+
+            # Already isi teacher ko assign hai?
+            c.execute("""
+                SELECT id FROM teacher_subjects WHERE teacher_id=%s AND subject_id=%s
+            """, (teacher_id, subject_id))
+            if not c.fetchone():
+                c.execute("""
+                    INSERT INTO teacher_subjects (teacher_id, subject_id, school_id)
+                    VALUES (%s,%s,%s)
+                """, (teacher_id, subject_id, school_id))
+                saved += 1
+
+        if saved == 0:
+            flash('Koi valid subject row nahi mili — Subject Name aur Class dono zaruri hain', 'error')
         else:
-            for subject_id in subject_ids:
-                c.execute(
-                    "SELECT id FROM teacher_subjects WHERE teacher_id=%s AND subject_id=%s",
-                    (teacher_id, subject_id)
-                )
-                if not c.fetchone():
-                    c.execute(
-                        "INSERT INTO teacher_subjects (teacher_id, subject_id, school_id) VALUES (%s,%s,%s)",
-                        (teacher_id, subject_id, school_id)
-                    )
             conn.commit()
-            flash('Subjects assign ho gaye!', 'success')
+            flash(f'{saved} subject(s) teacher ko assign ho gaye!', 'success')
 
-    c.execute("""
-        SELECT ts.*, t.full_name AS teacher_name, 
-               sub.subject_name, c.class_name, c.section
-        FROM teacher_subjects ts
-        JOIN teachers t ON ts.teacher_id = t.id
-        JOIN subjects sub ON ts.subject_id = sub.id
-        JOIN classes c ON sub.class_id = c.id
-        WHERE ts.school_id = %s
-        ORDER BY t.full_name
-    """, (school_id,))
-    assignments_list = fetchall_dict(c)
+        conn.close()
+        return redirect(url_for('teacher_subjects'))
+
     conn.close()
-
     return render_template('teacher_subjects.html',
                            teachers=teachers_list,
-                           classes=classes_list,   # ✅ naya variable pass kiya
-                           subjects=subjects_list,
-                           assignments=assignments_list)
+                           classes=classes_list,
+                           current_year=datetime.datetime.now().year)
+
+
+@app.route('/get_teacher_subjects/<int:teacher_id>')
+@login_required
+@school_admin_only_required
+def get_teacher_subjects(teacher_id):
+    school_id = session.get('active_school_id', session.get('school_id'))
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""
+        SELECT ts.id, sub.subject_name, c.class_name, c.section
+        FROM teacher_subjects ts
+        JOIN subjects sub ON ts.subject_id = sub.id
+        JOIN classes c ON sub.class_id = c.id
+        WHERE ts.teacher_id = %s AND ts.school_id = %s
+        ORDER BY c.class_name, sub.subject_name
+    """, (teacher_id, school_id))
+    rows = fetchall_dict(c)
+    conn.close()
+    for r in rows:
+        r['class_name'] = f"{r['class_name']}{' - ' + r['section'] if r.get('section') else ''}"
+    return jsonify(rows)
+
+
+@app.route('/remove_teacher_subject/<int:ts_id>', methods=['POST'])
+@login_required
+@school_admin_only_required
+def remove_teacher_subject(ts_id):
+    school_id = session.get('active_school_id', session.get('school_id'))
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id FROM teacher_subjects WHERE id=%s AND school_id=%s", (ts_id, school_id))
+    if not c.fetchone():
+        conn.close()
+        return jsonify({'success': False, 'error': 'not found'}), 404
+    c.execute("DELETE FROM teacher_subjects WHERE id=%s", (ts_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
 
 
 @app.route('/classes/add', methods=['GET', 'POST'])
