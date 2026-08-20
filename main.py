@@ -2051,12 +2051,13 @@ def student_attendance():
 
     conn = get_db()
     c = conn.cursor()
-
-    if session['role'] == 'admin':
+    if session['role'] in ('admin', 'school_admin'):
         c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
     else:
         c.execute("SELECT id FROM teachers WHERE user_id=%s", (session['user_id'],))
         t = c.fetchone()
+    
+
         if t:
             c.execute("""
                 SELECT c.* FROM classes c
