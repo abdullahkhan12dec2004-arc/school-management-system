@@ -1515,6 +1515,10 @@ def teacher_subjects():
     c.execute("SELECT * FROM teachers WHERE school_id=%s ORDER BY full_name", (school_id,))
     teachers_list = fetchall_dict(c)
 
+    # ✅ Classes fetch karke dropdown ke liye
+    c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name, section", (school_id,))
+    classes_list = fetchall_dict(c)
+
     c.execute("""
         SELECT sub.*, c.class_name, c.section
         FROM subjects sub
@@ -1527,7 +1531,6 @@ def teacher_subjects():
     if request.method == 'POST':
         teacher_id = request.form.get('teacher_id')
         subject_ids = request.form.getlist('subject_ids')
-
         if not teacher_id or not subject_ids:
             flash('Teacher aur subject dono select karein', 'error')
         else:
@@ -1555,10 +1558,11 @@ def teacher_subjects():
         ORDER BY t.full_name
     """, (school_id,))
     assignments_list = fetchall_dict(c)
-
     conn.close()
+
     return render_template('teacher_subjects.html',
                            teachers=teachers_list,
+                           classes=classes_list,   # ✅ naya variable pass kiya
                            subjects=subjects_list,
                            assignments=assignments_list)
 
