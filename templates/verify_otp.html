@@ -1,25 +1,90 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" style="max-width:420px; margin-top:60px;">
-  <h3>Email Verification</h3>
-  <p>OTP <strong>{{ email }}</strong> par bheja gaya hai. Neeche daalein.</p>
+<style>
+  body {
+    background-color: #ffffff !important;
+  }
+  .verify-card {
+    max-width: 420px;
+    margin: 80px auto;
+    padding: 40px 35px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+  .verify-card h3 {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 8px;
+  }
+  .verify-card p {
+    color: #6b7280;
+    font-size: 14.5px;
+    margin-bottom: 24px;
+  }
+  .verify-card label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .form-control {
+    letter-spacing: 4px;
+    font-size: 18px;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+  }
+  .form-control:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  }
+  .btn-primary {
+    background-color: #4f46e5;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
+  .btn-primary:hover {
+    background-color: #4338ca;
+  }
+  .resend-link {
+    font-size: 14px;
+    color: #4f46e5;
+    text-decoration: none;
+  }
+  .resend-link:hover {
+    text-decoration: underline;
+  }
+</style>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, msg in messages %}
-      <div class="alert alert-{{ 'danger' if category=='error' else category }}">{{ msg }}</div>
-    {% endfor %}
-  {% endwith %}
+<div class="container">
+  <div class="verify-card">
+    <h3>Email Verification</h3>
+    <p>An OTP has been sent to <strong>{{ email }}</strong>. Please enter it below.</p>
 
-  <form method="POST">
-    <div class="mb-3">
-      <label>6-digit OTP</label>
-      <input type="text" name="otp" maxlength="6" pattern="\d{6}" class="form-control" required autofocus>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}
+        <div class="alert alert-{{ 'danger' if category=='error' else category }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+      <div class="mb-3">
+        <label>6-digit OTP</label>
+        <input type="text" name="otp" maxlength="6" pattern="\d{6}"
+               class="form-control" required autofocus placeholder="――――――">
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Verify</button>
+    </form>
+
+    <div class="text-center mt-3">
+      <a href="{{ url_for('resend_otp') }}" class="resend-link">Resend OTP</a>
     </div>
-    <button type="submit" class="btn btn-primary w-100">Verify</button>
-  </form>
-
-  <div class="text-center mt-3">
-    <a href="{{ url_for('resend_otp') }}">OTP dobara bhejein</a>
   </div>
 </div>
 {% endblock %}
