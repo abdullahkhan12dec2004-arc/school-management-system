@@ -17,9 +17,9 @@
     }
 
     .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
         color: white;
-        border: 1px solid #2c6e9e !important;
+        border: 1px solid #38bdf8 !important;
         font-weight: 600;
         font-size: 13px;
         text-transform: uppercase;
@@ -31,13 +31,13 @@
     }
 
     .table-bordered-custom tbody tr:hover {
-        background-color: #e8f1f8;
+        background-color: #e0f4ff;
         cursor: pointer;
     }
 
     .table-bordered-custom td:first-child {
         font-weight: 700;
-        color: #c6a43b;
+        color: #0ea5e9;
         text-align: center;
         width: 50px;
     }
@@ -45,8 +45,8 @@
     /* Student count badge */
     .student-count {
         display: inline-block;
-        background: #e8f1f8;
-        color: #1a4a6f;
+        background: #e0f4ff;
+        color: #0369a1;
         padding: 4px 10px;
         border-radius: 20px;
         font-weight: 600;
@@ -55,12 +55,114 @@
         min-width: 40px;
     }
 
+    /* Page heading */
+    .page-heading {
+        font-size: 32px;
+        font-weight: 800;
+        color: #0ea5e9;
+    }
+
+    .page-heading i {
+        color: #0ea5e9;
+        font-size: 30px;
+    }
+
+    /* Top action row */
+    .top-action-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .top-action-row .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+    }
+
+    .btn-sky {
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .btn-sky:hover {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: #fff;
+    }
+
+    .btn-outline-sky {
+        border: 1px solid #0ea5e9;
+        color: #0ea5e9;
+        font-weight: 600;
+        background: #fff;
+    }
+
+    .btn-outline-sky:hover {
+        background: #0ea5e9;
+        color: #fff;
+    }
+
+    /* Dashboard style stat cards */
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        border-top: 4px solid #0ea5e9;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .stat-card .stat-label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .stat-card .stat-value {
+        font-size: 30px;
+        font-weight: 800;
+        color: #0f2b3d;
+    }
+
+    .stat-card .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: #e0f4ff;
+        color: #0ea5e9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
     /* Filter card styling */
     .filter-card {
         background: white;
         border-radius: 12px;
         border: 1px solid #e2e8f0;
+        border-left: 4px solid #38bdf8;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .filter-card .form-label {
+        color: #0369a1;
+    }
+
+    .filter-card .form-select:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 0.2rem rgba(56, 189, 248, 0.25);
     }
 
     /* Responsive */
@@ -69,6 +171,19 @@
         .table-bordered-custom td {
             padding: 8px;
             font-size: 12px;
+        }
+
+        .page-heading {
+            font-size: 24px;
+        }
+
+        .top-action-row .action-buttons {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .top-action-row .action-buttons .btn {
+            flex: 1;
         }
     }
     .dashboard-container {
@@ -83,16 +198,59 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <h2 class="fw-bold mb-0">
-        <i class="fas fa-door-open" style="color: #c6a43b;"></i> Classes
+<!-- Top Row: Heading (left) + Add Class & Add Teacher buttons (right) -->
+<div class="top-action-row mb-4">
+    <h2 class="page-heading mb-0">
+        <i class="fas fa-door-open"></i> Classes
     </h2>
-    <div>
-        <a href="{{ url_for('add_class') }}" class="btn btn-primary">
+    <div class="action-buttons">
+        <a href="{{ url_for('add_class') }}" class="btn btn-sky">
             <i class="fas fa-plus"></i> Add Class
+        </a>
+        <a href="{{ url_for('add_teacher') }}" class="btn btn-outline-sky">
+            <i class="fas fa-chalkboard-teacher"></i> Add Teacher
         </a>
     </div>
 </div>
+
+<!-- Stats Summary (moved to top, dashboard style, 2 rows) -->
+{% if classes %}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Classes</div>
+                <div class="stat-value">{{ classes|length }}</div>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-door-open"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Students</div>
+                <div class="stat-value">{{ classes|sum(attribute='student_count')|default(0) }}</div>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">With Sections</div>
+                <div class="stat-value">{{ classes|selectattr('section', 'ne', '')|list|length }}</div>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-layer-group"></i>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- School Filter Card -->
 <div class="filter-card mb-4">
@@ -152,7 +310,7 @@
                             </span>
                         </td>
                         <td>
-                            <i class="fas fa-school" style="color: #c6a43b; font-size: 12px;"></i>
+                            <i class="fas fa-school" style="color: #0ea5e9; font-size: 12px;"></i>
                             {{ class.school_name }}
                         </td>
                         <td>
@@ -183,38 +341,6 @@
         </div>
     </div>
 </div>
-
-<!-- Stats Summary -->
-{% if classes %}
-<div class="row mt-4">
-    <div class="col-md-4">
-        <div class="card bg-primary bg-opacity-10 border-0">
-            <div class="card-body text-center">
-                <h3 class="mb-0 text-primary">{{ classes|length }}</h3>
-                <small class="text-muted">Total Classes</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card bg-success bg-opacity-10 border-0">
-            <div class="card-body text-center">
-                <h3 class="mb-0 text-success">
-                    {{ classes|sum(attribute='student_count')|default(0) }}
-                </h3>
-                <small class="text-muted">Total Students</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card bg-warning bg-opacity-10 border-0">
-            <div class="card-body text-center">
-                <h3 class="mb-0 text-warning">{{ classes|selectattr('section', 'ne', '')|list|length }}</h3>
-                <small class="text-muted">With Sections</small>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 {% endblock %}
 
