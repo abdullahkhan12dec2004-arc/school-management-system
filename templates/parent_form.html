@@ -4,9 +4,10 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
     body {
-        background: #f5f7fb !important;
+        background: #ffffff !important;
         font-family: 'Inter', sans-serif;
     }
 
@@ -25,15 +26,16 @@
     .page-header h1 {
         font-size: 1.8rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+        color: #0ea5e9;
         margin-bottom: 0.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 12px;
+    }
+
+    .page-header h1 i {
+        color: #0ea5e9;
     }
 
     .page-header p {
@@ -44,8 +46,8 @@
     .card-custom {
         background: #ffffff;
         border-radius: 24px;
-        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.05);
-        border: 1px solid #eef2f8;
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.08);
+        border: 1px solid #e7f4fc;
         overflow: hidden;
         height: 100%;
         display: flex;
@@ -58,11 +60,11 @@
     }
 
     .card-header-custom.primary {
-        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(98deg, #0ea5e9 0%, #38bdf8 100%);
     }
 
     .card-header-custom.success {
-        background: linear-gradient(98deg, #0f3d23 0%, #16a34a 100%);
+        background: linear-gradient(98deg, #0284c7 0%, #38bdf8 100%);
     }
 
     .card-header-custom h3 {
@@ -83,7 +85,10 @@
     }
 
     .card-header-custom h3 i {
-        color: #e0c87c;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px;
+        border-radius: 8px;
     }
 
     .card-body-custom {
@@ -102,12 +107,12 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #5b6e8c;
+        color: #0ea5e9;
         margin-bottom: 0.4rem;
     }
 
     .form-label i {
-        color: #c6a43b;
+        color: #0ea5e9;
         margin-right: 6px;
         width: 14px;
     }
@@ -138,14 +143,15 @@
         border-radius: 12px;
         font-size: 0.85rem;
         font-family: 'Inter', sans-serif;
-        background: #ffffff;
+        background: #f8fbfd;
         transition: all 0.2s;
     }
 
     .input-wrapper input:focus {
         outline: none;
-        border-color: #1a4a6f;
-        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+        border-color: #0ea5e9;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
     }
 
     .input-wrapper input::placeholder {
@@ -179,6 +185,14 @@
         border: 1.5px solid #e5eaf0;
         border-radius: 12px;
         font-size: 0.85rem;
+        background: #f8fbfd;
+    }
+
+    .search-wrapper input:focus {
+        outline: none;
+        border-color: #0ea5e9;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
     }
 
     .students-list {
@@ -189,7 +203,7 @@
 
     .student-item {
         background: #ffffff;
-        border: 1px solid #eef2f8;
+        border: 1px solid #e7f4fc;
         border-radius: 16px;
         padding: 1rem;
         margin-bottom: 0.75rem;
@@ -200,13 +214,13 @@
     }
 
     .student-item:hover {
-        background: #f5f8fc;
-        border-color: #1a4a6f;
+        background: #f0f9ff;
+        border-color: #0ea5e9;
     }
 
     .student-item.selected {
-        background: #f0fdf4;
-        border-color: #16a34a;
+        background: #ecfeff;
+        border-color: #0ea5e9;
     }
 
     .avatar-circle {
@@ -218,7 +232,7 @@
         justify-content: center;
         font-weight: 700;
         color: white;
-        background: linear-gradient(135deg, #1a4a6f 0%, #2c6e9e 100%);
+        background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
     }
 
     .student-info {
@@ -244,7 +258,7 @@
 
     .badge-count {
         background: white;
-        color: #16a34a;
+        color: #0284c7;
         padding: 2px 8px;
         border-radius: 20px;
         font-size: 0.75rem;
@@ -252,7 +266,7 @@
     }
 
     .check-badge {
-        color: #16a34a;
+        color: #0ea5e9;
         font-size: 1.25rem;
         margin-left: 10px;
     }
@@ -261,13 +275,13 @@
     .action-bar {
         background: white;
         border-radius: 20px;
-        border: 1px solid #eef2f8;
+        border: 1px solid #e7f4fc;
         padding: 1.25rem 2rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-top: 2rem;
-        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.03);
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
     }
 
     .action-bar-text {
@@ -276,6 +290,10 @@
         display: flex;
         align-items: center;
         gap: 8px;
+    }
+
+    .action-bar-text i {
+        color: #0ea5e9;
     }
 
     .btn-group-custom {
@@ -299,32 +317,32 @@
     }
 
     .btn-custom-primary {
-        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
+        background: linear-gradient(105deg, #0ea5e9, #38bdf8);
         color: white;
     }
 
     .btn-custom-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.2);
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
     }
 
     .btn-custom-secondary {
-        background: #f1f4f9;
-        color: #3a4b66;
-        border: 1px solid #e2e8f0;
+        background: #f0f9ff;
+        color: #0284c7;
+        border: 1px solid #bae6fd;
     }
 
     .btn-custom-secondary:hover {
-        background: #e9eef4;
+        background: #e0f2fe;
     }
 
     .info-box {
-        background: #f4f8fb;
-        border: 1px solid #e5eff6;
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
         border-radius: 12px;
         padding: 10px 14px;
         font-size: 0.78rem;
-        color: #1a4a6f;
+        color: #0284c7;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -343,6 +361,7 @@
         font-size: 0.9rem;
     }
 </style>
+
 {% endblock %}
 
 {% block content %}
