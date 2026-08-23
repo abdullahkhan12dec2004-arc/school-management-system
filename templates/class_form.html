@@ -13,97 +13,131 @@
     }
 
     body {
-        background: #FFFFFF;
+        background: #f4f7fb;
         font-family: 'Inter', sans-serif;
     }
 
     /* Main container */
-   .add-class-page {
+    .add-class-page {
         width: 100%;
         min-height: calc(100vh - 60px);
         padding: 2rem;
-        background: #FFFFFF;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-   }
+        background: #f4f7fb;
+    }
 
     .form-container {
-        max-width: 750px;
+        max-width: 900px;
         width: 100%;
         margin: 0 auto;
     }
 
     /* Page Header */
     .page-header {
-        text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     .page-header h1 {
-       font-size: 1.8rem;
-       font-weight: 700;
-       color: #38BDF8;
-       background: none;
-       -webkit-background-clip: initial;
-       background-clip: initial;
-       margin-bottom: 0.5rem;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       gap: 12px;
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #29ABE2;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .page-header h1 i {
-        background: none;
-        color: #38BDF8;
+        color: #29ABE2;
     }
 
-    .page-header p {
-        color: #6c7a91;
-        font-size: 0.9rem;
-        margin-top: 0.25rem;
+    .page-header .breadcrumb {
+        color: #8a97ab;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .page-header .breadcrumb i {
+        font-size: 0.8rem;
     }
 
     /* Main Form Card */
     .form-card {
         background: #ffffff;
-        border-radius: 28px;
-        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(20, 40, 70, 0.06);
         overflow: hidden;
         border: 1px solid #eef2f8;
         margin-bottom: 1.5rem;
     }
 
     .card-header {
-        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(90deg, #1FA7DE 0%, #29ABE2 100%);
         padding: 1rem 1.8rem;
     }
 
     .card-header h3 {
         color: white;
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
         margin: 0;
         display: flex;
         align-items: center;
         gap: 10px;
+        letter-spacing: 0.3px;
     }
 
     .card-header h3 i {
-        color: #e0c87c;
-        font-size: 1.2rem;
+        color: white;
+        font-size: 1.1rem;
     }
 
     .card-body {
-        padding: 1.8rem;
+        padding: 1.8rem 2rem 1rem;
+    }
+
+    /* Section header (e.g. "PERSONAL INFORMATION" style) */
+    .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1.2rem;
+    }
+
+    .section-heading .icon-badge {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        background: #e8f6fd;
+        color: #29ABE2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    .section-heading span {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #29ABE2;
     }
 
     /* Form Grid */
     .form-grid {
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 1.2rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2rem 1.5rem;
+        margin-bottom: 1.6rem;
+    }
+
+    @media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     .form-group {
@@ -111,25 +145,26 @@
     }
 
     .form-label {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.7px;
-        color: #5b6e8c;
-        margin-bottom: 0.4rem;
-        display: block;
+        letter-spacing: 0.5px;
+        color: #1c9bd8;
+        margin-bottom: 0.45rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .form-label i {
-        margin-right: 5px;
-        color: #c6a43b;
+        color: #1c9bd8;
         width: 14px;
-        font-size: 0.65rem;
+        font-size: 0.75rem;
     }
 
     .required {
         color: #e05a5a;
-        margin-left: 3px;
+        margin-left: 2px;
     }
 
     .input-wrapper {
@@ -138,10 +173,10 @@
 
     .input-wrapper i.input-icon {
         position: absolute;
-        left: 12px;
+        left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        color: #9aa9bf;
+        color: #a9b4c4;
         font-size: 0.9rem;
         pointer-events: none;
     }
@@ -149,20 +184,22 @@
     .input-wrapper input,
     .input-wrapper select {
         width: 100%;
-        padding: 0.75rem 0.8rem 0.75rem 2.3rem;
+        padding: 0.75rem 0.9rem 0.75rem 2.5rem;
         border: 1.5px solid #e5eaf0;
-        border-radius: 12px;
+        border-radius: 10px;
         font-size: 0.85rem;
         font-family: 'Inter', sans-serif;
-        background: #ffffff;
+        background: #fbfcfe;
+        color: #33445c;
         transition: all 0.2s;
     }
 
     .input-wrapper input:focus,
     .input-wrapper select:focus {
         outline: none;
-        border-color: #1a4a6f;
-        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+        border-color: #29ABE2;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(41, 171, 226, 0.12);
     }
 
     .input-wrapper input::placeholder {
@@ -175,34 +212,45 @@
         cursor: pointer;
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239aa9bf' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-        background-position: right 0.8rem center;
+        background-position: right 0.9rem center;
         background-repeat: no-repeat;
-        background-size: 1.2em;
+        background-size: 1.1em;
     }
 
     .help-text {
-        font-size: 0.6rem;
+        font-size: 0.65rem;
         color: #8a99b0;
-        margin-top: 5px;
+        margin-top: 6px;
         display: flex;
         align-items: center;
         gap: 4px;
     }
 
+    .help-text i {
+        color: #a9b4c4;
+    }
+
+    hr.section-divider {
+        border: none;
+        border-top: 1px solid #eef2f8;
+        margin: 0 0 1.6rem;
+    }
+
     /* Preview Card */
     .preview-card {
-        background: #f9fbfe;
-        border-radius: 16px;
+        background: #f6fafd;
+        border-radius: 12px;
         padding: 1rem 1.2rem;
-        margin-top: 1.5rem;
-        border: 1px solid #eef2f8;
+        margin: 0 2rem 1.6rem;
+        border: 1px solid #e8f2f9;
+        display: none;
     }
 
     .preview-title {
         font-size: 0.65rem;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
         color: #6f7d98;
         margin-bottom: 10px;
         display: flex;
@@ -218,26 +266,27 @@
     }
 
     .preview-icon {
-        width: 45px;
-        height: 45px;
-        background: linear-gradient(145deg, #c6a43b, #a07d2a);
-        border-radius: 12px;
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(145deg, #29ABE2, #1c8fc4);
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #0f2b3d;
-        font-size: 1.3rem;
+        color: #ffffff;
+        font-size: 1.2rem;
+        flex-shrink: 0;
     }
 
     .preview-info h4 {
         font-size: 0.9rem;
         font-weight: 700;
         color: #1a2c3e;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
     }
 
     .preview-info p {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         color: #6c7c97;
         margin: 0;
     }
@@ -246,14 +295,13 @@
     .btn-group {
         display: flex;
         gap: 1rem;
-        margin-top: 1.5rem;
+        padding: 0 2rem 1.8rem;
         flex-wrap: wrap;
-        justify-content: flex-end;
     }
 
     .btn {
-        padding: 0.7rem 1.8rem;
-        border-radius: 40px;
+        padding: 0.7rem 1.6rem;
+        border-radius: 10px;
         font-weight: 600;
         font-size: 0.85rem;
         cursor: pointer;
@@ -263,16 +311,17 @@
         gap: 8px;
         font-family: 'Inter', sans-serif;
         transition: all 0.2s;
+        text-decoration: none;
     }
 
     .btn-primary {
-        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
+        background: linear-gradient(90deg, #1FA7DE, #29ABE2);
         color: white;
     }
 
     .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.2);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(41, 171, 226, 0.28);
     }
 
     .btn-secondary {
@@ -285,20 +334,21 @@
         background: #e9eef4;
     }
 
-    /* Notes Card */
+    /* Notes bar (footer notes like in teacher form) */
     .notes-card {
-        background: #fafcff;
-        border-radius: 16px;
+        background: #ffffff;
+        border-radius: 14px;
         border: 1px solid #eef2f8;
-        padding: 1rem 1.2rem;
+        padding: 0.9rem 1.5rem;
         display: flex;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 1rem 2rem;
         justify-content: space-between;
+        box-shadow: 0 4px 18px rgba(20, 40, 70, 0.04);
     }
 
     .note-item {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         color: #4f5e7a;
         display: flex;
         align-items: center;
@@ -307,14 +357,14 @@
 
     .note-item i {
         color: #10b981;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
     }
 
     /* Alert */
     .alert {
         padding: 0.7rem 1rem;
-        border-radius: 14px;
-        margin-bottom: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.2rem;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -340,10 +390,18 @@
             padding: 1rem;
         }
         .card-body {
-            padding: 1.2rem;
+            padding: 1.4rem 1.2rem 0.8rem;
+        }
+        .preview-card,
+        .btn-group {
+            margin-left: 1.2rem;
+            margin-right: 1.2rem;
+            padding-left: 0;
+            padding-right: 0;
         }
         .btn-group {
             flex-direction: column;
+            padding-bottom: 1.4rem;
         }
         .btn {
             justify-content: center;
@@ -364,7 +422,9 @@
             <h1>
                 <i class="fas fa-door-open"></i> Add New Class
             </h1>
-
+            <div class="breadcrumb">
+                <i class="fas fa-house"></i> Home <i class="fas fa-chevron-right"></i> Classes <i class="fas fa-chevron-right"></i> Add New
+            </div>
         </div>
 
         <!-- Flash Messages -->
@@ -381,6 +441,11 @@
             <div class="card-body">
                 <form method="POST" id="classForm" onsubmit="return validateForm(event)">
 
+                    <div class="section-heading">
+                        <div class="icon-badge"><i class="fas fa-id-badge"></i></div>
+                        <span>Class Information</span>
+                    </div>
+
                     <div class="form-grid">
                         <!-- Class Name -->
                         <div class="form-group">
@@ -394,7 +459,7 @@
                                        oninput="updatePreview()" required>
                             </div>
                             <div class="help-text">
-                                <i class="fas fa-info-circle"></i> Enter the class name as you want it to appear
+                                <i class="fas fa-circle-info"></i> Enter the class name as you want it to appear
                             </div>
                         </div>
 
@@ -410,7 +475,7 @@
                                        oninput="updatePreview()">
                             </div>
                             <div class="help-text">
-                                <i class="fas fa-info-circle"></i> Optional - leave empty if no section
+                                <i class="fas fa-circle-info"></i> Optional - leave empty if no section
                             </div>
                         </div>
 
@@ -443,47 +508,47 @@
                                        oninput="updatePreview()" required>
                             </div>
                             <div class="help-text">
-                                <i class="fas fa-info-circle"></i> Format: YYYY-YYYY (e.g., 2024-2025)
+                                <i class="fas fa-circle-info"></i> Format: YYYY-YYYY (e.g., 2024-2025)
                             </div>
                         </div>
                     </div>
 
-                    <!-- Preview Card -->
-                    <div id="previewCard" class="preview-card" style="display: none;">
-                        <div class="preview-title">
-                            <i class="fas fa-eye"></i> Class Preview
-                        </div>
-                        <div class="preview-content">
-                            <div class="preview-icon">
-                                <i class="fas fa-door-open"></i>
-                            </div>
-                            <div class="preview-info">
-                                <h4 id="previewName">—</h4>
-                                <p id="previewDetail">—</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Form Actions -->
-                    <div class="btn-group">
-                        <a href="{{ url_for('classes') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Add New Class
-                        </button>
-                    </div>
-
+                    <hr class="section-divider">
                 </form>
+            </div>
+
+            <!-- Preview Card -->
+            <div id="previewCard" class="preview-card">
+                <div class="preview-title">
+                    <i class="fas fa-eye"></i> Class Preview
+                </div>
+                <div class="preview-content">
+                    <div class="preview-icon">
+                        <i class="fas fa-door-open"></i>
+                    </div>
+                    <div class="preview-info">
+                        <h4 id="previewName">—</h4>
+                        <p id="previewDetail">—</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="btn-group">
+                <button type="submit" form="classForm" class="btn btn-primary">
+                    <i class="fas fa-floppy-disk"></i> Register Class
+                </button>
+                <a href="{{ url_for('classes') }}" class="btn btn-secondary">
+                    <i class="fas fa-xmark"></i> Cancel
+                </a>
             </div>
         </div>
 
-        <!-- Quick Tips Card -->
+        <!-- Quick Tips / Notes Card -->
         <div class="notes-card">
-            <div class="note-item"><i class="fas fa-check-circle"></i> Class name should be unique within the school</div>
-            <div class="note-item"><i class="fas fa-check-circle"></i> You can add multiple sections for same class</div>
-            <div class="note-item"><i class="fas fa-check-circle"></i> After creating class, you can add students</div>
-            <div class="note-item"><i class="fas fa-check-circle"></i> Fields marked with <span style="color:#e05a5a;">*</span> are required</div>
+            <div class="note-item"><i class="fas fa-check-circle"></i> All fields marked with <span style="color:#e05a5a;">&nbsp;*&nbsp;</span> are required</div>
+            <div class="note-item"><i class="fas fa-check-circle"></i> Class name must be unique within the school</div>
+            <div class="note-item"><i class="fas fa-check-circle"></i> Students can be added after class is created</div>
         </div>
     </div>
 </div>
