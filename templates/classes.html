@@ -147,6 +147,40 @@
         flex-shrink: 0;
     }
 
+    /* Stat card color variants - matches dashboard cards */
+    .stat-card-pink {
+        border-top-color: #ec4899;
+    }
+    .stat-card-pink .stat-value {
+        color: #ec4899;
+    }
+    .stat-card-pink .stat-icon {
+        background: #fce7f3;
+        color: #ec4899;
+    }
+
+    .stat-card-blue {
+        border-top-color: #4f46e5;
+    }
+    .stat-card-blue .stat-value {
+        color: #4f46e5;
+    }
+    .stat-card-blue .stat-icon {
+        background: #e0e7ff;
+        color: #4f46e5;
+    }
+
+    .stat-card-teal {
+        border-top-color: #14b8a6;
+    }
+    .stat-card-teal .stat-value {
+        color: #14b8a6;
+    }
+    .stat-card-teal .stat-icon {
+        background: #ccfbf1;
+        color: #14b8a6;
+    }
+
     /* Filter card styling */
     .filter-card {
         background: white;
@@ -207,15 +241,17 @@
         <a href="{{ url_for('add_class') }}" class="btn btn-sky">
             <i class="fas fa-plus"></i> Add Class
         </a>
-
+        <a href="{{ url_for('add_teacher') }}" class="btn btn-outline-sky">
+            <i class="fas fa-chalkboard-teacher"></i> Add Teacher
+        </a>
     </div>
 </div>
 
-<!-- Stats Summary (moved to top, dashboard style, 2 rows) -->
+<!-- Stats Summary (moved to top, dashboard style, all in one row) -->
 {% if classes %}
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-4">
-        <div class="stat-card">
+    <div class="col-md-4">
+        <div class="stat-card stat-card-pink">
             <div>
                 <div class="stat-label">Total Classes</div>
                 <div class="stat-value">{{ classes|length }}</div>
@@ -225,8 +261,8 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4">
-        <div class="stat-card">
+    <div class="col-md-4">
+        <div class="stat-card stat-card-blue">
             <div>
                 <div class="stat-label">Total Students</div>
                 <div class="stat-value">{{ classes|sum(attribute='student_count')|default(0) }}</div>
@@ -236,8 +272,8 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4">
-        <div class="stat-card">
+    <div class="col-md-4">
+        <div class="stat-card stat-card-teal">
             <div>
                 <div class="stat-label">With Sections</div>
                 <div class="stat-value">{{ classes|selectattr('section', 'ne', '')|list|length }}</div>
