@@ -4,6 +4,11 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
+    /* Page background pure white */
+    body {
+        background-color: #ffffff !important;
+    }
+
     /* Custom table styles with borders */
     .table-bordered-custom {
         width: 100%;
@@ -18,9 +23,9 @@
     }
 
     .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
         color: white;
-        border: 1px solid #2c6e9e !important;
+        border: 1px solid #38bdf8 !important;
         font-weight: 600;
         font-size: 13px;
         text-transform: uppercase;
@@ -68,8 +73,8 @@
     }
 
     .search-wrapper input:focus {
-        border-color: #1a4a6f;
-        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.08);
     }
 
     .username-badge {
@@ -91,16 +96,38 @@
         font-weight: 600;
         display: inline-block;
     }
+
+    /* Header row: icon + heading on left, button on right */
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-header-row h2 {
+        color: #0ea5e9;
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .page-header-row h2 i {
+        color: #0ea5e9 !important;
+        font-size: 2rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-header-row">
     <h2 class="fw-bold mb-0">
-        <i class="fas fa-user-friends" style="color: #c6a43b;"></i> Parents List
+        <i class="fas fa-user-friends"></i> Parents List
     </h2>
     <a href="{{ url_for('add_parent') }}" class="btn btn-primary">
-        <i class="fas fa-user-plus"></i> Parent Login Banayein
+        <i class="fas fa-user-plus"></i> Create Parent Login
     </a>
 </div>
 
