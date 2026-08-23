@@ -193,7 +193,9 @@
                     {% for parent in parents %}
                     <tr>
                         <td>{{ loop.index }}</td>
-
+                        <td>
+                            <span class="fw-semibold" style="color: #1a2c3e;">{{ parent.full_name }}</span>
+                        </td>
                         <td>
                             <span class="username-badge">{{ parent.username }}</span>
                         </td>
