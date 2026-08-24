@@ -3,18 +3,23 @@
 
 {% block extra_css %}
 <style>
-  /* ===== NAV BAR COLOR (matches your theme) ===== */
+  /* ===== NAV BAR / THEME COLOR (ab sky blue) ===== */
   :root {
-    --navy-primary: #1e293b;      /* Dark navy/slate from nav bar */
-    --navy-light: #334155;         /* Slightly lighter for hover */
+    --navy-primary: #0ea5e9;      /* Sky blue */
+    --navy-light: #38bdf8;         /* Lighter sky blue for hover */
     --card-radius: 0.875rem;
     --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  /* ===== PAGE BACKGROUND - PURE WHITE ===== */
+  .container-fluid {
+    background: #ffffff;
   }
 
   /* ===== CARD HEADER - ICON RIGHT NEXT TO TEXT ===== */
   .fee-card .card-header {
     background: var(--navy-primary) !important;
-    padding: 12px 16px;   /* Header height increase */
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -23,7 +28,7 @@
   }
 
   .fee-card .card-header i {
-    color: #fbbf24;
+    color: #ffffff;
     font-size: 1rem;
   }
 
@@ -34,7 +39,6 @@
     margin: 0;
     letter-spacing: 0.3px;
   }
-
 
   /* ===== CARDS ===== */
   .fee-card {
@@ -49,11 +53,11 @@
     padding: 0.9rem 1rem 1.1rem 1rem;
   }
 
-  /* ===== FORM LABELS (compact) ===== */
+  /* ===== FORM LABELS (sky blue) ===== */
   .fee-card .form-label {
     font-size: 0.65rem;
     font-weight: 700;
-    color: #475569;
+    color: #0ea5e9;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.2rem;
@@ -61,7 +65,7 @@
   .fee-card .form-control {
     font-size: 0.78rem;
     padding: 10px 10px 10px 32px;
-    min-height: 42px;   /* Height increase */
+    min-height: 42px;
     border: 1.5px solid #e2e8f0;
     background: #fafbfc;
     border-radius: 6px;
@@ -70,7 +74,7 @@
 
   .fee-card .form-control:focus {
     border-color: var(--navy-primary);
-    box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
     background: #fff;
   }
 
@@ -85,7 +89,7 @@
   .fee-card .section-label {
     font-size: 0.65rem;
     font-weight: 700;
-    color: #64748b;
+    color: #0ea5e9;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     border-bottom: 1.5px solid #eef2ff;
@@ -104,13 +108,13 @@
     .row-5col { grid-template-columns: 1fr 1fr; gap: 10px; }
   }
 
-  /* ===== BUTTONS - SAME NAV BAR COLOR ===== */
+  /* ===== BUTTONS - SKY BLUE, BIGGER SIZE ===== */
   .btn-primary {
     background: var(--navy-primary) !important;
     border: none !important;
     font-weight: 500;
-    font-size: 0.73rem;
-    padding: 6px 12px;
+    font-size: 0.9rem;
+    padding: 10px 18px;
     border-radius: 6px;
     transition: all 0.2s;
   }
@@ -119,25 +123,25 @@
     transform: translateY(-1px);
   }
 
-  /* ===== COLLECT FEE BUTTON - WHITE TEXT ===== */
+  /* ===== COLLECT FEE BUTTON - WHITE TEXT, BIGGER SIZE ===== */
   .btn-success {
     background: var(--navy-primary) !important;
     border: none !important;
     font-weight: 500;
-    font-size: 0.73rem;
-    padding: 7px 20px;
+    font-size: 0.9rem;
+    padding: 12px 28px;
     border-radius: 30px;
     transition: all 0.2s;
-    color: #ffffff !important;  /* White text color */
+    color: #ffffff !important;
   }
   .btn-success:hover {
     background: var(--navy-light) !important;
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    color: #ffffff !important;  /* Keep white on hover */
+    color: #ffffff !important;
   }
 
-  /* ===== SECOND CARD (Collect Fee) - MOVED SLIGHTLY LOWER ===== */
+  /* ===== SECOND CARD (Collect Fee) ===== */
   .col-md-9 {
     margin-top: 6px;
   }
@@ -154,14 +158,14 @@
 
   /* ===== BUTTON ICONS ===== */
   .btn i, .card-header i {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
   }
 
-  /* ===== HEADING STYLE ===== */
+  /* ===== HEADING STYLE - SKY BLUE, BIGGER ===== */
   h2 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #0f172a;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #0ea5e9;
     margin-bottom: 0.75rem;
   }
 
