@@ -33,9 +33,15 @@
         color: white !important;
         font-weight: 600;
         font-size: 1rem;
-        display: flex;
-        align-items: center;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important; /* kill any space-between from base.html */
         gap: 6px !important; /* tighter icon-to-text spacing */
+    }
+
+    .card-header i,
+    .card-header span {
+        flex: 0 0 auto !important;
     }
 
     /* Icon and text in header - WHITE */
@@ -201,7 +207,7 @@
 {% block content %}
 <div class="container-fluid py-3">
   <!-- Heading in one line with icon - bigger & sky blue -->
-  <h2 class="mb-4 d-flex align-items-center" style="font-weight: 800; color: #0ea5e9; font-size: 2.1rem; gap: 12px;">
+  <h2 class="d-flex align-items-center" style="font-weight: 800; color: #0ea5e9; font-size: 2.1rem; gap: 12px; margin-bottom: 28px;">
     <i class="fas fa-file-upload" style="color: #0ea5e9; font-size: 2rem;"></i>
     Bulk Upload — <span id="uploadTypeDisplay">{{ upload_type | title }}</span>
   </h2>
@@ -214,13 +220,13 @@
           <i class="fas fa-download"></i> Step A — Download Template
         </div>
         <div class="card-body">
-          <p class="text-muted small">Download the structured Excel template below, fill it with your data, then upload it in the form below.</p>
+          <p class="text-muted small">Download the template, fill in your data, then upload it below.</p>
 
           {% if upload_type == 'students' and classes %}
           <div class="mb-3">
-            <label class="form-label">Class Select Karein (Class ID auto-fill ke liye)</label>
+            <label class="form-label">Select Class (to auto-fill Class ID)</label>
             <select id="templateClassSelect" class="form-select" onchange="updateTemplateLink()">
-              <option value="">-- Sab Classes (manually Class ID fill karein) --</option>
+              <option value="">-- All Classes (enter Class ID manually) --</option>
               {% for c in classes %}
               <option value="{{ c.id }}">{{ c.class_name }} — {{ c.section }}</option>
               {% endfor %}
@@ -232,7 +238,7 @@
             <div style="flex: 1; min-width: 250px;">
               {% if upload_type == 'students' %}
               <div style="font-size: 0.8rem; color: #0369a1; background: #f0f9ff; padding: 10px 15px; border-radius: 8px; border: 1px solid #bae6fd;">
-                <i class="fas fa-lightbulb me-1"></i><strong>Tip:</strong> Agar aapne upar class select ki hai, to Class ID khud-bakhud template mein bhar jayegi. Warna "Class Reference" sheet se manually copy karein.
+                <i class="fas fa-lightbulb me-1"></i><strong>Tip:</strong> Selecting a class above auto-fills its Class ID, or copy it from the "Class Reference" sheet.
               </div>
               {% endif %}
             </div>
@@ -302,7 +308,7 @@
           <i class="fas fa-info-circle"></i> Mandatory Fields
         </div>
         <div class="card-body">
-          <p class="text-muted small mb-3">Please ensure these fields are filled (marked <span class="text-danger fw-bold">RED</span> in the template):</p>
+          <p class="text-muted small mb-3">These fields are required (marked <span class="text-danger fw-bold">RED</span> in the template):</p>
 
           <div class="mandatory-box">
             <ul class="mb-0 ps-3 small" style="line-height: 1.6; color: #4b5563;">
