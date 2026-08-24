@@ -17,70 +17,71 @@
         }
 
         /* ================================================================
-               STATS CARDS — exact match to the image
-               (icon box + label + large number)
+               STATS CARDS — exact match to the Parents List image
+               (rounded icon box + uppercase label + large bold number)
                ================================================================ */
         .stat-box-card {
             display: flex;
             align-items: center;
-            gap: 14px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 16px 18px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            gap: 16px;
+            background: #ffffff;
+            border: 1px solid #e5eaf0;
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
             height: 100%;
-            transition: box-shadow 0.2s ease;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
 
         .stat-box-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
         }
 
         /* ── icon box ── */
         .stat-box-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 10px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            color: white;
+            font-size: 19px;
+            color: #ffffff;
             flex-shrink: 0;
         }
 
-        /* icon background variants (matches the image) */
+        /* icon background variants (exact colors from the image) */
         .stat-box-icon.icon-navy {
-            background: #0f2b3d;
-        } /* TOTAL PARENTS */
+            background: #17293a;
+        } /* dark navy — first stat */
         .stat-box-icon.icon-green {
-            background: #16a34a;
-        } /* ACTIVE */
+            background: #22c55e;
+        } /* green — second stat (active/check) */
         .stat-box-icon.icon-amber {
-            background: #d97706;
-        } /* PENDING / extra */
+            background: #f5a623;
+        } /* amber/orange — third stat */
         .stat-box-icon.icon-sky {
             background: #0ea5e9;
-        } /* CHILDREN / extra */
+        } /* sky blue — optional extra stat */
 
         /* ── text side ── */
         .stat-box-content small {
             display: block;
-            font-size: 11px;
+            font-size: 11.5px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            color: #64748b;
-            margin-bottom: 2px;
-            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #8a94a6;
+            margin-bottom: 4px;
+            font-weight: 700;
         }
 
         .stat-box-content h4 {
             margin: 0;
-            font-size: 20px;
-            font-weight: 700;
-            color: #0f2b3d;
-            line-height: 1.2;
+            font-size: 22px;
+            font-weight: 800;
+            color: #17293a;
+            line-height: 1.1;
         }
 
         /* ================================================================
@@ -397,7 +398,7 @@
         </div>
     </div>
 
-    <!-- Stats Summary - moved ABOVE table, styled like Parents page 3-box design -->
+    <!-- Stats Summary - moved ABOVE table, styled exactly like Parents page 3-box design -->
     {% if subjects %}
     <div class="col-md-12">
         <div class="row g-3">
