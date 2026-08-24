@@ -24,56 +24,55 @@
     overflow: hidden;
   }
 
+  /* 🔵 Header redesigned: sky blue, smaller/tighter footprint, more professional */
   .receipt-header {
-    background: #1e3a5f;
-    padding: 18px 24px 14px 24px;
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    padding: 14px 20px 10px 20px;
     text-align: center;
     color: white;
   }
 
   .school-name {
-    font-size: 0.85rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
     font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: #cbe4fe;
-    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    color: #ffffff;
+    margin-bottom: 2px;
+    line-height: 1.25;
   }
 
   .receipt-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin: 4px 0 2px 0;
-    color: white;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 2px 0 4px 0;
+    color: #e0f4ff;
   }
 
   .receipt-sub {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #bdd9f0;
-    margin-bottom: 8px;
-    border-bottom: 1px dashed rgba(255,255,255,0.2);
-    display: inline-block;
-    padding-bottom: 3px;
+    display: none; /* redundant with h2 label now, removed to keep header compact */
   }
 
   .receipt-number {
     display: inline-block;
-    background: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.16);
     border-radius: 40px;
-    padding: 4px 14px;
-    font-size: 0.7rem;
+    padding: 3px 12px;
+    font-size: 0.68rem;
     font-weight: 500;
     font-family: monospace;
     letter-spacing: 0.6px;
-    margin-top: 6px;
-    border: 0.5px solid rgba(255,255,255,0.25);
+    margin-top: 4px;
+    border: 0.5px solid rgba(255,255,255,0.3);
   }
 
   .receipt-divider {
     height: 4px;
-    background: linear-gradient(90deg, #f4c542 0%, #1e3a5f 70%, #2c6e9e 100%);
+    background: linear-gradient(90deg, #f4c542 0%, #0ea5e9 70%, #38bdf8 100%);
   }
 
   .receipt-body {
@@ -132,7 +131,7 @@
 
   .info-table .amount-row td {
     font-weight: 700;
-    color: #1e3a5f;
+    color: #0ea5e9;
     font-size: 0.95rem;
   }
 
@@ -146,6 +145,7 @@
     background: #fefefe;
   }
 
+  /* 🔵 Buttons redesigned: all sky blue, differentiated by fill/outline */
   .btn-print, .btn-new, .btn-dash {
     font-family: 'Inter', sans-serif;
     font-weight: 600;
@@ -161,30 +161,30 @@
   }
 
   .btn-print {
-    background: #1e3a5f;
+    background: #0ea5e9;
     color: white;
   }
   .btn-print:hover {
-    background: #0f2c48;
+    background: #0284c7;
     transform: translateY(-1px);
   }
 
   .btn-new {
-    background: #e9b13b;
-    color: #1e2f3c;
+    background: #38bdf8;
+    color: white;
   }
   .btn-new:hover {
-    background: #daa12c;
+    background: #0ea5e9;
     transform: translateY(-1px);
   }
 
   .btn-dash {
     background: transparent;
-    border: 1.5px solid #1e3a5f;
-    color: #1e3a5f;
+    border: 1.5px solid #38bdf8;
+    color: #0ea5e9;
   }
   .btn-dash:hover {
-    background: #1e3a5f;
+    background: #38bdf8;
     color: white;
   }
 
@@ -218,7 +218,6 @@
     <div class="receipt-header">
       <div class="school-name">{{ receipt.school_name if receipt.school_name else 'School Name' }}</div>
       <h2>Fee Receipt</h2>
-      <div class="receipt-sub">Fee Collection Receipt</div>
       <span class="receipt-number">Receipt No: {{ receipt.receipt_number }}</span>
     </div>
 
