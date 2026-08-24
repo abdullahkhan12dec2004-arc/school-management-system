@@ -17,9 +17,30 @@
         }
 
         /* ================================================================
-               STATS CARDS — exact match to the Parents List image
-               (rounded icon box + uppercase label + large bold number)
+               PAGE SECTIONS SPACING
                ================================================================ */
+        .subjects-page-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* ================================================================
+               STATS CARDS ROW — exact match to Parents List image
+               (rounded icon box + uppercase label + large bold number)
+               Always 3 in a single row, equal width & height
+               ================================================================ */
+        .stats-row {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 20px;
+        }
+
+        .stats-row .stat-col {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
         .stat-box-card {
             display: flex;
             align-items: center;
@@ -135,7 +156,7 @@
         }
 
         /* ================================================================
-               FORM CARD (for "Create Parent Login")
+               FORM CARD (Add New Subject)
                ================================================================ */
         .form-card {
             background: white;
@@ -255,13 +276,14 @@
             font-weight: 700;
         }
 
-        .d-flex.justify-content-between.align-items-center.mb-4 h2.fw-bold {
+        .subjects-heading {
+            margin: 0;
             color: #0ea5e9 !important;
             font-size: 28px !important;
             font-weight: 700;
         }
 
-        .d-flex.justify-content-between.align-items-center.mb-4 h2.fw-bold i.fa-book {
+        .subjects-heading i.fa-book {
             color: #0ea5e9 !important;
             font-size: 32px !important;
         }
@@ -300,29 +322,15 @@
         /* ================================================================
                RESPONSIVE
                ================================================================ */
-        @media (max-width: 768px) {
-            .table-bordered-custom th,
-            .table-bordered-custom td {
-                padding: 8px;
-                font-size: 12px;
-            }
-
-            .stat-box-card {
-                padding: 12px 14px;
-            }
-
-            .stat-box-icon {
-                width: 38px;
-                height: 38px;
-                font-size: 14px;
-            }
-
-            .stat-box-content h4 {
-                font-size: 17px;
-            }
-        }
-
         @media (max-width: 992px) {
+            .stats-row {
+                flex-wrap: wrap;
+            }
+
+            .stats-row .stat-col {
+                flex: 1 1 calc(50% - 10px);
+            }
+
             .compact-form {
                 flex-direction: column;
                 align-items: stretch;
@@ -342,168 +350,192 @@
                 width: 100%;
             }
         }
+
+        @media (max-width: 768px) {
+            .table-bordered-custom th,
+            .table-bordered-custom td {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .stats-row {
+                flex-wrap: wrap;
+            }
+
+            .stats-row .stat-col {
+                flex: 1 1 100%;
+            }
+
+            .stat-box-card {
+                padding: 12px 14px;
+            }
+
+            .stat-box-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 14px;
+            }
+
+            .stat-box-content h4 {
+                font-size: 17px;
+            }
+        }
     </style>
 {% endblock %}
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0">
-        <i class="fas fa-book" style="color: #c6a43b;"></i> Subjects
-    </h2>
-</div>
+<div class="subjects-page-wrap">
 
-    <!-- Stats Summary - moved ABOVE table, styled exactly like Parents page 3-box design -->
+    <!-- 1. TOP: Icon + Heading -->
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="subjects-heading">
+            <i class="fas fa-book" style="color: #c6a43b;"></i> Subjects
+        </h2>
+    </div>
+
+    <!-- 2. STATS CARDS — always one row, equal width & height -->
     {% if subjects %}
-    <div class="col-md-12">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="stat-box-card">
-                    <div class="stat-box-icon icon-navy">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <div class="stat-box-content">
-                        <small>Total Subjects</small>
-                        <h4>{{ subjects|length }}</h4>
-                    </div>
+    <div class="stats-row">
+        <div class="stat-col">
+            <div class="stat-box-card">
+                <div class="stat-box-icon icon-navy">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-box-content">
+                    <small>Total Subjects</small>
+                    <h4>{{ subjects|length }}</h4>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-box-card">
-                    <div class="stat-box-icon icon-green">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-box-content">
-                        <small>Avg Total Marks</small>
-                        <h4>{{ (subjects|sum(attribute='total_marks') / subjects|length)|int }}</h4>
-                    </div>
+        </div>
+        <div class="stat-col">
+            <div class="stat-box-card">
+                <div class="stat-box-icon icon-green">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-box-content">
+                    <small>Avg Total Marks</small>
+                    <h4>{{ (subjects|sum(attribute='total_marks') / subjects|length)|int }}</h4>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-box-card">
-                    <div class="stat-box-icon icon-amber">
-                        <i class="fas fa-door-open"></i>
-                    </div>
-                    <div class="stat-box-content">
-                        <small>Classes</small>
-                        <h4>{{ subjects|map(attribute='class_name')|unique|list|length }}</h4>
-                    </div>
+        </div>
+        <div class="stat-col">
+            <div class="stat-box-card">
+                <div class="stat-box-icon icon-amber">
+                    <i class="fas fa-door-open"></i>
+                </div>
+                <div class="stat-box-content">
+                    <small>Classes</small>
+                    <h4>{{ subjects|map(attribute='class_name')|unique|list|length }}</h4>
                 </div>
             </div>
         </div>
     </div>
-{% endif %}
-<div class="row g-4">
-    <!-- Add Subject Form - compact ONE ROW layout, entries + button aligned -->
-    <div class="col-md-12">
-        <div class="form-card">
-            <div class="form-card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-plus-circle"></i> Add New Subject
-                </h5>
-            </div>
-            <div class="card-body p-4">
-                <form method="POST">
-                    <div class="compact-form">
-                        <div class="form-group">
-                            <label><i class="fas fa-door-open"></i> CLASS *</label>
-                            <select name="class_id" class="form-select" required>
-                                <option value="">-- Select Class --</option>
-                                {% for c in classes %}
-                                <option value="{{ c.id }}">{{ c.class_name }}{% if c.section %} - {{ c.section }}{% endif %}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-tag"></i> SUBJECT NAME *</label>
-                            <input type="text" name="subject_name" class="form-control" required placeholder="e.g. Mathematics">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-star"></i> TOTAL MARKS</label>
-                            <input type="number" name="total_marks" class="form-control" value="100" min="1">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-flag-checkered"></i> PASSING MARKS</label>
-                            <input type="number" name="passing_marks" class="form-control" value="40" min="1">
-                        </div>
-                        <div class="form-group btn-group">
-                            <label class="spacer-label">Action</label>
-                            <button type="submit" class="btn-add">
-                                <i class="fas fa-save"></i> Add Subject
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+    {% endif %}
+
+    <!-- 3. ADD NEW SUBJECT FORM -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-plus-circle"></i> Add New Subject
+            </h5>
         </div>
-    </div>
-
-
-
-
-
-    <!-- Subjects List with Borders -->
-    <div class="col-md-12">
-        <div class="card shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table-bordered-custom">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;">#</th>
-                                <th>Subject Name</th>
-                                <th>Class</th>
-                                <th style="text-align: center;">Total Marks</th>
-                                <th style="text-align: center;">Passing Marks</th>
-                                <th style="width: 80px;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for s in subjects %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td class="fw-semibold">
-                                    <i class="fas fa-book-open" style="color: #c6a43b;"></i>
-                                    {{ s.subject_name }}
-                                </td>
-                                <td>
-                                    <span class="class-badge">
-                                        <i class="fas fa-door-open"></i>
-                                        {{ s.class_name }}{% if s.section %} - {{ s.section }}{% endif %}
-                                    </span>
-                                </td>
-                                <td style="text-align: center;">
-                                    <span class="marks-total">
-                                        <i class="fas fa-star"></i> {{ s.total_marks }}
-                                    </span>
-                                </td>
-                                <td style="text-align: center;">
-                                    <span class="marks-passing">
-                                        <i class="fas fa-flag-checkered"></i> {{ s.passing_marks }}
-                                    </span>
-                                </td>
-                                <td style="text-align: center;">
-                                    {% if s.passing_marks <= s.total_marks * 0.4 %}
-                                    <span class="badge bg-success">Pass: {{ ((s.passing_marks/s.total_marks)*100)|int }}%</span>
-                                    {% else %}
-                                    <span class="badge bg-warning">{{ ((s.passing_marks/s.total_marks)*100)|int }}%</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <i class="fas fa-book fa-3x text-muted mb-3 d-block"></i>
-                                    <p class="text-muted mb-0">No subjects found</p>
-                                    <small class="text-muted">Add a subject using the form</small>
-                                </td>
-                            </tr>
+        <div class="card-body p-4">
+            <form method="POST">
+                <div class="compact-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-door-open"></i> CLASS *</label>
+                        <select name="class_id" class="form-select" required>
+                            <option value="">-- Select Class --</option>
+                            {% for c in classes %}
+                            <option value="{{ c.id }}">{{ c.class_name }}{% if c.section %} - {{ c.section }}{% endif %}</option>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> SUBJECT NAME *</label>
+                        <input type="text" name="subject_name" class="form-control" required placeholder="e.g. Mathematics">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-star"></i> TOTAL MARKS</label>
+                        <input type="number" name="total_marks" class="form-control" value="100" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-flag-checkered"></i> PASSING MARKS</label>
+                        <input type="number" name="passing_marks" class="form-control" value="40" min="1">
+                    </div>
+                    <div class="form-group btn-group">
+                        <label class="spacer-label">Action</label>
+                        <button type="submit" class="btn-add">
+                            <i class="fas fa-save"></i> Add Subject
+                        </button>
+                    </div>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. SUBJECTS TABLE -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table-bordered-custom">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>Subject Name</th>
+                            <th>Class</th>
+                            <th style="text-align: center;">Total Marks</th>
+                            <th style="text-align: center;">Passing Marks</th>
+                            <th style="width: 80px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in subjects %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td class="fw-semibold">
+                                <i class="fas fa-book-open" style="color: #c6a43b;"></i>
+                                {{ s.subject_name }}
+                            </td>
+                            <td>
+                                <span class="class-badge">
+                                    <i class="fas fa-door-open"></i>
+                                    {{ s.class_name }}{% if s.section %} - {{ s.section }}{% endif %}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="marks-total">
+                                    <i class="fas fa-star"></i> {{ s.total_marks }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="marks-passing">
+                                    <i class="fas fa-flag-checkered"></i> {{ s.passing_marks }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                {% if s.passing_marks <= s.total_marks * 0.4 %}
+                                <span class="badge bg-success">Pass: {{ ((s.passing_marks/s.total_marks)*100)|int }}%</span>
+                                {% else %}
+                                <span class="badge bg-warning">{{ ((s.passing_marks/s.total_marks)*100)|int }}%</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="fas fa-book fa-3x text-muted mb-3 d-block"></i>
+                                <p class="text-muted mb-0">No subjects found</p>
+                                <small class="text-muted">Add a subject using the form</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}
