@@ -14,83 +14,86 @@
 
     /* Card styling */
     .card {
-        border-radius: 12px !important;
-        border: 1px solid #e2e8f0 !important;
+        border-radius: 14px !important;
+        border: 1px solid #bae6fd !important;
         margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(14, 165, 233, 0.08);
     }
 
-    /* Slate/Navy buttons */
+    /* Sky Blue buttons */
     .btn-navy {
-        background-color: #1e293b !important;
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%) !important;
         color: white !important;
         border: none !important;
-        padding: 8px 20px !important;
-        font-size: 0.85rem !important;
-        border-radius: 6px !important;
+        padding: 10px 24px !important;
+        font-size: 0.95rem !important;
+        border-radius: 8px !important;
         cursor: pointer;
         transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        font-weight: 500;
+        font-weight: 600;
         text-decoration: none;
+        box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
     }
 
     .btn-navy:hover {
-        background-color: #1e40af !important;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
         color: white !important;
     }
 
     .btn-outline-navy {
         background-color: transparent !important;
-        color: #1e293b !important;
-        border: 1px solid #cbd5e1 !important;
-        padding: 8px 20px !important;
-        font-size: 0.85rem !important;
-        border-radius: 6px !important;
+        color: #0ea5e9 !important;
+        border: 1.5px solid #7dd3fc !important;
+        padding: 10px 24px !important;
+        font-size: 0.95rem !important;
+        border-radius: 8px !important;
         cursor: pointer;
         transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        font-weight: 500;
+        font-weight: 600;
         text-decoration: none;
     }
 
     .btn-outline-navy:hover {
-        background-color: #f1f5f9 !important;
-        border-color: #1e293b !important;
-        color: #1e293b !important;
+        background-color: #f0f9ff !important;
+        border-color: #0ea5e9 !important;
+        color: #0284c7 !important;
+        transform: translateY(-1px);
     }
 
     /* Summary cards */
     .summary-card {
         text-align: center;
-        padding: 15px !important;
+        padding: 20px !important;
     }
     .summary-value {
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 2.4rem;
+        font-weight: 800;
     }
 
     /* Custom Filter Tabs */
     .filter-tabs-container {
         display: flex;
-        gap: 8px;
-        border-bottom: 2px solid #e2e8f0;
-        padding-bottom: 10px;
-        margin-bottom: 15px;
+        gap: 10px;
+        border-bottom: 2px solid #bae6fd;
+        padding-bottom: 12px;
+        margin-bottom: 18px;
     }
     .filter-tab {
         background: none;
         border: none;
-        padding: 8px 16px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #64748b;
-        border-radius: 6px;
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0369a1;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.2s ease;
         display: flex;
@@ -98,52 +101,56 @@
         gap: 6px;
     }
     .filter-tab:hover {
-        background: #f1f5f9;
-        color: #1e293b;
+        background: #e0f2fe;
+        color: #0ea5e9;
     }
     .filter-tab.active {
-        background: #1e293b;
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
         color: white;
+        box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
     }
-    
+
     /* Table Styling */
     .table-wrapper {
         overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        border: 1px solid #bae6fd;
+        box-shadow: 0 2px 10px rgba(14, 165, 233, 0.08);
     }
     .edu-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 0.85rem;
+        font-size: 0.95rem;
     }
     .edu-table thead th {
-        background: #1e293b !important;
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%) !important;
         color: white !important;
-        font-weight: 600;
-        padding: 10px 15px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 14px 18px;
         text-align: left;
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: 2px solid #bae6fd;
     }
     .edu-table tbody tr {
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f0f9ff;
         transition: background 0.2s ease;
     }
     .edu-table tbody tr:hover {
-        background: #f8fafc;
+        background: #f0f9ff;
     }
     .edu-table tbody td {
-        padding: 10px 15px;
+        padding: 12px 18px;
         color: #334155;
         vertical-align: middle;
+        font-size: 0.9rem;
     }
 
     /* Badges */
     .badge-custom {
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 700;
     }
     .badge-success-custom {
         background: #dcfce7;
@@ -177,7 +184,7 @@
 {% block content %}
 <div class="container-fluid py-3">
   <!-- Heading in one line with icon -->
-  <h2 class="mb-4" style="font-weight: 700; color: #1e293b;"><i class="fas fa-clipboard-check me-2" style="color: #c6a43b;"></i>Review Upload — {{ upload_type | title }}</h2>
+  <h2 class="mb-4" style="font-weight: 800; font-size: 1.9rem; color: #0ea5e9;"><i class="fas fa-clipboard-check me-2" style="color: #0ea5e9;"></i>Review Upload — {{ upload_type | title }}</h2>
 
   {% if not records %}
   <!-- Empty State -->
@@ -201,8 +208,8 @@
 
   <div class="row mb-4">
     <div class="col-sm-4">
-      <div class="card summary-card" style="border-top: 4px solid #1e293b !important;">
-        <div class="summary-value" style="color: #1e293b;">{{ total_count }}</div>
+      <div class="card summary-card" style="border-top: 4px solid #0ea5e9 !important;">
+        <div class="summary-value" style="color: #0ea5e9;">{{ total_count }}</div>
         <div class="small text-muted fw-bold">Total Records</div>
       </div>
     </div>
@@ -221,7 +228,7 @@
   </div>
 
   {% if invalid_count > 0 %}
-  <div style="background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; display: flex; align-items: flex-start; gap: 8px;">
+  <div style="background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; display: flex; align-items: flex-start; gap: 8px;">
     <i class="fas fa-exclamation-triangle mt-1"></i>
     <div>
       <strong>{{ invalid_count }} record(s) have errors.</strong>
@@ -251,7 +258,7 @@
   <!-- Filter tabs -->
   <div class="filter-tabs-container">
     <button class="filter-tab active" onclick="filterRows('all', this)">
-      All Records <span style="background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">{{ total_count }}</span>
+      All Records <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">{{ total_count }}</span>
     </button>
     <button class="filter-tab" onclick="filterRows('VALID', this)">
       Valid <span style="background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">{{ valid_count }}</span>
