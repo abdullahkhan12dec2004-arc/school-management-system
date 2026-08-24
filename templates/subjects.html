@@ -120,7 +120,10 @@
         font-size: 32px !important;
     }
 
-    /* ===== NEW: Stat cards styled like Parents page (icon box + label + value) ===== */
+    /* ================================================================
+       STATS CARDS — UPDATED to match your image exactly
+       (square icon box + label + large number)
+       ================================================================ */
     .stat-box-card {
         display: flex;
         align-items: center;
@@ -131,6 +134,11 @@
         padding: 16px 18px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         height: 100%;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .stat-box-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
     .stat-box-icon {
@@ -145,9 +153,11 @@
         flex-shrink: 0;
     }
 
-    .stat-box-icon.icon-navy { background: #0f2b3d; }
-    .stat-box-icon.icon-green { background: #16a34a; }
-    .stat-box-icon.icon-amber { background: #d97706; }
+    /* Icon background variants */
+    .stat-box-icon.icon-navy { background: #0f2b3d; }   /* Total Parents */
+    .stat-box-icon.icon-green { background: #16a34a; }  /* Active */
+    .stat-box-icon.icon-amber { background: #d97706; }  /* Pending / extra */
+    .stat-box-icon.icon-sky { background: #0ea5e9; }    /* Children / extra */
 
     .stat-box-content small {
         display: block;
@@ -164,6 +174,7 @@
         font-size: 20px;
         font-weight: 700;
         color: #0f2b3d;
+        line-height: 1.2;
     }
 
     /* ===== Remove navy background above table (card-header) ===== */
@@ -178,6 +189,17 @@
         .table-bordered-custom td {
             padding: 8px;
             font-size: 12px;
+        }
+        .stat-box-card {
+            padding: 12px 14px;
+        }
+        .stat-box-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 14px;
+        }
+        .stat-box-content h4 {
+            font-size: 17px;
         }
     }
 
@@ -214,8 +236,6 @@
        white-space: nowrap;
        line-height: 1.2;
     }
-    /* hidden label reserves the same vertical space as real labels, so the
-       button's TOP lines up exactly with the inputs' TOP */
     .compact-form .form-group.btn-group label.spacer-label {
         visibility: hidden;
     }
