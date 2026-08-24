@@ -108,7 +108,7 @@
         font-weight: 700;
     }
 
-    /* ===== Heading "Subjects" + book icon -> sky blue & bigger (targets actual markup) ===== */
+    /* ===== Heading "Subjects" + book icon -> sky blue & bigger ===== */
     .d-flex.justify-content-between.align-items-center.mb-4 h2.fw-bold {
         color: #0ea5e9 !important;
         font-size: 28px !important;
@@ -120,95 +120,57 @@
         font-size: 32px !important;
     }
 
-    .stats-row,
-    .summary-cards-row {
+    /* ===== NEW: Stat cards styled like Parents page (icon box + label + value) ===== */
+    .stat-box-card {
         display: flex;
-        flex-wrap: nowrap;
-        gap: 1rem;
-        margin: 1rem 0 1.5rem 0;
-    }
-
-    .stat-card,
-    .summary-card {
-        flex: 1;
-        min-width: 0;
-        max-width: 220px;
+        align-items: center;
+        gap: 14px;
         background: white;
         border: 1px solid #e2e8f0;
         border-radius: 10px;
-        padding: 10px 14px;
+        padding: 16px 18px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        text-align: center;
+        height: 100%;
     }
 
-    .stat-card .stat-icon,
-    .summary-card .stat-icon {
-        color: #0ea5e9;
-        font-size: 20px;
-    }
-
-    .stat-card .stat-value,
-    .summary-card .stat-value {
+    .stat-box-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 18px;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .stat-box-icon.icon-navy { background: #0f2b3d; }
+    .stat-box-icon.icon-green { background: #16a34a; }
+    .stat-box-icon.icon-amber { background: #d97706; }
+
+    .stat-box-content small {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: #64748b;
+        margin-bottom: 2px;
+        font-weight: 600;
+    }
+
+    .stat-box-content h4 {
+        margin: 0;
+        font-size: 20px;
         font-weight: 700;
         color: #0f2b3d;
     }
 
-    .stat-card .stat-label,
-    .summary-card .stat-label {
-        font-size: 11px;
-        text-transform: uppercase;
-        color: #64748b;
-    }
-
-    /* ===== Move stats block (Total Subjects/Avg Marks/Classes) ABOVE table using flex order ===== */
-    .row.g-4 > .col-md-12:nth-child(2) {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .row.g-4 > .col-md-12:nth-child(2) > .card.shadow-sm {
-        order: 2;
-    }
-
-    .row.g-4 > .col-md-12:nth-child(2) > .row.mt-3.g-2 {
-        order: 1;
-        margin-top: 0 !important;
-        margin-bottom: 1rem !important;
-    }
-
-    /* Restyle the 3 stat cards to flat white style (like Parents page) */
-    .row.g-4 > .col-md-12:nth-child(2) > .row.mt-3.g-2 .card {
-        background: white !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
-    }
-
-    .row.g-4 > .col-md-12:nth-child(2) > .row.mt-3.g-2 .card small.text-muted {
-        font-size: 11px;
-        text-transform: uppercase;
-        color: #64748b !important;
-    }
-
-    .row.g-4 > .col-md-12:nth-child(2) > .row.mt-3.g-2 .card h4 {
-        font-size: 20px;
-        font-weight: 700;
-        color: #0f2b3d !important;
-    }
-
     /* ===== Remove navy background above table (card-header) ===== */
-    .row.g-4 > .col-md-12:nth-child(2) > .card.shadow-sm > .card-header {
+    .card.shadow-sm > .card-header {
         background-color: #ffffff !important;
         color: #0f2b3d !important;
         border-bottom: 1px solid #e2e8f0 !important;
-    }
-
-    @media (max-width: 992px) {
-        .stats-row,
-        .summary-cards-row {
-            flex-wrap: wrap;
-        }
     }
 
     @media (max-width: 768px) {
@@ -216,12 +178,6 @@
         .table-bordered-custom td {
             padding: 8px;
             font-size: 12px;
-        }
-        .compact-form-row {
-            flex-wrap: wrap;
-        }
-        .compact-form-row .compact-field {
-            min-width: 120px;
         }
     }
 
@@ -233,7 +189,7 @@
         background-color: #ffffff !important;
     }
 
-    /* Compact row form - one row, labels sky blue */
+    /* ===== Compact one-row form: inputs + button perfectly aligned ===== */
     .compact-form {
        display: flex;
        flex-wrap: nowrap;
@@ -245,6 +201,9 @@
        flex: 1 1 0;
        min-width: 0;
     }
+    .compact-form .form-group.btn-group {
+       flex: 0 0 auto;
+    }
     .compact-form .form-group label {
        font-size: 0.85rem;
        text-transform: uppercase;
@@ -253,6 +212,12 @@
        margin-bottom: 0.25rem;
        display: block;
        white-space: nowrap;
+       line-height: 1.2;
+    }
+    /* hidden label reserves the same vertical space as real labels, so the
+       button's TOP lines up exactly with the inputs' TOP */
+    .compact-form .form-group.btn-group label.spacer-label {
+        visibility: hidden;
     }
     .compact-form .form-control,
     .compact-form .form-select {
@@ -263,6 +228,8 @@
         padding: 0.5rem 0.75rem;
         transition: all 0.2s;
         width: 100%;
+        height: 42px;
+        box-sizing: border-box;
     }
     .compact-form .form-control:focus,
     .compact-form .form-select:focus {
@@ -282,11 +249,13 @@
       transition: all 0.2s;
       white-space: nowrap;
       flex-shrink: 0;
-      height: 38px;
+      height: 42px;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
-      align-self: flex-end;
+      width: 100%;
+      box-sizing: border-box;
     }
     .compact-form .btn-add:hover {
       transform: translateY(-1px);
@@ -295,13 +264,13 @@
     }
 
     @media (max-width: 992px) {
-        .row.g-4 > .col-md-12:nth-child(2) {
-            display: block;
-        }
         .compact-form {
             flex-direction: column;
              align-items: stretch;
              gap: 0.75rem;
+        }
+        .compact-form .form-group.btn-group {
+            width: 100%;
         }
         .compact-form .btn-add {
             width: 100%;
@@ -326,7 +295,7 @@
 </div>
 
 <div class="row g-4">
-    <!-- Add Subject Form - Now in COMPACT ONE ROW layout (After image) -->
+    <!-- Add Subject Form - compact ONE ROW layout, entries + button aligned -->
     <div class="col-md-12">
         <div class="form-card">
             <div class="form-card-header">
@@ -335,7 +304,6 @@
                 </h5>
             </div>
             <div class="card-body p-4">
-                <!-- Compact row form: class, subject name, total marks, passing marks inline -->
                 <form method="POST">
                     <div class="compact-form">
                         <div class="form-group">
@@ -359,14 +327,58 @@
                             <label><i class="fas fa-flag-checkered"></i> PASSING MARKS</label>
                             <input type="number" name="passing_marks" class="form-control" value="40" min="1">
                         </div>
-                        <button type="submit" class="btn-add">
-                            <i class="fas fa-save"></i> Add Subject
-                        </button>
+                        <div class="form-group btn-group">
+                            <label class="spacer-label">Action</label>
+                            <button type="submit" class="btn-add">
+                                <i class="fas fa-save"></i> Add Subject
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Stats Summary - moved ABOVE table, styled like Parents page 3-box design -->
+    {% if subjects %}
+    <div class="col-md-12">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="stat-box-card">
+                    <div class="stat-box-icon icon-navy">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-box-content">
+                        <small>Total Subjects</small>
+                        <h4>{{ subjects|length }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box-card">
+                    <div class="stat-box-icon icon-green">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-box-content">
+                        <small>Avg Total Marks</small>
+                        <h4>{{ (subjects|sum(attribute='total_marks') / subjects|length)|int }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box-card">
+                    <div class="stat-box-icon icon-amber">
+                        <i class="fas fa-door-open"></i>
+                    </div>
+                    <div class="stat-box-content">
+                        <small>Classes</small>
+                        <h4>{{ subjects|map(attribute='class_name')|unique|list|length }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Subjects List with Borders -->
     <div class="col-md-12">
@@ -435,30 +447,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Stats Summary -->
-        {% if subjects %}
-        <div class="row mt-3 g-2">
-            <div class="col-4">
-                <div class="card bg-primary bg-opacity-10 border-0 text-center p-2">
-                    <small class="text-muted">Total Subjects</small>
-                    <h4 class="mb-0 text-primary">{{ subjects|length }}</h4>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="card bg-success bg-opacity-10 border-0 text-center p-2">
-                    <small class="text-muted">Avg Total Marks</small>
-                    <h4 class="mb-0 text-success">{{ (subjects|sum(attribute='total_marks') / subjects|length)|int }}</h4>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="card bg-warning bg-opacity-10 border-0 text-center p-2">
-                    <small class="text-muted">Classes</small>
-                    <h4 class="mb-0 text-warning">{{ subjects|map(attribute='class_name')|unique|list|length }}</h4>
-                </div>
-            </div>
-        </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
