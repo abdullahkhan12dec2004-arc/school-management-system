@@ -175,6 +175,32 @@
         background-color: var(--sky-blue-dark);
         color: #ffffff !important;
     }
+    .notice-row {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.notice-col {
+    width: 42%;
+}
+
+@media (max-width: 992px) {
+    .notice-col {
+        width: 48%;
+    }
+}
+
+@media (max-width: 768px) {
+    .notice-row {
+        flex-direction: column;
+    }
+
+    .notice-col {
+        width: 100%;
+    }
+}
 </style>
 
 <div class="container mt-4">
@@ -183,8 +209,8 @@
         <i class="bi bi-megaphone-fill"></i>Notice Board Management
     </h3>
 
-    <div class="row g-4">
-        <div class="col-lg-6">
+    <div class="notice-row">
+        <div class="notice-col">
             <div class="card shadow-sm notice-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-plus-circle-fill"></i>New Notice</h5>
@@ -219,7 +245,7 @@
             </div>
         </div>
 
-        <div class="col-lg-6">
+        <div class="notice-col">
             <div class="card shadow-sm notice-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-clock-history"></i>Previous Notices</h5>
