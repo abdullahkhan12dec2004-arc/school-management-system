@@ -2236,6 +2236,7 @@ def fee_collection():
                            now=datetime.datetime.now(),
                            students=[])
 
+
 @app.route('/fee_collection/save', methods=['POST'])
 @login_required
 @school_admin_only_required
@@ -2248,12 +2249,9 @@ def save_fee():
     payment_mode = request.form.get('payment_mode')
     transaction_reference = request.form.get('transaction_reference', '')
     remarks = request.form.get('remarks', '')
-
     school_id = session.get('active_school_id', session.get('school_id'))
     collected_by = session['user_id']
-
     receipt_number = f"FEE-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-
     conn = get_db()
     c = conn.cursor()
     c.execute("""
@@ -2265,22 +2263,21 @@ def save_fee():
     """, (student_id, school_id, class_id, month, year, amount,
           payment_mode, transaction_reference, remarks, collected_by,
           receipt_number, session['user_id']))
-
     fee_id = c.fetchone()[0]
     conn.commit()
-
     c.execute("""
         SELECT fc.*, s.full_name as student_name, s.student_code,
-               c.class_name, u.full_name as collector_name
+               c.class_name, u.full_name as collector_name,
+               sc.name as school_name
         FROM fee_collections fc
         JOIN students s ON fc.student_id = s.id
         JOIN classes c ON fc.class_id = c.id
         JOIN users u ON fc.collected_by = u.id
+        JOIN schools sc ON fc.school_id = sc.id
         WHERE fc.id = %s
     """, (fee_id,))
     receipt = fetchone_dict(c)
     conn.close()
-
     flash(f'Fee collection successful! Receipt: {receipt_number}', 'success')
     return render_template('fee_receipt.html', receipt=receipt)
 
