@@ -2,308 +2,346 @@
 {% block title %}Subjects{% endblock %}
 
 {% block extra_css %}
-<style>
-    /* Custom table styles with borders */
-    .table-bordered-custom {
-        width: 100%;
-        border-collapse: collapse;
-    }
+ <style>
+        /* ================================================================
+               GLOBAL RESET / BASE
+               ================================================================ */
+        body,
+        .main-content,
+        .container-fluid {
+            background-color: #ffffff !important;
+        }
 
-    .table-bordered-custom th,
-    .table-bordered-custom td {
-        border: 1px solid #dee2e6 !important;
-        padding: 12px;
-        vertical-align: middle;
-    }
+        .dashboard-container {
+            background-color: #ffffff !important;
+        }
 
-    /* Table header - sky blue */
-    .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-        color: white;
-        border: 1px solid #38bdf8 !important;
-        font-weight: 600;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+        /* ================================================================
+               STATS CARDS — exact match to the image
+               (icon box + label + large number)
+               ================================================================ */
+        .stat-box-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px 18px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            transition: box-shadow 0.2s ease;
+        }
 
-    .table-bordered-custom tbody tr:nth-child(even) {
-        background-color: #f8fafc;
-    }
+        .stat-box-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
 
-    .table-bordered-custom tbody tr:hover {
-        background-color: #e8f1f8;
-        cursor: pointer;
-    }
+        /* ── icon box ── */
+        .stat-box-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+        }
 
-    .table-bordered-custom td:first-child {
-        font-weight: 700;
-        color: #c6a43b;
-        text-align: center;
-        width: 50px;
-    }
+        /* icon background variants (matches the image) */
+        .stat-box-icon.icon-navy {
+            background: #0f2b3d;
+        } /* TOTAL PARENTS */
+        .stat-box-icon.icon-green {
+            background: #16a34a;
+        } /* ACTIVE */
+        .stat-box-icon.icon-amber {
+            background: #d97706;
+        } /* PENDING / extra */
+        .stat-box-icon.icon-sky {
+            background: #0ea5e9;
+        } /* CHILDREN / extra */
 
-    .table-card,
-    .table-wrapper-card,
-    .card:has(.table-bordered-custom) {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
+        /* ── text side ── */
+        .stat-box-content small {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #64748b;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
 
-    /* Form Card Styling */
-    .form-card {
-        background: white;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        overflow: hidden;
-    }
+        .stat-box-content h4 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f2b3d;
+            line-height: 1.2;
+        }
 
-    .form-card-header {
-        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-        color: white;
-        padding: 15px 20px;
-        border-bottom: 1px solid #38bdf8;
-    }
+        /* ================================================================
+               TABLE — bordered, sky‑blue header, striped hover
+               ================================================================ */
+        .table-bordered-custom {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-    .form-card-header h5 {
-        margin: 0;
-        color: white;
-        font-size: 20px;
-        font-weight: 700;
-    }
-
-    .class-badge {
-        background: #e0f2fe;
-        color: #0369a1;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-        display: inline-block;
-    }
-
-    .marks-total {
-        font-weight: 600;
-        color: #059669;
-    }
-
-    .marks-passing {
-        font-weight: 600;
-        color: #d97706;
-    }
-
-    .page-header-icon,
-    .dashboard-title-icon {
-        color: #0ea5e9 !important;
-        font-size: 32px !important;
-    }
-
-    .page-header h1,
-    .page-header h2,
-    .dashboard-title {
-        color: #0ea5e9 !important;
-        font-size: 28px !important;
-        font-weight: 700;
-    }
-
-    /* ===== Heading "Subjects" + book icon -> sky blue & bigger ===== */
-    .d-flex.justify-content-between.align-items-center.mb-4 h2.fw-bold {
-        color: #0ea5e9 !important;
-        font-size: 28px !important;
-        font-weight: 700;
-    }
-
-    .d-flex.justify-content-between.align-items-center.mb-4 h2.fw-bold i.fa-book {
-        color: #0ea5e9 !important;
-        font-size: 32px !important;
-    }
-
-    /* ================================================================
-       STATS CARDS — UPDATED to match your image exactly
-       (square icon box + label + large number)
-       ================================================================ */
-    .stat-box-card {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 16px 18px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        height: 100%;
-        transition: box-shadow 0.2s ease;
-    }
-
-    .stat-box-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-
-    .stat-box-icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        color: white;
-        flex-shrink: 0;
-    }
-
-    /* Icon background variants */
-    .stat-box-icon.icon-navy { background: #0f2b3d; }   /* Total Parents */
-    .stat-box-icon.icon-green { background: #16a34a; }  /* Active */
-    .stat-box-icon.icon-amber { background: #d97706; }  /* Pending / extra */
-    .stat-box-icon.icon-sky { background: #0ea5e9; }    /* Children / extra */
-
-    .stat-box-content small {
-        display: block;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        color: #64748b;
-        margin-bottom: 2px;
-        font-weight: 600;
-    }
-
-    .stat-box-content h4 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 700;
-        color: #0f2b3d;
-        line-height: 1.2;
-    }
-
-    /* ===== Remove navy background above table (card-header) ===== */
-    .card.shadow-sm > .card-header {
-        background-color: #ffffff !important;
-        color: #0f2b3d !important;
-        border-bottom: 1px solid #e2e8f0 !important;
-    }
-
-    @media (max-width: 768px) {
         .table-bordered-custom th,
         .table-bordered-custom td {
-            padding: 8px;
-            font-size: 12px;
+            border: 1px solid #dee2e6 !important;
+            padding: 12px;
+            vertical-align: middle;
         }
-        .stat-box-card {
-            padding: 12px 14px;
+
+        .table-bordered-custom thead th {
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            color: white;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .stat-box-icon {
-            width: 38px;
-            height: 38px;
-            font-size: 14px;
+
+        .table-bordered-custom tbody tr:nth-child(even) {
+            background-color: #f8fafc;
         }
-        .stat-box-content h4 {
-            font-size: 17px;
+
+        .table-bordered-custom tbody tr:hover {
+            background-color: #e8f1f8;
+            cursor: pointer;
         }
-    }
 
-    .dashboard-container {
-        background-color: #ffffff !important;
-    }
+        .table-bordered-custom td:first-child {
+            font-weight: 700;
+            color: #c6a43b;
+            text-align: center;
+            width: 50px;
+        }
 
-    body, .main-content, .container-fluid {
-        background-color: #ffffff !important;
-    }
+        /* remove extra card wrappers */
+        .table-card,
+        .table-wrapper-card,
+        .card:has(.table-bordered-custom) {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
 
-    /* ===== Compact one-row form: inputs + button perfectly aligned ===== */
-    .compact-form {
-       display: flex;
-       flex-wrap: nowrap;
-       align-items: flex-end;
-       gap: 1rem;
-       padding: 0.5rem 0;
-    }
-    .compact-form .form-group {
-       flex: 1 1 0;
-       min-width: 0;
-    }
-    .compact-form .form-group.btn-group {
-       flex: 0 0 auto;
-    }
-    .compact-form .form-group label {
-       font-size: 0.85rem;
-       text-transform: uppercase;
-       font-weight: 700;
-       color: #0ea5e9;
-       margin-bottom: 0.25rem;
-       display: block;
-       white-space: nowrap;
-       line-height: 1.2;
-    }
-    .compact-form .form-group.btn-group label.spacer-label {
-        visibility: hidden;
-    }
-    .compact-form .form-control,
-    .compact-form .form-select {
-        background-color: #f9fafb;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        padding: 0.5rem 0.75rem;
-        transition: all 0.2s;
-        width: 100%;
-        height: 42px;
-        box-sizing: border-box;
-    }
-    .compact-form .form-control:focus,
-    .compact-form .form-select:focus {
-       border-color: #0ea5e9;
-       box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
-       background-color: white;
-    }
+        /* ================================================================
+               FORM CARD (for "Create Parent Login")
+               ================================================================ */
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
 
-    .compact-form .btn-add {
-      background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-      border: none;
-      padding: 0.5rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 500;
-      font-size: 0.875rem;
-      color: white;
-      transition: all 0.2s;
-      white-space: nowrap;
-      flex-shrink: 0;
-      height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .compact-form .btn-add:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
-    }
+        .form-card-header {
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            color: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #38bdf8;
+        }
 
-    @media (max-width: 992px) {
+        .form-card-header h5 {
+            margin: 0;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* ── compact one‑row form ── */
         .compact-form {
-            flex-direction: column;
-             align-items: stretch;
-             gap: 0.75rem;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: flex-end;
+            gap: 1rem;
+            padding: 0.5rem 0;
         }
+
+        .compact-form .form-group {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
         .compact-form .form-group.btn-group {
-            width: 100%;
+            flex: 0 0 auto;
         }
+
+        .compact-form .form-group label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #0ea5e9;
+            margin-bottom: 0.25rem;
+            display: block;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .compact-form .form-group.btn-group label.spacer-label {
+            visibility: hidden;
+        }
+
+        .compact-form .form-control,
+        .compact-form .form-select {
+            background-color: #f9fafb;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s;
+            width: 100%;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .compact-form .form-control:focus,
+        .compact-form .form-select:focus {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+            background-color: white;
+        }
+
         .compact-form .btn-add {
-            width: 100%;
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: white;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
         }
-       .compact-form .form-group {
-          width: 100%;
-       }
-     }
-    .card-body.p-4 {
-        padding: 1.2rem 1.5rem !important;
-    }
-</style>
+
+        .compact-form .btn-add:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+        }
+
+        /* ================================================================
+               MISC — headings, badges, etc.
+               ================================================================ */
+        .page-header-icon,
+        .dashboard-title-icon {
+            color: #0ea5e9 !important;
+            font-size: 32px !important;
+        }
+
+        .page-header h1,
+        .page-header h2,
+        .dashboard-title {
+            color: #0ea5e9 !important;
+            font-size: 28px !important;
+            font-weight: 700;
+        }
+
+        .d-flex.justify-content-between.align-items-center.mb-4 h2.fw-bold {
+            color: #0ea5e9 !important;
+            font-size: 28px !important;
+            font-weight: 700;
+        }
+
+        .d-flex.justify-content-between.align-items-center.mb-4 h2.fw-bold i.fa-book {
+            color: #0ea5e9 !important;
+            font-size: 32px !important;
+        }
+
+        .class-badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .marks-total {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        .marks-passing {
+            font-weight: 600;
+            color: #d97706;
+        }
+
+        /* remove navy header from generic cards */
+        .card.shadow-sm>.card-header {
+            background-color: #ffffff !important;
+            color: #0f2b3d !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        .card-body.p-4 {
+            padding: 1.2rem 1.5rem !important;
+        }
+
+        /* ================================================================
+               RESPONSIVE
+               ================================================================ */
+        @media (max-width: 768px) {
+            .table-bordered-custom th,
+            .table-bordered-custom td {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .stat-box-card {
+                padding: 12px 14px;
+            }
+
+            .stat-box-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 14px;
+            }
+
+            .stat-box-content h4 {
+                font-size: 17px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .compact-form {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+
+            .compact-form .form-group.btn-group {
+                width: 100%;
+            }
+
+            .compact-form .btn-add {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .compact-form .form-group {
+                width: 100%;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
