@@ -70,12 +70,12 @@
 
     /* Summary cards */
     .summary-card {
-        text-align: center;
-        padding: 15px !important;
+       text-align: center;
+       padding: 10px !important;   /* pehle 20px tha, height kam karne ke liye ghata diya */
     }
     .summary-value {
-        font-size: 2.4rem;
-        font-weight: 700;
+      font-size: 1.6rem;          /* pehle 2.4rem tha, number chota kar diya */
+      font-weight: 800;
     }
 
     /* Custom Filter Tabs */
@@ -210,7 +210,7 @@
     <div class="col-sm-4">
       <div class="card summary-card" style="border-top: 4px solid #0ea5e9 !important;">
         <div class="summary-value" style="color: #0ea5e9;">{{ total_count }}</div>
-        <div class="small text-muted fw-bold">Total Records</div>
+        <div class="small text-muted fw-bold" style="font-size: 0.75rem;">Total Records</div>
       </div>
     </div>
     <div class="col-sm-4">
