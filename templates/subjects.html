@@ -16,10 +16,11 @@
         vertical-align: middle;
     }
 
+    /* Table header - sky blue */
     .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
         color: white;
-        border: 1px solid #2c6e9e !important;
+        border: 1px solid #38bdf8 !important;
         font-weight: 600;
         font-size: 13px;
         text-transform: uppercase;
@@ -42,7 +43,16 @@
         width: 50px;
     }
 
-    /* Form Card Styling (original colors unchanged) */
+    /* Remove card background behind table */
+    .table-card,
+    .table-wrapper-card,
+    .card:has(.table-bordered-custom) {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Form Card Styling */
     .form-card {
         background: white;
         border-radius: 12px;
@@ -51,22 +61,25 @@
         overflow: hidden;
     }
 
+    /* Add New Subject card header - sky blue */
     .form-card-header {
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
         color: white;
         padding: 15px 20px;
-        border-bottom: 1px solid #2c6e9e;
+        border-bottom: 1px solid #38bdf8;
     }
 
     .form-card-header h5 {
         margin: 0;
         color: white;
+        font-size: 20px;
+        font-weight: 700;
     }
 
     /* Class Badge */
     .class-badge {
-        background: #e8f1f8;
-        color: #1a4a6f;
+        background: #e0f2fe;
+        color: #0369a1;
         padding: 5px 12px;
         border-radius: 20px;
         font-size: 12px;
@@ -85,6 +98,70 @@
         color: #d97706;
     }
 
+    /* Top page icon + heading - sky blue, bigger */
+    .page-header-icon,
+    .dashboard-title-icon {
+        color: #0ea5e9 !important;
+        font-size: 32px !important;
+    }
+
+    .page-header h1,
+    .page-header h2,
+    .dashboard-title {
+        color: #0ea5e9 !important;
+        font-size: 28px !important;
+        font-weight: 700;
+    }
+
+    /* Summary stat cards (Total Subjects / Avg Total Marks / Classes) - moved under heading, one row, small width */
+    .stats-row,
+    .summary-cards-row {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 1rem;
+        margin: 1rem 0 1.5rem 0;
+    }
+
+    .stat-card,
+    .summary-card {
+        flex: 1;
+        min-width: 0;
+        max-width: 220px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        text-align: center;
+    }
+
+    .stat-card .stat-icon,
+    .summary-card .stat-icon {
+        color: #0ea5e9;
+        font-size: 20px;
+    }
+
+    .stat-card .stat-value,
+    .summary-card .stat-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f2b3d;
+    }
+
+    .stat-card .stat-label,
+    .summary-card .stat-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #64748b;
+    }
+
+    @media (max-width: 992px) {
+        .stats-row,
+        .summary-cards-row {
+            flex-wrap: wrap;
+        }
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .table-bordered-custom th,
@@ -92,7 +169,6 @@
             padding: 8px;
             font-size: 12px;
         }
-        /* Make form row wrap on mobile */
         .compact-form-row {
             flex-wrap: wrap;
         }
@@ -108,7 +184,7 @@
         background-color: #ffffff !important;
     }
 
-   /* Compact row form styles - "All in one row with equal gaps" */
+    /* Compact row form - labels sky blue, one row */
     .compact-form {
        display: flex;
        flex-wrap: nowrap;
@@ -121,10 +197,10 @@
       min-width: 0;
    }
    .compact-form .form-group label {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       text-transform: uppercase;
-      font-weight: 600;
-      color: #4a5568;
+      font-weight: 700;
+      color: #0ea5e9;
       margin-bottom: 0.25rem;
       display: block;
    }
@@ -140,12 +216,14 @@
   }
   .compact-form .form-control:focus,
   .compact-form .form-select:focus {
-     border-color: #c6a43b;
-     box-shadow: 0 0 0 2px rgba(198, 164, 59, 0.2);
+     border-color: #0ea5e9;
+     box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
      background-color: white;
   }
+
+  /* Add Subject button - sky blue, same row as fields */
   .compact-form .btn-add {
-    background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     border: none;
     padding: 0.5rem 1.2rem;
     border-radius: 8px;
@@ -163,11 +241,10 @@
   .compact-form .btn-add:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    background: linear-gradient(135deg, #1a4a6f 0%, #0f2b3d 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
   }
 
-  /* For smaller screens, all items stack */
-   @media (max-width: 992px) {
+  @media (max-width: 992px) {
       .compact-form {
           flex-direction: column;
            align-items: stretch;
@@ -181,7 +258,6 @@
         width: 100%;
      }
    }
-    /* Custom styling for the card body when using compact form */
     .card-body.p-4 {
         padding: 1.2rem 1.5rem !important;
     }
