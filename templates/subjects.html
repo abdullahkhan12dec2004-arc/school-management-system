@@ -353,6 +353,46 @@
     </h2>
 </div>
 
+    <!-- Stats Summary - moved ABOVE table, styled exactly like Parents page 3-box design -->
+    {% if subjects %}
+    <div class="col-md-12">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="stat-box-card">
+                    <div class="stat-box-icon icon-navy">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-box-content">
+                        <small>Total Subjects</small>
+                        <h4>{{ subjects|length }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box-card">
+                    <div class="stat-box-icon icon-green">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-box-content">
+                        <small>Avg Total Marks</small>
+                        <h4>{{ (subjects|sum(attribute='total_marks') / subjects|length)|int }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box-card">
+                    <div class="stat-box-icon icon-amber">
+                        <i class="fas fa-door-open"></i>
+                    </div>
+                    <div class="stat-box-content">
+                        <small>Classes</small>
+                        <h4>{{ subjects|map(attribute='class_name')|unique|list|length }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 <div class="row g-4">
     <!-- Add Subject Form - compact ONE ROW layout, entries + button aligned -->
     <div class="col-md-12">
@@ -398,46 +438,9 @@
         </div>
     </div>
 
-    <!-- Stats Summary - moved ABOVE table, styled exactly like Parents page 3-box design -->
-    {% if subjects %}
-    <div class="col-md-12">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="stat-box-card">
-                    <div class="stat-box-icon icon-navy">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <div class="stat-box-content">
-                        <small>Total Subjects</small>
-                        <h4>{{ subjects|length }}</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-box-card">
-                    <div class="stat-box-icon icon-green">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-box-content">
-                        <small>Avg Total Marks</small>
-                        <h4>{{ (subjects|sum(attribute='total_marks') / subjects|length)|int }}</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-box-card">
-                    <div class="stat-box-icon icon-amber">
-                        <i class="fas fa-door-open"></i>
-                    </div>
-                    <div class="stat-box-content">
-                        <small>Classes</small>
-                        <h4>{{ subjects|map(attribute='class_name')|unique|list|length }}</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+
+
+
 
     <!-- Subjects List with Borders -->
     <div class="col-md-12">
