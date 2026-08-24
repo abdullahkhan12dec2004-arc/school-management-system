@@ -84,7 +84,7 @@
         gap: 10px;
         border-bottom: 2px solid #bae6fd;
         padding-bottom: 12px;
-        margin-bottom: 18px;
+        margin-bottom: 25px;
     }
     .filter-tab {
         background: none;
@@ -139,7 +139,7 @@
         background: #f0f9ff;
     }
     .edu-table tbody td {
-        padding: 12px 18px;
+        padding: 16px 18px;
         color: #334155;
         vertical-align: middle;
         font-size: 0.9rem;
@@ -165,11 +165,11 @@
     .row {
         display: flex;
         flex-wrap: wrap;
-        margin: 0 -10px;
+        margin: -14px;
     }
     .col-sm-4 {
         width: 33.333%;
-        padding: 0 10px;
+        padding: 14px;
         box-sizing: border-box;
     }
     @media (max-width: 768px) {
@@ -182,9 +182,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-3">
+<div class="container-fluid py-4">
   <!-- Heading in one line with icon -->
-  <h2 class="mb-4" style="font-weight: 800; font-size: 2.4rem; color: #0ea5e9;"><i class="fas fa-clipboard-check me-2" style="color: #0ea5e9;"></i>Review Upload — {{ upload_type | title }}</h2>
+  <h2 class="mb-5" style="font-weight: 800; font-size: 2.4rem; color: #0ea5e9;"><i class="fas fa-clipboard-check me-2" style="color: #0ea5e9;"></i>Review Upload — {{ upload_type | title }}</h2>
 
   {% if not records %}
   <!-- Empty State -->
@@ -206,7 +206,7 @@
   {% set invalid_count = records | selectattr('validation_status','equalto','INVALID') | list | length %}
   {% set total_count   = records | length %}
 
-  <div class="row mb-4">
+  <div class="row mb-5">
     <div class="col-sm-4">
       <div class="card summary-card" style="border-top: 4px solid #0ea5e9 !important;">
         <div class="summary-value" style="color: #0ea5e9;">{{ total_count }}</div>
@@ -239,7 +239,7 @@
   {% endif %}
 
   <!-- Action Buttons (top) -->
-  <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
     {% if valid_count > 0 %}
     <a href="{{ url_for('confirm_' + upload_type + '_upload') }}"
        class="btn-navy"
