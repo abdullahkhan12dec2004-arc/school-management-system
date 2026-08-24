@@ -14,19 +14,28 @@
 
     /* Card styling */
     .card {
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         border: 1px solid #e2e8f0 !important;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+        transition: box-shadow 0.2s ease;
     }
 
-    /* Card header styling - NAVY BLUE */
+    .card:hover {
+        box-shadow: 0 6px 16px rgba(14, 165, 233, 0.12);
+    }
+
+    /* Card header styling - SKY BLUE, tighter icon/heading spacing */
     .card-header {
-        background-color: #1e293b !important; /* Slate/Navy blue */
+        background-color: #0ea5e9 !important; /* Sky blue */
         border-bottom: 1px solid #e2e8f0 !important;
-        padding: 12px 20px !important;
+        padding: 14px 20px !important;
         color: white !important;
         font-weight: 600;
         font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 6px !important; /* tighter icon-to-text spacing */
     }
 
     /* Icon and text in header - WHITE */
@@ -37,50 +46,54 @@
         color: #ffffff !important;
     }
 
+    .card-header i {
+        margin-right: 0 !important; /* kill the old me-2 gap, gap handled by flex */
+    }
+
     /* Card body */
     .card-body {
-        padding: 20px !important;
+        padding: 24px !important;
     }
 
     /* Form labels */
     .form-label {
         font-size: 0.85rem !important;
         font-weight: 600 !important;
-        margin-bottom: 5px !important;
+        margin-bottom: 6px !important;
         color: #333;
     }
 
     /* Form selects/inputs */
     .form-select, .form-control {
         font-size: 0.85rem !important;
-        padding: 8px 12px !important;
-        border-radius: 6px !important;
+        padding: 9px 12px !important;
+        border-radius: 8px !important;
         border: 1px solid #cbd5e1 !important;
         width: 100%;
         box-sizing: border-box;
     }
 
-    /* NAVY BLUE BUTTONS */
+    /* SKY BLUE BUTTONS, rounder corners */
     .btn-navy {
-        background-color: #1e293b !important; /* Navy blue */
+        background-color: #0ea5e9 !important; /* Sky blue */
         color: white !important;
         border: none !important;
-        padding: 8px 20px !important;
+        padding: 10px 22px !important;
         font-size: 0.85rem !important;
-        border-radius: 6px !important;
+        border-radius: 24px !important; /* pill / rounded corners */
         cursor: pointer;
         transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        font-weight: 500;
+        font-weight: 600;
         text-decoration: none;
     }
 
     .btn-navy:hover {
-        background-color: #1e40af !important;
+        background-color: #0284c7 !important;
         transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
         color: white !important;
     }
 
@@ -98,9 +111,9 @@
         background-color: transparent !important;
         color: #1e293b !important;
         border: 1px solid #cbd5e1 !important;
-        padding: 8px 20px !important;
+        padding: 10px 22px !important;
         font-size: 0.85rem !important;
-        border-radius: 6px !important;
+        border-radius: 24px !important; /* rounded corners, same shape as navy btn */
         cursor: pointer;
         transition: all 0.3s ease;
         display: inline-flex;
@@ -118,23 +131,23 @@
 
     /* Drop Zone styling */
     .drop-zone {
-        border: 2px dashed #cbd5e1;
-        border-radius: 8px;
-        background: #fafcff;
+        border: 2px dashed #7dd3fc;
+        border-radius: 10px;
+        background: #f0f9ff;
         transition: all 0.2s;
         cursor: pointer;
-        padding: 40px 20px;
+        padding: 44px 20px;
         text-align: center;
     }
 
     .drop-zone:hover {
-        border-color: #1e293b;
-        background: #f1f5f9;
+        border-color: #0ea5e9;
+        background: #e0f2fe;
     }
 
     .drop-zone.dragover {
-        border-color: #1e40af;
-        background: #e0f2fe;
+        border-color: #0284c7;
+        background: #bae6fd;
     }
 
     /* Mandatory box */
@@ -156,24 +169,24 @@
     .row {
         display: flex;
         flex-wrap: wrap;
-        margin: 0 -10px;
+        margin: 0 -12px;
     }
 
     .col-12 {
         width: 100%;
-        padding: 0 10px;
+        padding: 0 12px;
         box-sizing: border-box;
     }
 
     .col-md-8 {
         width: 66.666%;
-        padding: 0 10px;
+        padding: 0 12px;
         box-sizing: border-box;
     }
 
     .col-md-4 {
         width: 33.333%;
-        padding: 0 10px;
+        padding: 0 12px;
         box-sizing: border-box;
     }
 
@@ -187,15 +200,18 @@
 
 {% block content %}
 <div class="container-fluid py-3">
-  <!-- Heading in one line with icon -->
-  <h2 class="mb-4" style="font-weight: 700; color: #1e293b;"><i class="fas fa-file-upload me-2" style="color: #c6a43b;"></i>Bulk Upload — <span id="uploadTypeDisplay">{{ upload_type | title }}</span></h2>
+  <!-- Heading in one line with icon - bigger & sky blue -->
+  <h2 class="mb-4 d-flex align-items-center" style="font-weight: 800; color: #0ea5e9; font-size: 2.1rem; gap: 12px;">
+    <i class="fas fa-file-upload" style="color: #0ea5e9; font-size: 2rem;"></i>
+    Bulk Upload — <span id="uploadTypeDisplay">{{ upload_type | title }}</span>
+  </h2>
 
   <!-- 1 Card on top: Step A -->
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
         <div class="card-header">
-          <i class="fas fa-download me-2"></i> Step A — Download Template
+          <i class="fas fa-download"></i> Step A — Download Template
         </div>
         <div class="card-body">
           <p class="text-muted small">Download the structured Excel template below, fill it with your data, then upload it in the form below.</p>
@@ -215,7 +231,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
             <div style="flex: 1; min-width: 250px;">
               {% if upload_type == 'students' %}
-              <div style="font-size: 0.8rem; color: #1e3a8a; background: #eff6ff; padding: 10px 15px; border-radius: 6px; border: 1px solid #bfdbfe;">
+              <div style="font-size: 0.8rem; color: #0369a1; background: #f0f9ff; padding: 10px 15px; border-radius: 8px; border: 1px solid #bae6fd;">
                 <i class="fas fa-lightbulb me-1"></i><strong>Tip:</strong> Agar aapne upar class select ki hai, to Class ID khud-bakhud template mein bhar jayegi. Warna "Class Reference" sheet se manually copy karein.
               </div>
               {% endif %}
@@ -240,13 +256,13 @@
     <div class="col-md-8">
       <div class="card h-100">
         <div class="card-header">
-          <i class="fas fa-upload me-2"></i> Step B — Upload Filled Template
+          <i class="fas fa-upload"></i> Step B — Upload Filled Template
         </div>
         <div class="card-body">
           <form method="POST" enctype="multipart/form-data">
 
             <div id="dropZone" class="drop-zone mb-3" onclick="document.getElementById('fileInput').click()">
-              <i class="fas fa-cloud-upload-alt fa-3x mb-2" style="color: #64748b;"></i>
+              <i class="fas fa-cloud-upload-alt fa-3x mb-2" style="color: #0ea5e9;"></i>
               <p class="fw-semibold mb-1" style="color: #334155; font-size: 0.9rem;">Click to browse or drag & drop your Excel file here</p>
               <p class="text-muted small mb-0">Supported: .xlsx, .xls</p>
               <div id="fileNameDisplay" class="mt-2 fw-bold text-success" style="display:none; font-size: 0.85rem;"></div>
@@ -266,7 +282,7 @@
             </div>
             {% endif %}
 
-            <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
+            <div style="display: flex; gap: 12px; align-items: center; margin-top: 18px;">
               <button type="submit" class="btn-navy" id="uploadBtn" disabled>
                 <i class="fas fa-check-circle me-1"></i> Validate & Upload
               </button>
@@ -281,9 +297,9 @@
 
     <!-- Right Column: Mandatory Fields -->
     <div class="col-md-4">
-      <div class="card h-100" style="border-left: 4px solid #dc2626 !important;">
-        <div class="card-header" style="background-color: #dc2626 !important;">
-          <i class="fas fa-info-circle me-2"></i> Mandatory Fields
+      <div class="card h-100" style="border-left: 4px solid #0ea5e9 !important;">
+        <div class="card-header">
+          <i class="fas fa-info-circle"></i> Mandatory Fields
         </div>
         <div class="card-body">
           <p class="text-muted small mb-3">Please ensure these fields are filled (marked <span class="text-danger fw-bold">RED</span> in the template):</p>
@@ -316,20 +332,20 @@
 
 <style>
   .drop-zone {
-    border: 2px dashed #cbd5e1;
+    border: 2px dashed #7dd3fc;
     border-radius: var(--radius-lg);
-    background: var(--off-white);
+    background: #f0f9ff;
     transition: all 0.2s ease-in-out;
     cursor: pointer;
     padding: 3rem 1.5rem;
   }
   .drop-zone:hover {
-    border-color: var(--navy);
-    background: #eef4fe;
+    border-color: #0ea5e9;
+    background: #e0f2fe;
   }
   .drop-zone.dragover {
-    border-color: var(--navy);
-    background: #e2ecfc;
+    border-color: #0284c7;
+    background: #bae6fd;
   }
   .form-control {
     width: 100%;
@@ -341,9 +357,9 @@
     transition: var(--transition);
   }
   .form-control:focus {
-    border-color: var(--navy);
+    border-color: #0ea5e9;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(13, 27, 42, 0.1);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
   }
 </style>
 
@@ -355,13 +371,13 @@
     if (input.files && input.files[0]) {
       display.textContent = '📎 ' + input.files[0].name;
       display.style.display = 'block';
-      zone.style.borderColor = '#1a3b5d';
-      zone.style.background = '#eef4fe';
+      zone.style.borderColor = '#0ea5e9';
+      zone.style.background = '#e0f2fe';
       btn.disabled = false;
     } else {
       display.style.display = 'none';
-      zone.style.borderColor = '#cbd5e1';
-      zone.style.background = '#fafcff';
+      zone.style.borderColor = '#7dd3fc';
+      zone.style.background = '#f0f9ff';
       btn.disabled = true;
     }
   }
