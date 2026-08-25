@@ -14,19 +14,19 @@
     .form-container-custom {
         width: 100%;
         max-width: 600px;
-        margin: 3rem auto;
+        margin: 1rem auto;
         padding: 0 1rem;
     }
 
     .page-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.2rem;
     }
 
     .page-header h1 {
         font-size: 1.8rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -35,6 +35,11 @@
         align-items: center;
         justify-content: center;
         gap: 12px;
+    }
+
+    .page-header h1 i {
+        color: #0ea5e9;
+        -webkit-text-fill-color: #0ea5e9;
     }
 
     .page-header p {
@@ -46,9 +51,9 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: linear-gradient(105deg, #e8f0fe, #d4e3fa);
-        border: 1px solid #b8d0f5;
-        color: #1a4a6f;
+        background: linear-gradient(105deg, #e0f2fe, #bae6fd);
+        border: 1px solid #7dd3fc;
+        color: #0369a1;
         padding: 0.5rem 1.2rem;
         border-radius: 50px;
         font-size: 0.85rem;
@@ -62,11 +67,12 @@
         box-shadow: 0 10px 30px rgba(15, 43, 61, 0.05);
         border: 1px solid #eef2f8;
         overflow: hidden;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
+        margin-top: -0.5rem;
     }
 
     .card-header-custom {
-        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(98deg, #38bdf8 0%, #0ea5e9 100%);
         padding: 1.25rem 2rem;
         color: white;
     }
@@ -82,7 +88,7 @@
     }
 
     .card-header-custom h3 i {
-        color: #e0c87c;
+        color: white;
     }
 
     .card-body-custom {
@@ -100,12 +106,12 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #5b6e8c;
+        color: #0ea5e9;
         margin-bottom: 0.4rem;
     }
 
     .form-label i {
-        color: #c6a43b;
+        color: #0ea5e9;
         margin-right: 6px;
         width: 14px;
     }
@@ -124,7 +130,7 @@
         left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        color: #9aa9bf;
+        color: #0ea5e9;
         font-size: 0.9rem;
         pointer-events: none;
     }
@@ -142,8 +148,8 @@
 
     .input-wrapper input:focus {
         outline: none;
-        border-color: #1a4a6f;
-        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
     }
 
     .input-wrapper input::placeholder {
@@ -152,21 +158,21 @@
     }
 
     .school-locked-info {
-        background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
-        border: 1px solid #c5d8fa;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        border: 1px solid #7dd3fc;
         border-radius: 12px;
         padding: 1rem 1.25rem;
         display: flex;
         align-items: center;
         gap: 12px;
         margin-bottom: 1.5rem;
-        color: #1a4a6f;
+        color: #0369a1;
         font-size: 0.85rem;
         font-weight: 500;
     }
 
     .school-locked-info i {
-        color: #e0c87c;
+        color: #0ea5e9;
         font-size: 1.2rem;
         flex-shrink: 0;
     }
@@ -194,23 +200,23 @@
     }
 
     .btn-custom-primary {
-        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
+        background: linear-gradient(105deg, #38bdf8, #0ea5e9);
         color: white;
     }
 
     .btn-custom-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.2);
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
     }
 
     .btn-custom-secondary {
-        background: #f1f4f9;
-        color: #3a4b66;
-        border: 1px solid #e2e8f0;
+        background: #0ea5e9;
+        color: white;
+        border: 1px solid #0ea5e9;
     }
 
     .btn-custom-secondary:hover {
-        background: #e9eef4;
+        background: #0284c7;
     }
 </style>
 {% endblock %}
