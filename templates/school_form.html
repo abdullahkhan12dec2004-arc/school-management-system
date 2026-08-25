@@ -20,14 +20,20 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+    :root {
+        --sky: #0ea5e9;
+        --sky-dark: #0284c7;
+        --sky-light: #e0f2fe;
+    }
+
     body {
-        background: #f5f7fb !important;
+        background: #ffffff !important;
         font-family: 'Inter', sans-serif;
     }
 
     .form-container-custom {
         width: 100%;
-        max-width: 950px;
+        max-width: 650px;
         margin: 1.5rem auto;
         padding: 0 1rem;
     }
@@ -40,15 +46,16 @@
     .page-header h1 {
         font-size: 1.8rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+        color: var(--sky);
         margin-bottom: 0.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 12px;
+    }
+
+    .page-header h1 i {
+        color: var(--sky);
     }
 
     .page-header p {
@@ -66,7 +73,7 @@
     }
 
     .card-header-custom {
-        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: var(--sky);
         padding: 1.25rem 2rem;
         color: white;
     }
@@ -82,7 +89,7 @@
     }
 
     .card-header-custom h3 i {
-        color: #e0c87c;
+        color: white;
     }
 
     .card-body-custom {
@@ -94,13 +101,17 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: #1a4a6f;
+        color: var(--sky);
         margin-bottom: 1.25rem;
         border-bottom: 2px solid #f0f4f8;
         padding-bottom: 0.5rem;
         display: flex;
         align-items: center;
         gap: 8px;
+    }
+
+    .section-title i {
+        color: var(--sky);
     }
 
     .form-grid {
@@ -124,12 +135,12 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #5b6e8c;
+        color: var(--sky);
         margin-bottom: 0.4rem;
     }
 
     .form-label i {
-        color: #c6a43b;
+        color: var(--sky);
         margin-right: 6px;
         width: 14px;
     }
@@ -148,7 +159,7 @@
         left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        color: #9aa9bf;
+        color: var(--sky);
         font-size: 0.9rem;
         pointer-events: none;
     }
@@ -170,8 +181,8 @@
     .input-wrapper select:focus,
     .input-wrapper textarea:focus {
         outline: none;
-        border-color: #1a4a6f;
-        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.08);
+        border-color: var(--sky);
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
     }
 
     .input-wrapper input::placeholder {
@@ -202,23 +213,24 @@
     }
 
     .btn-custom-primary {
-        background: linear-gradient(105deg, #1a4a6f, #2c6e9e);
+        background: var(--sky);
         color: white;
     }
 
     .btn-custom-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(26, 74, 111, 0.2);
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        background: var(--sky-dark);
     }
 
     .btn-custom-secondary {
-        background: #f1f4f9;
-        color: #3a4b66;
-        border: 1px solid #e2e8f0;
+        background: var(--sky-light);
+        color: var(--sky-dark);
+        border: 1px solid var(--sky);
     }
 
     .btn-custom-secondary:hover {
-        background: #e9eef4;
+        background: #cdeaf9;
     }
 
     /* Map Styles */
@@ -247,7 +259,7 @@
         border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
-        color: #1a4a6f;
+        color: var(--sky);
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         cursor: pointer;
         display: flex;
@@ -309,13 +321,13 @@
     }
 
     .osm-item i {
-        color: #ef4444;
+        color: var(--sky);
         margin-top: 3px;
     }
 
     .osm-item-main {
         font-weight: 600;
-        color: #1a4a6f;
+        color: var(--sky);
     }
 
     .osm-item-sub {
@@ -339,6 +351,10 @@
         gap: 5px;
     }
 
+    .helper-text i {
+        color: var(--sky);
+    }
+
     /* Preview Card */
     .preview-card {
         background: #f9fbfe;
@@ -353,11 +369,15 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: #6f7d98;
+        color: var(--sky);
         margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 6px;
+    }
+
+    .preview-title i {
+        color: var(--sky);
     }
 
     .preview-content {
@@ -370,7 +390,7 @@
     .preview-avatar {
         width: 45px;
         height: 45px;
-        background: linear-gradient(135deg, var(--secondary, #c6a43b) 0%, var(--secondary-dark, #a07d2a) 100%);
+        background: var(--sky);
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -408,21 +428,25 @@
         border-radius: 12px;
         margin-top: 1.5rem;
         font-size: 0.8rem;
-        background: #eef7ff;
-        border: 1px solid #d0e7ff;
-        color: #1a4a6f;
+        background: var(--sky-light);
+        border: 1px solid var(--sky);
+        color: var(--sky-dark);
         display: flex;
         align-items: center;
         gap: 8px;
+    }
+
+    .form-alert i {
+        color: var(--sky-dark);
     }
 
     .edit-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: #fff3cd;
-        color: #8a6416;
-        border: 1px solid #ffe3a3;
+        background: var(--sky-light);
+        color: var(--sky-dark);
+        border: 1px solid var(--sky);
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 0.72rem;
@@ -443,17 +467,21 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: #fff8e8;
-        border: 1px solid #ffe3a3;
+        background: var(--sky-light);
+        border: 1px solid var(--sky);
         border-radius: 12px;
         padding: 10px 16px;
         margin-bottom: 1.5rem;
         font-size: 0.8rem;
-        color: #8a6416;
+        color: var(--sky-dark);
+    }
+
+    .edit-trigger-bar i {
+        color: var(--sky-dark);
     }
 
     .btn-edit-trigger {
-        background: linear-gradient(105deg, #c6a43b, #a07d2a);
+        background: var(--sky);
         color: white;
         border: none;
         padding: 0.55rem 1.3rem;
@@ -470,7 +498,8 @@
 
     .btn-edit-trigger:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 14px rgba(198, 164, 59, 0.3);
+        box-shadow: 0 6px 14px rgba(14, 165, 233, 0.3);
+        background: var(--sky-dark);
     }
 
     .btn-custom-primary:disabled {
@@ -947,7 +976,7 @@ function previewLogo(input) {
         reader.readAsDataURL(input.files[0]);
     } else {
         logo.innerHTML = '<i class="fas fa-school"></i>';
-        logo.style.background = 'linear-gradient(135deg, var(--secondary, #c6a43b) 0%, var(--secondary-dark, #a07d2a) 100%)';
+        logo.style.background = 'var(--sky)';
     }
 }
 
@@ -966,9 +995,9 @@ function enableEditing() {
     const bar = document.getElementById('editTriggerBar');
     if (bar) {
         bar.innerHTML = '<span><i class="fas fa-unlock"></i> Fields unlocked — you can now edit and save.</span>';
-        bar.style.background = '#e8f5e9';
-        bar.style.borderColor = '#c8e6c9';
-        bar.style.color = '#2e7d32';
+        bar.style.background = '#e0f2fe';
+        bar.style.borderColor = '#0ea5e9';
+        bar.style.color = '#0284c7';
     }
 }
 
