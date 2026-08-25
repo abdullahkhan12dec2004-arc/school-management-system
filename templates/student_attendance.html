@@ -65,10 +65,23 @@
     }
 
     .filter-grid {
-        display: grid;
-        grid-template-columns: 2.2fr 1.8fr 1.2fr 1fr;
+        display: flex;
+        flex-wrap: wrap;
         gap: 16px;
         align-items: end;
+    }
+
+    .filter-field {
+        flex: 0 0 auto;
+    }
+
+    .filter-field.field-class,
+    .filter-field.field-date {
+        width: 260px;
+    }
+
+    .filter-field.field-btn {
+        width: 170px;
     }
 
     .filter-field label {
@@ -399,7 +412,13 @@
     /* ── Responsive ── */
     @media (max-width: 768px) {
         .filter-grid {
-            grid-template-columns: 1fr;
+            flex-direction: column;
+        }
+
+        .filter-field.field-class,
+        .filter-field.field-date,
+        .filter-field.field-btn {
+            width: 100%;
         }
 
         .table thead {
@@ -451,7 +470,7 @@
                 <form method="POST" action="{{ url_for('student_attendance') }}" id="attendanceForm">
                     <div class="filter-inner">
                         <div class="filter-grid">
-                            <div class="filter-field">
+                            <div class="filter-field field-class">
                                 <label for="class_id">
                                     <i class="fas fa-chalkboard"></i>Select class
                                 </label>
@@ -465,7 +484,7 @@
                                 </select>
                             </div>
 
-                            <div class="filter-field">
+                            <div class="filter-field field-date">
                                 <label for="attendance_date">
                                     <i class="fas fa-calendar-alt"></i>Attendance date
                                 </label>
@@ -473,14 +492,14 @@
                                        class="form-control" value="{{ attendance_date }}" required>
                             </div>
 
-                            <div class="filter-field">
+                            <div class="filter-field field-btn">
                                 <label>&nbsp;</label>
                                 <button type="submit" class="btn-load">
                                     <i class="fas fa-search"></i>Load students
                                 </button>
                             </div>
 
-                            <div class="filter-field">
+                            <div class="filter-field field-btn">
                                 <label>&nbsp;</label>
                                 <button type="button" class="btn-reset" onclick="resetForm()">
                                     <i class="fas fa-redo"></i>Reset
