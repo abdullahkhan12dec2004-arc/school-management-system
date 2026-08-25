@@ -213,14 +213,16 @@
     }
 
     .table tbody td {
-       padding: 1.15rem 1rem;
-       vertical-align: middle;
+       padding: 1rem 1rem !important;
+       vertical-align: middle !important;
        border-color: var(--border-color, #f0f0f0);
        color: var(--text-primary, #2c3e50);
        font-size: 14px;
     }
     .table tbody tr {
-       height: 72px;
+       padding: 1rem 1rem !important;
+       vertical-align: middle !important;
+       height: 86px;
        transition: background 0.15s;
        background-color: var(--card-bg, white);
     }
@@ -229,11 +231,7 @@
     }
 
     /* ── Student Info ── */
-    .student-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+
 
     .student-avatar {
         width: 38px;
@@ -269,9 +267,15 @@
         color: var(--text-secondary, #7f8c8d);
         font-family: monospace;
     }
-
-    /* ── Status Select ── */
+    .student-info {
+       display: flex;
+       align-items: center;
+       gap: 10px;
+       min-height: 50px;
+    }
+     /* ── Status Select ── */
     .status-select {
+        height: 38px;
         border-radius: 6px;
         padding: 0.38rem 0.7rem;
         font-size: 13px;
@@ -297,6 +301,7 @@
 
     /* ── Remarks Input ── */
     .remarks-input {
+        height: 38px;
         border-radius: 6px;
         border: 1.5px solid var(--border-color, #d0d5dd);
         padding: 0.38rem 0.75rem;
