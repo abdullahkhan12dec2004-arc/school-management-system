@@ -498,7 +498,7 @@ def edit_school(school_id):
         except psycopg2.Error as e:
             conn.rollback()
             print(f"edit_school UPDATE error: {e}")
-            flash(f'School update nahi ho saka: {e}', 'error')
+            flash(f'School update nahi ho saka: {e}', 'error') 
             conn.close()
             return render_template('school_form.html', school=school)
         finally:
