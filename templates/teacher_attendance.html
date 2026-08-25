@@ -6,21 +6,20 @@
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
   :root {
-    --bg:      #0d1117;
-    --surface: #161b27;
-    --card:    #1c2333;
-    --card2:   #212840;
-    --border:  #2a3352;
-    --accent:  #f0b429;
-    --accent2: #e09518;
-    --blue:    #4f8ef7;
-    --text:    #e2e8f0;
-    --muted:   #64748b;
-    --muted2:  #8899bb;
-    --present: #22c55e;
-    --absent:  #ef4444;
-    --late:    #f59e0b;
-    --leave:   #a78bfa;
+    --bg:      #f4f7fb;
+    --surface: #ffffff;
+    --card:    #ffffff;
+    --card2:   #f8fafc;
+    --border:  #e6ebf2;
+    --primary: #2196f3;
+    --primary2:#1877c9;
+    --text:    #1e293b;
+    --muted:   #7c8aa0;
+    --muted2:  #55637a;
+    --present: #16a34a;
+    --absent:  #dc2626;
+    --late:    #d97706;
+    --leave:   #7c3aed;
     --radius:  10px;
   }
 
@@ -30,69 +29,81 @@
     font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
     color: var(--text);
     font-size: 14px;
+    background: var(--bg);
   }
 
   /* ── Top Bar ── */
   .ta-topbar {
     background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: .75rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 1rem 1.5rem 0;
+    padding: .85rem 1.25rem;
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: .75rem;
+    box-shadow: 0 1px 3px rgba(30,41,59,.05);
   }
   .ta-topbar-left { display: flex; align-items: center; gap: .75rem; }
   .ta-back {
-    background: var(--card); border: 1px solid var(--border);
-    color: var(--muted2); padding: .35rem .8rem; border-radius: 7px;
+    background: var(--card2); border: 1px solid var(--border);
+    color: var(--muted2); padding: .4rem .9rem; border-radius: 7px;
     font-size: .8rem; font-weight: 600; text-decoration: none;
     display: inline-flex; align-items: center; gap: .4rem;
     transition: border-color .15s, color .15s;
   }
-  .ta-back:hover { border-color: var(--blue); color: var(--text); }
+  .ta-back:hover { border-color: var(--primary); color: var(--primary); }
   .ta-page-title {
-    font-size: 1rem; font-weight: 800; color: var(--text);
-    display: flex; align-items: center; gap: .45rem;
+    font-size: 1.05rem; font-weight: 800; color: var(--text);
+    display: flex; align-items: center; gap: .5rem;
   }
-  .ta-page-title i { color: var(--accent); }
+  .ta-page-title i { color: var(--primary); }
   .ta-report-btn {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #1a1000; border: none; padding: .4rem 1.1rem; border-radius: 7px;
-    font-size: .8rem; font-weight: 800; cursor: pointer;
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color: #fff; border: none; padding: .5rem 1.2rem; border-radius: 7px;
+    font-size: .8rem; font-weight: 700; cursor: pointer;
     font-family: inherit; text-decoration: none;
     display: inline-flex; align-items: center; gap: .4rem;
+    box-shadow: 0 2px 6px rgba(33,150,243,.35);
     transition: opacity .15s;
   }
-  .ta-report-btn:hover { opacity: .88; }
+  .ta-report-btn:hover { opacity: .9; }
 
-  /* ── Date Bar ── */
+  /* ── Date Bar (Filter card, mirrors screenshot's blue-labelled filter section) ── */
   .ta-datebar {
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    padding: .7rem 1.5rem;
-    display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 1rem 1.5rem 0;
+    padding: 1rem 1.25rem;
+    display: flex; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap;
+    box-shadow: 0 1px 3px rgba(30,41,59,.05);
   }
+  .ta-field { display: flex; flex-direction: column; gap: .35rem; }
   .ta-date-label {
-    font-size: .7rem; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: .08em;
+    font-size: .72rem; font-weight: 700; color: var(--primary);
+    text-transform: uppercase; letter-spacing: .06em;
+    display: flex; align-items: center; gap: .35rem;
   }
   .ta-date-input {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); border-radius: 7px; padding: .4rem .85rem;
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--text); border-radius: 7px; padding: .5rem .85rem;
     font-size: .85rem; font-family: inherit; outline: none; cursor: pointer;
     transition: border-color .15s;
+    min-width: 200px;
   }
-  .ta-date-input:focus { border-color: var(--accent); }
-  .ta-date-hint { font-size: .72rem; color: var(--muted); font-style: italic; }
+  .ta-date-input:focus { border-color: var(--primary); }
+  .ta-date-hint { font-size: .72rem; color: var(--muted); font-style: italic; margin-top: .15rem; }
 
   /* ── Stats Strip ── */
   .ta-stats {
-    display: flex; gap: .75rem; padding: .9rem 1.5rem; flex-wrap: wrap;
+    display: flex; gap: .75rem; padding: 1rem 1.5rem .25rem; flex-wrap: wrap;
   }
   .ta-pill {
-    display: flex; align-items: center; gap: .45rem;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 20px; padding: .32rem .9rem;
+    display: flex; align-items: center; gap: .5rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: .4rem 1rem;
     font-size: .8rem; font-weight: 700;
+    box-shadow: 0 1px 2px rgba(30,41,59,.04);
   }
   .ta-pill .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .ta-pill.p .dot  { background: var(--present); }
@@ -104,134 +115,135 @@
 
   /* ── Table Card ── */
   .ta-card {
-    margin: .9rem 1.5rem 5.5rem;
+    margin: .75rem 1.5rem 5.5rem;
     background: var(--card); border: 1px solid var(--border);
     border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 1px 3px rgba(30,41,59,.05);
   }
   .ta-card-head {
-    background: var(--card2); border-bottom: 1px solid var(--border);
-    padding: .7rem 1.1rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    padding: .85rem 1.25rem;
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: .5rem;
   }
   .ta-card-head h2 {
-    margin: 0; font-size: .9rem; font-weight: 700; color: var(--text);
-    display: flex; align-items: center; gap: .4rem;
+    margin: 0; font-size: .95rem; font-weight: 700; color: #fff;
+    display: flex; align-items: center; gap: .45rem;
   }
-  .ta-card-head h2 i { color: var(--accent); }
+  .ta-card-head .ta-count-badge {
+    background: rgba(255,255,255,.2);
+    color: #fff; font-size: .72rem; font-weight: 700;
+    padding: .25rem .7rem; border-radius: 20px;
+  }
   .ta-mark-all { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
-  .ta-mark-lbl { font-size: .7rem; color: var(--muted); font-weight: 600; }
+  .ta-mark-lbl { font-size: .7rem; color: rgba(255,255,255,.85); font-weight: 600; }
   .ta-mbtn {
-    border: 1px solid; border-radius: 6px; padding: .3rem .8rem;
+    border: 1px solid rgba(255,255,255,.5); border-radius: 6px; padding: .32rem .8rem;
     font-size: .75rem; font-weight: 700; cursor: pointer; font-family: inherit;
-    transition: opacity .12s, transform .1s;
+    background: rgba(255,255,255,.12); color: #fff;
+    transition: opacity .12s, transform .1s, background .15s;
   }
-  .ta-mbtn:hover { opacity: .8; transform: scale(1.03); }
+  .ta-mbtn:hover { background: rgba(255,255,255,.25); transform: scale(1.03); }
   .ta-mbtn:active { transform: scale(0.97); }
-  .ta-mbtn.p  { background: rgba(34,197,94,.12);  color: var(--present); border-color: rgba(34,197,94,.4); }
-  .ta-mbtn.a  { background: rgba(239,68,68,.12);  color: var(--absent);  border-color: rgba(239,68,68,.4); }
-  .ta-mbtn.l  { background: rgba(245,158,11,.12); color: var(--late);    border-color: rgba(245,158,11,.4); }
-  .ta-mbtn.lv { background: rgba(167,139,250,.12);color: var(--leave);   border-color: rgba(167,139,250,.4); }
 
   /* Table */
   .ta-card table { width: 100%; border-collapse: collapse; }
   .ta-card thead th {
-    background: var(--surface); padding: .6rem 1rem;
-    font-size: .68rem; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: .07em;
+    background: var(--card2); padding: .7rem 1.1rem;
+    font-size: .7rem; font-weight: 700; color: var(--primary);
+    text-transform: uppercase; letter-spacing: .06em;
     text-align: left; border-bottom: 1px solid var(--border);
   }
   .ta-card tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
   .ta-card tbody tr:last-child { border-bottom: none; }
-  .ta-card tbody tr:hover { background: rgba(79,142,247,.04); }
-  .ta-card tbody td { padding: .65rem 1rem; vertical-align: middle; }
+  .ta-card tbody tr:hover { background: rgba(33,150,243,.05); }
+  .ta-card tbody td { padding: .75rem 1.1rem; vertical-align: middle; }
 
   .ta-num { color: var(--muted); font-weight: 600; font-size: .8rem; }
   .ta-avatar-img {
-    width: 36px; height: 36px; border-radius: 50%;
+    width: 38px; height: 38px; border-radius: 50%;
     object-fit: cover; border: 2px solid var(--border); flex-shrink: 0;
   }
   .ta-initials {
-    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--blue), #7c3aed);
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: .72rem; color: #fff;
+    font-weight: 800; font-size: .74rem; color: #fff;
   }
-  .ta-tcell { display: flex; align-items: center; gap: .65rem; }
-  .ta-tname { font-weight: 600; font-size: .85rem; color: var(--text); }
+  .ta-tcell { display: flex; align-items: center; gap: .7rem; }
+  .ta-tname { font-weight: 700; font-size: .87rem; color: var(--text); }
   .ta-tqual { font-size: .72rem; color: var(--muted); }
   .ta-tsub  { font-size: .8rem; color: var(--muted2); }
 
   /* ══════════════════════════════════════════
-     NEW: Easy One-Click Status Buttons
+     Status dropdown — matches screenshot's colored select badge
   ══════════════════════════════════════════ */
-  .ta-stabs { display: flex; gap: .35rem; flex-wrap: wrap; }
-  .ta-stabs input[type=radio] { display: none; }
-
-  .ta-stab {
-    display: inline-flex; align-items: center; gap: .3rem;
-    padding: .45rem .9rem;
-    border-radius: 8px;
-    font-size: .78rem;
+  .ta-status-wrap { position: relative; display: inline-block; min-width: 150px; }
+  .ta-status-select {
+    appearance: none; -webkit-appearance: none;
+    width: 100%;
+    padding: .5rem 2.2rem .5rem .9rem;
+    border-radius: 7px;
+    font-size: .8rem;
     font-weight: 700;
     cursor: pointer;
     border: 1.5px solid var(--border);
-    background: var(--surface);
+    background-color: var(--card2);
     color: var(--muted2);
+    font-family: inherit;
     transition: all .15s ease;
-    user-select: none;
-    min-width: 78px;
-    justify-content: center;
   }
-  .ta-stab:hover {
-    border-color: var(--muted2);
-    color: var(--text);
-    background: var(--card2);
-    transform: translateY(-1px);
+  .ta-status-wrap::after {
+    content: '';
+    position: absolute; right: .8rem; top: 50%;
+    width: 0; height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    color: var(--muted);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .ta-status-select.st-present {
+    background: rgba(22,163,74,.12); color: var(--present); border-color: rgba(22,163,74,.45);
+  }
+  .ta-status-select.st-absent {
+    background: rgba(220,38,38,.12); color: var(--absent); border-color: rgba(220,38,38,.45);
+  }
+  .ta-status-select.st-late {
+    background: rgba(217,119,6,.12); color: var(--late); border-color: rgba(217,119,6,.45);
+  }
+  .ta-status-select.st-leave {
+    background: rgba(124,58,237,.12); color: var(--leave); border-color: rgba(124,58,237,.45);
   }
 
-  /* Active states — solid colored background */
-  .ta-stab.sel-present {
-    background: rgba(34,197,94,.18);
-    color: #4ade80;
-    border-color: rgba(34,197,94,.6);
-    box-shadow: 0 0 0 3px rgba(34,197,94,.1);
+  /* Remarks-style helper input (optional note per row, visual only, mirrors screenshot layout) */
+  .ta-remark {
+    border: 1.5px solid var(--border); border-radius: 7px;
+    padding: .45rem .8rem; font-size: .78rem; font-family: inherit;
+    color: var(--muted2); background: var(--surface); width: 100%; max-width: 180px;
   }
-  .ta-stab.sel-absent {
-    background: rgba(239,68,68,.18);
-    color: #f87171;
-    border-color: rgba(239,68,68,.6);
-    box-shadow: 0 0 0 3px rgba(239,68,68,.1);
-  }
-  .ta-stab.sel-late {
-    background: rgba(245,158,11,.18);
-    color: #fbbf24;
-    border-color: rgba(245,158,11,.6);
-    box-shadow: 0 0 0 3px rgba(245,158,11,.1);
-  }
-  .ta-stab.sel-leave {
-    background: rgba(167,139,250,.18);
-    color: #c4b5fd;
-    border-color: rgba(167,139,250,.6);
-    box-shadow: 0 0 0 3px rgba(167,139,250,.1);
-  }
+  .ta-remark::placeholder { color: var(--muted); }
+  .ta-remark:focus { outline: none; border-color: var(--primary); }
 
   /* Save Bar */
   .ta-savebar {
     position: sticky; bottom: 0;
     background: var(--surface); border-top: 1px solid var(--border);
-    padding: .7rem 1.5rem;
+    padding: .85rem 1.5rem;
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: .5rem; z-index: 50;
+    box-shadow: 0 -2px 8px rgba(30,41,59,.05);
   }
   .ta-save-info { font-size: .8rem; color: var(--muted); }
   .ta-save-info strong { color: var(--text); }
   .ta-save-btn {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #1a1000; border: none; padding: .55rem 1.8rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color: #fff; border: none; padding: .6rem 1.9rem;
     border-radius: 8px; font-size: .88rem; font-weight: 800;
     cursor: pointer; font-family: inherit;
     display: inline-flex; align-items: center; gap: .45rem;
+    box-shadow: 0 2px 6px rgba(33,150,243,.35);
     transition: opacity .15s;
   }
   .ta-save-btn:hover { opacity: .9; }
@@ -242,19 +254,11 @@
 
   /* ── Mobile Responsive ── */
   @media (max-width: 600px) {
-    .ta-topbar, .ta-datebar, .ta-stats, .ta-card { margin-left: 0; padding-left: 1rem; padding-right: 1rem; }
-    .ta-card { margin-left: .75rem; margin-right: .75rem; }
+    .ta-topbar, .ta-datebar, .ta-stats, .ta-card { margin-left: .75rem; margin-right: .75rem; }
     .ta-card table thead th:nth-child(3) { display: none; }
     .ta-card tbody td:nth-child(3) { display: none; }
-    .ta-stab { padding: .4rem .65rem; min-width: 64px; font-size: .72rem; }
     .ta-mark-all { gap: .3rem; }
-  }
-  .dashboard-container {
-        background-color: #ffffff !important;
-  }
-
-  body, .main-content, .container-fluid {
-        background-color: #ffffff !important;
+    .ta-status-wrap { min-width: 120px; }
   }
 </style>
 
@@ -280,10 +284,12 @@
 
     <!-- Date Bar -->
     <div class="ta-datebar">
-      <span class="ta-date-label"><i class="fas fa-calendar-alt" style="margin-right:5px;"></i>Attendance Date</span>
-      <input type="date" class="ta-date-input" name="attendance_date" id="att_date"
-             value="{{ attendance_date }}" max="{{ today }}">
-      <span class="ta-date-hint">Date badlne par page reload hoga</span>
+      <div class="ta-field">
+        <span class="ta-date-label"><i class="fas fa-calendar-alt"></i>Attendance Date</span>
+        <input type="date" class="ta-date-input" name="attendance_date" id="att_date"
+               value="{{ attendance_date }}" max="{{ today }}">
+        <span class="ta-date-hint">Date badlne par page reload hoga</span>
+      </div>
     </div>
 
     <!-- Stats Strip -->
@@ -309,13 +315,13 @@
     <!-- Table Card -->
     <div class="ta-card">
       <div class="ta-card-head">
-        <h2><i class="fas fa-users"></i> Teachers — {{ teachers|length }} total</h2>
+        <h2><i class="fas fa-users"></i> Teachers <span class="ta-count-badge">Total: {{ teachers|length }}</span></h2>
         <div class="ta-mark-all">
           <span class="ta-mark-lbl">Sab mark karein:</span>
-          <button type="button" class="ta-mbtn p"  onclick="markAll('Present')">✓ Present</button>
-          <button type="button" class="ta-mbtn a"  onclick="markAll('Absent')">✗ Absent</button>
-          <button type="button" class="ta-mbtn l"  onclick="markAll('Late')">⏰ Late</button>
-          <button type="button" class="ta-mbtn lv" onclick="markAll('Leave')">🏖 Leave</button>
+          <button type="button" class="ta-mbtn" onclick="markAll('Present')">✓ Present</button>
+          <button type="button" class="ta-mbtn" onclick="markAll('Absent')">✗ Absent</button>
+          <button type="button" class="ta-mbtn" onclick="markAll('Late')">⏰ Late</button>
+          <button type="button" class="ta-mbtn" onclick="markAll('Leave')">🏖 Leave</button>
         </div>
       </div>
 
@@ -332,6 +338,7 @@
         <tbody>
           {% for t in teachers %}
           {% set saved = existing.get(t.id, '') %}
+          {% set current = saved if saved else 'Present' %}
           <tr>
             <td class="ta-num">{{ loop.index }}</td>
             <td>
@@ -350,20 +357,14 @@
             </td>
             <td class="ta-tsub">{{ t.subject_specialization or '—' }}</td>
             <td>
-              <div class="ta-stabs" data-tid="{{ t.id }}">
-                {% for status in ['Present','Absent','Late','Leave'] %}
-                <input type="radio"
-                       name="status_{{ t.id }}"
-                       id="s_{{ t.id }}_{{ status|lower }}"
-                       value="{{ status }}"
-                       {% if saved == status or (not saved and status == 'Present') %}checked{% endif %}>
-                <label for="s_{{ t.id }}_{{ status|lower }}"
-                       class="ta-stab"
-                       data-val="{{ status }}">
-                  {% if status == 'Present' %}✓{% elif status == 'Absent' %}✗{% elif status == 'Late' %}⏰{% else %}🏖{% endif %}
-                  {{ status }}
-                </label>
-                {% endfor %}
+              <div class="ta-status-wrap">
+                <select name="status_{{ t.id }}" id="s_{{ t.id }}" class="ta-status-select st-{{ current|lower }}">
+                  {% for status in ['Present','Absent','Late','Leave'] %}
+                  <option value="{{ status }}" {% if current == status %}selected{% endif %}>
+                    {% if status == 'Present' %}✓ Present{% elif status == 'Absent' %}✗ Absent{% elif status == 'Late' %}⏰ Late{% else %}🏖 Leave{% endif %}
+                  </option>
+                  {% endfor %}
+                </select>
               </div>
             </td>
           </tr>
@@ -394,33 +395,35 @@
 </div>
 
 <script>
-function styleAllTabs() {
-  document.querySelectorAll('.ta-stabs').forEach(group => {
-    group.querySelectorAll('input[type=radio]').forEach(r => {
-      const lbl = group.querySelector('label[for="' + r.id + '"]');
-      if (!lbl) return;
-      lbl.className = 'ta-stab';
-      if (r.checked) lbl.classList.add('sel-' + r.value.toLowerCase());
-    });
+function styleSelect(sel) {
+  sel.classList.remove('st-present', 'st-absent', 'st-late', 'st-leave');
+  sel.classList.add('st-' + sel.value.toLowerCase());
+}
+
+function styleAllSelects() {
+  document.querySelectorAll('.ta-status-select').forEach(sel => styleSelect(sel));
+  updateCounts();
+}
+
+document.querySelectorAll('.ta-status-select').forEach(sel => {
+  sel.addEventListener('change', function () {
+    styleSelect(this);
+    updateCounts();
+  });
+});
+
+function markAll(status) {
+  document.querySelectorAll('.ta-status-select').forEach(sel => {
+    sel.value = status;
+    styleSelect(sel);
   });
   updateCounts();
 }
 
-document.querySelectorAll('.ta-stabs input[type=radio]').forEach(r => {
-  r.addEventListener('change', styleAllTabs);
-});
-
-function markAll(status) {
-  document.querySelectorAll('input[type=radio][value="' + status + '"]').forEach(r => {
-    r.checked = true;
-  });
-  styleAllTabs();
-}
-
 function updateCounts() {
   var counts = { Present: 0, Absent: 0, Late: 0, Leave: 0 };
-  document.querySelectorAll('.ta-stabs input[type=radio]:checked').forEach(r => {
-    if (counts[r.value] !== undefined) counts[r.value]++;
+  document.querySelectorAll('.ta-status-select').forEach(sel => {
+    if (counts[sel.value] !== undefined) counts[sel.value]++;
   });
   document.getElementById('cnt_present').textContent = counts.Present;
   document.getElementById('cnt_absent').textContent  = counts.Absent;
@@ -435,7 +438,7 @@ document.getElementById('att_date').addEventListener('change', function () {
   form.submit();
 });
 
-styleAllTabs();
+styleAllSelects();
 </script>
 
 {% endblock %}
