@@ -3,103 +3,263 @@
 
 {% block extra_css %}
 <style>
-    /* Custom table styles with borders */
-    .table-bordered-custom {
-        width: 100%;
-        border-collapse: collapse;
+    /* ===== Global Palette ===== */
+    :root {
+        --sky-dark: #0369a1;
+        --sky: #0ea5e9;
+        --sky-light: #38bdf8;
+        --sky-lighter: #e0f2fe;
+        --sky-text: #0284c7;
     }
 
-    .table-bordered-custom th,
-    .table-bordered-custom td {
-        border: 1px solid #dee2e6 !important;
-        padding: 12px;
-        vertical-align: middle;
+    body, .main-content, .container-fluid, .dashboard-container {
+        background-color: #ffffff !important;
     }
 
-    .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
-        color: white;
-        border: 1px solid #2c6e9e !important;
-        font-weight: 600;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    /* ===== Page Heading ===== */
+    .page-heading {
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--sky-dark);
+        letter-spacing: 0.2px;
     }
 
-    .table-bordered-custom tbody tr:nth-child(even) {
-        background-color: #f8fafc;
+    .page-heading i {
+        color: var(--sky);
+        font-size: 30px;
+        margin-right: 6px;
     }
 
-    .table-bordered-custom tbody tr:hover {
-        background-color: #e8f1f8;
-        cursor: pointer;
-    }
-
-    .table-bordered-custom td:first-child {
-        font-weight: 700;
-        color: #c6a43b;
-        text-align: center;
-        width: 50px;
-    }
-
-    /* Form Card Styling */
+    /* ===== Assign Teacher Form Card ===== */
     .form-card {
         background: white;
-        border-radius: 12px;
+        border-radius: 14px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.10);
         overflow: hidden;
+        font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+        transition: box-shadow 0.25s ease;
+    }
+
+    .form-card:hover {
+        box-shadow: 0 8px 22px rgba(14, 165, 233, 0.18);
     }
 
     .form-card-header {
-        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 55%, var(--sky-light) 100%);
         color: white;
-        padding: 15px 20px;
-        border-bottom: 1px solid #2c6e9e;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--sky-light);
     }
 
     .form-card-header h5 {
         margin: 0;
         color: white;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.3px;
     }
 
-    /* Badge Styles */
-    .badge-primary-teacher {
-        background: #fef3c7;
-        color: #d97706;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
+    .form-card .card-body {
+        padding: 26px 24px 24px 24px;
+    }
+
+    .form-card .form-label {
+        font-size: 13.5px;
+        color: #1e293b;
+        margin-bottom: 8px;
         font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
     }
 
-    .badge-subject-teacher {
-        background: #e2e8f0;
-        color: #475569;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
+    .form-card .form-label i {
+        color: var(--sky);
+        margin-right: 4px;
+    }
+
+    .form-card .mb-3 {
+        margin-bottom: 20px !important;
+    }
+
+    .form-card .form-select {
+        border: 1.5px solid #dbe7f0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-card .form-select:focus {
+        border-color: var(--sky);
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+    }
+
+    .form-card .form-text {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 6px;
+    }
+
+    .form-card .form-check {
+        background: var(--sky-lighter);
+        border-radius: 10px;
+        padding: 12px 14px 12px 40px;
+        margin-bottom: 22px !important;
+    }
+
+    .form-card .form-check-input:checked {
+        background-color: var(--sky);
+        border-color: var(--sky);
+    }
+
+    .form-card .form-check-label {
+        font-size: 14px;
+        color: #1e293b;
+    }
+
+    .form-card .form-check .form-text {
+        margin-left: 0;
+    }
+
+    /* Buttons inside assign card -> sky blue */
+    .form-card .btn-primary,
+    .form-card button[type="submit"] {
+        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 100%);
+        border: none;
         font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
+        font-size: 14.5px;
+        padding: 11px 18px;
+        border-radius: 9px;
+        letter-spacing: 0.3px;
+        box-shadow: 0 3px 10px rgba(14, 165, 233, 0.30);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    /* Select multiple styling */
+    .form-card .btn-primary:hover,
+    .form-card button[type="submit"]:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(14, 165, 233, 0.40);
+        background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
+    }
+
+    /* Refresh button -> sky blue outline */
+    .btn-outline-secondary {
+        color: var(--sky-dark) !important;
+        border-color: var(--sky) !important;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .btn-outline-secondary:hover {
+        background: var(--sky) !important;
+        border-color: var(--sky) !important;
+        color: white !important;
+    }
+
     select[multiple] {
         min-height: 150px;
     }
 
     select[multiple] option {
         padding: 8px 10px;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid #eef2f6;
+    }
+
+    select[multiple] option:checked {
+        background: var(--sky-lighter) linear-gradient(0deg, var(--sky-lighter) 0%, var(--sky-lighter) 100%);
+        color: var(--sky-dark);
     }
 
     select[multiple] option:hover {
-        background: #e8f1f8;
+        background: var(--sky-lighter);
+    }
+
+    /* ===== Stat Row (Total / Class Teachers / Subject Teachers) ===== */
+    .stat-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .stat-box {
+        flex: 1;
+        border: none;
+        border-radius: 10px;
+        text-align: center;
+        padding: 10px 6px;
+    }
+
+    .stat-box i {
+        font-size: 16px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .stat-box h6, .stat-box small {
+        font-size: 10.5px;
+    }
+
+    .stat-box h3, .stat-box h4 {
+        font-size: 20px;
+        margin: 2px 0 0 0;
+    }
+
+    .stat-total {
+        background: rgba(14, 165, 233, 0.10);
+    }
+
+    .stat-total i, .stat-total h3 { color: var(--sky-dark); }
+
+    .stat-class-teachers {
+        background: #fef3c7;
+    }
+
+    .stat-class-teachers h4 { color: #d97706; }
+
+    .stat-subject-teachers {
+        background: var(--sky-lighter);
+    }
+
+    .stat-subject-teachers h4 { color: var(--sky-dark); }
+
+    /* ===== Table Styling ===== */
+    .table-bordered-custom {
+        width: 100%;
+        border-collapse: collapse;
+        background: #ffffff;
+    }
+
+    .table-bordered-custom th,
+    .table-bordered-custom td {
+        border: 1px solid #eef2f6 !important;
+        padding: 12px;
+        vertical-align: middle;
+        background: #ffffff;
+    }
+
+    .table-bordered-custom thead th {
+        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 60%, var(--sky-light) 100%);
+        color: white;
+        border: 1px solid var(--sky-light) !important;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-bordered-custom tbody tr {
+        background-color: #ffffff;
+    }
+
+    .table-bordered-custom tbody tr:hover {
+        background-color: var(--sky-lighter);
+        cursor: pointer;
+    }
+
+    .table-bordered-custom td:first-child {
+        font-weight: 700;
+        color: var(--sky-dark);
+        text-align: center;
+        width: 50px;
     }
 
     /* Responsive */
@@ -109,13 +269,9 @@
             padding: 8px;
             font-size: 12px;
         }
-    }
-    .dashboard-container {
-        background-color: #ffffff !important;
-    }
-
-    body, .main-content, .container-fluid {
-        background-color: #ffffff !important;
+        .stat-row {
+            flex-wrap: wrap;
+        }
     }
 </style>
 {% endblock %}
@@ -123,8 +279,8 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0">
-        <i class="fas fa-chalkboard-teacher" style="color: #c6a43b;"></i> Teacher-Class Assignments
+    <h2 class="page-heading mb-0">
+        <i class="fas fa-chalkboard-teacher"></i> Teacher-Class Assignments
     </h2>
     <div>
         <button class="btn btn-outline-secondary" onclick="window.location.reload()">
@@ -142,10 +298,10 @@
                     <i class="fas fa-user-plus"></i> Assign Teacher to Class
                 </h5>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body">
                 <form method="POST">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">
+                        <label class="form-label">
                             <i class="fas fa-user"></i> Teacher <span class="text-danger">*</span>
                         </label>
                         <select name="teacher_id" class="form-select" required>
@@ -157,7 +313,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">
+                        <label class="form-label">
                             <i class="fas fa-door-open"></i> Classes <span class="text-danger">*</span>
                         </label>
                         <select name="class_ids" class="form-select" multiple size="5" required>
@@ -172,7 +328,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-4 form-check">
+                    <div class="form-check">
                         <input type="checkbox" name="is_primary" value="1" class="form-check-input" id="isPrimary">
                         <label class="form-check-label fw-semibold" for="isPrimary">
                             <i class="fas fa-star" style="color: #f59e0b;"></i> Set as Class Teacher (Primary)
@@ -187,25 +343,34 @@
             </div>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="card mt-3 bg-primary bg-opacity-10 border-0">
-            <div class="card-body text-center">
-                <i class="fas fa-users fa-2x text-primary mb-2 d-block"></i>
-                <h6 class="mb-0">Total Assignments</h6>
-                <h3 class="text-primary">{{ assignments|length }}</h3>
-                <small class="text-muted">{{ teachers|length }} Teachers | {{ classes|length }} Classes</small>
+        <!-- Quick Stats: single row, reduced width -->
+        <div class="stat-row">
+            <div class="stat-box stat-total">
+                <i class="fas fa-users"></i>
+                <h6 class="mb-0">Total</h6>
+                <h3 class="mb-0">{{ assignments|length }}</h3>
+            </div>
+            <div class="stat-box stat-class-teachers">
+                <i class="fas fa-star" style="color:#d97706;"></i>
+                <small class="text-muted d-block">Class Tchr</small>
+                <h4 class="mb-0">{{ assignments|selectattr('is_primary')|list|length }}</h4>
+            </div>
+            <div class="stat-box stat-subject-teachers">
+                <i class="fas fa-book" style="color: var(--sky-dark);"></i>
+                <small class="text-muted d-block">Subject Tchr</small>
+                <h4 class="mb-0">{{ assignments|rejectattr('is_primary')|list|length }}</h4>
             </div>
         </div>
     </div>
 
-    <!-- Assignments List with Borders -->
+    <!-- Assignments List -->
     <div class="col-md-8">
         <div class="card shadow-sm">
             <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-semibold">
-                    <i class="fas fa-list-check"></i> Current Assignments
+                    <i class="fas fa-list-check" style="color: var(--sky-dark);"></i> Current Assignments
                 </h5>
-                <span class="badge bg-primary rounded-pill">{{ assignments|length }} Total</span>
+                <span class="badge rounded-pill" style="background: var(--sky);">{{ assignments|length }} Total</span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -225,7 +390,7 @@
                             <tr>
                                 <td>{{ loop.index }}</td>
                                 <td class="fw-semibold">
-                                    <i class="fas fa-chalkboard-user" style="color: #c6a43b;"></i>
+                                    <i class="fas fa-chalkboard-user" style="color: var(--sky-dark);"></i>
                                     {{ a.teacher_name }}
                                 </td>
                                 <td>
@@ -273,28 +438,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Assignment Summary Cards -->
-        {% if assignments %}
-        <div class="row mt-3 g-2">
-            <div class="col-6">
-                <div class="card border-0 bg-warning bg-opacity-10 text-center p-2">
-                    <small class="text-muted">Class Teachers</small>
-                    <h4 class="mb-0 text-warning">
-                        {{ assignments|selectattr('is_primary')|list|length }}
-                    </h4>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="card border-0 bg-info bg-opacity-10 text-center p-2">
-                    <small class="text-muted">Subject Teachers</small>
-                    <h4 class="mb-0 text-info">
-                        {{ assignments|rejectattr('is_primary')|list|length }}
-                    </h4>
-                </div>
-            </div>
-        </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -305,7 +448,6 @@
     document.querySelectorAll('.table-bordered-custom tbody tr').forEach(row => {
         row.addEventListener('click', function(e) {
             if (!e.target.closest('.btn')) {
-                // Optional: Show assignment details
                 const teacherName = this.cells[1]?.innerText;
                 if (teacherName) {
                     console.log('Selected assignment for:', teacherName);
