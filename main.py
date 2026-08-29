@@ -3854,6 +3854,61 @@ def download_students_template():
         as_attachment=True,
         download_name=f'students_template_{school_id}{fname_suffix}.xlsx')
 
+
+
+@app.route('/salary/pay', methods=['GET', 'POST'])
+@login_required
+@school_admin_only_required
+def pay_salary():
+    school_id = session.get('active_school_id', session.get('school_id'))
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, full_name, salary FROM teachers WHERE school_id=%s ORDER BY full_name", (school_id,))
+    teachers = fetchall_dict(c)
+
+    if request.method == 'POST':
+        teacher_id     = request.form.get('teacher_id')
+        month          = request.form.get('month')
+        year           = request.form.get('year')
+        paid_amount    = request.form.get('paid_amount')
+        payment_date   = request.form.get('payment_date') or datetime.date.today()
+        payment_mode   = request.form.get('payment_mode')  # 'Cash' or 'Bank Transfer'
+        bank_ref       = request.form.get('bank_account_reference', '') or None
+        bank_detail    = request.form.get('bank_account_detail', '') or None
+        remarks        = request.form.get('remarks', '')
+
+        if payment_mode != 'Bank Transfer':
+            bank_ref = None
+            bank_detail = None
+
+        receipt_number = f"SAL-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+
+        try:
+            c.execute("""
+                INSERT INTO teacher_salary_payments
+                (teacher_id, school_id, month, year, paid_amount, payment_date,
+                 payment_mode, bank_account_reference, bank_account_detail,
+                 remarks, receipt_number, paid_by, created_by)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """, (teacher_id, school_id, month, year, paid_amount, payment_date,
+                  payment_mode, bank_ref, bank_detail,
+                  remarks, receipt_number, session['user_id'], session['user_id']))
+            conn.commit()
+            flash('Salary payment save ho gayi!', 'success')
+        except psycopg2.IntegrityError:
+            conn.rollback()
+            flash('Is teacher ki is month/year ki salary pehle se record ho chuki hai!', 'error')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Error: {str(e)}', 'error')
+        finally:
+            conn.close()
+
+        return redirect(url_for('pay_salary'))
+
+    conn.close()
+    return render_template('salary_form.html', teachers=teachers, now=datetime.datetime.now())
+
 if __name__ == "__main__":
     init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)
