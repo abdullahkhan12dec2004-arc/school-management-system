@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% block title %}Pay Teacher Salary{% endblock %}
+
+{% block content %}
+<style>
+    .salary-card {
+        max-width: 720px;
+        margin: 30px auto;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    .salary-card-header {
+        background: linear-gradient(135deg, #2E9BE6, #1F6FD6);
+        color: #fff;
+        padding: 20px 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .salary-card-header .icon-box {
+        width: 42px;
+        height: 42px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    .salary-card-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+    }
+    .salary-card-header p {
+        margin: 2px 0 0;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+    .salary-card-body {
+        padding: 28px;
+    }
+    .form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group label {
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    .form-group label .req {
+        color: #e74c3c;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        border: 1px solid #d5dbe3;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #222;
+        background: #fafbfc;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #2E9BE6;
+        background: #fff;
+    }
+    #bank_fields {
+        display: none;
+        background: #f4f8fc;
+        border: 1px dashed #b9d7f2;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 18px;
+    }
+    #bank_fields.show {
+        display: block;
+    }
+    .section-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1F6FD6;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+    }
+    .btn-submit {
+        background: #2E9BE6;
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-submit:hover {
+        background: #1F6FD6;
+    }
+    .btn-cancel {
+        background: #eef1f4;
+        color: #555;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+    .form-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+    .alert {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+    .alert-success { background: #e3f8e9; color: #1e7d3c; border: 1px solid #b3e8c4; }
+    .alert-error   { background: #fdeaea; color: #c0392b; border: 1px solid #f5c2c0; }
+    .alert-info    { background: #eaf4fd; color: #1a5fa0; border: 1px solid #bfe0f8; }
+</style>
+
+<div class="salary-card">
+    <div class="salary-card-header">
+        <div class="icon-box">💰</div>
+        <div>
+            <h2>Pay Teacher Salary</h2>
+            <p>Month/salary payment record karein — cash ya bank transfer ke sath</p>
+        </div>
+    </div>
+
+    <div class="salary-card-body">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ 'success' if category=='success' else ('info' if category=='info' else 'error') }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" id="salaryForm">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Teacher <span class="req">*</span></label>
+                    <select name="teacher_id" required>
+                        <option value="">-- Select Teacher --</option>
+                        {% for t in teachers %}
+                            <option value="{{ t.id }}" data-salary="{{ t.salary or '' }}">
+                                {{ t.full_name }}{% if t.salary %} (Base: {{ t.salary }}){% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Month <span class="req">*</span></label>
+                    <select name="month" required>
+                        <option value="">-- Select Month --</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Year <span class="req">*</span></label>
+                    <select name="year" required>
+                        {% set current_year = now.year %}
+                        {% for y in range(current_year - 2, current_year + 2) %}
+                            <option value="{{ y }}" {% if y == current_year %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Salary Amount (PKR) <span class="req">*</span></label>
+                    <input type="number" name="paid_amount" step="0.01" min="0" placeholder="e.g. 45000" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Date <span class="req">*</span></label>
+                    <input type="date" name="payment_date" value="{{ now.strftime('%Y-%m-%d') }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Mode of Payment <span class="req">*</span></label>
+                    <select name="payment_mode" id="payment_mode" required onchange="toggleBankFields()">
+                        <option value="">-- Select Mode --</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="bank_fields">
+                <div class="section-label">Bank Transfer Details</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Bank Account Reference No.</label>
+                        <input type="text" name="bank_account_reference" placeholder="e.g. TXN-2026-00123">
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Account Detail</label>
+                        <input type="text" name="bank_account_detail" placeholder="e.g. HBL - Acc# 0123456789">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Remarks (Optional)</label>
+                    <textarea name="remarks" rows="2" placeholder="Koi additional note..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <a href="{{ url_for('dashboard') }}" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">Save Salary Payment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleBankFields() {
+    var mode = document.getElementById('payment_mode').value;
+    var bankFields = document.getElementById('bank_fields');
+    if (mode === 'Bank Transfer') {
+        bankFields.classList.add('show');
+    } else {
+        bankFields.classList.remove('show');
+        // clear values if hidden so they don't get submitted accidentally
+        bankFields.querySelectorAll('input').forEach(function(el) { el.value = ''; });
+    }
+}
+// run once on load in case of validation re-render
+document.addEventListener('DOMContentLoaded', toggleBankFields);
+</script>
+{% endblock %}
