@@ -3894,10 +3894,10 @@ def pay_salary():
                   payment_mode, bank_ref, bank_detail,
                   remarks, receipt_number, session['user_id'], session['user_id']))
             conn.commit()
-            flash('Salary payment save ho gayi!', 'success')
+            flash('Salary payment has been saved successfully!', 'success')
         except psycopg2.IntegrityError:
             conn.rollback()
-            flash('Is teacher ki is month/year ki salary pehle se record ho chuki hai!', 'error')
+            flash('This teacher’s salary for this month/year has already been recorded!', 'error')
         except Exception as e:
             conn.rollback()
             flash(f'Error: {str(e)}', 'error')
