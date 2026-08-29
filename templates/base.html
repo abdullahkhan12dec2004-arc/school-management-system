@@ -1014,6 +1014,9 @@
         <a href="{{ url_for('fee_collection') }}" class="nav-item {% if request.endpoint == 'fee_collection' %}active{% endif %}">
             <i class="fas fa-money-bill-wave"></i> Fee Collection
         </a>
+        <a href="{{ url_for('pay_salary') }}" class="nav-item {% if request.endpoint == 'pay_salary' %}active{% endif %}">
+           <i class="fas fa-hand-holding-usd"></i> Teacher Salary
+        </a>
         <a href="/reports" class="nav-item {% if request.endpoint == 'reports_bp.reports' %}active{% endif %}">
             <i class="fas fa-file-excel"></i> Reports
         </a>
