@@ -31,6 +31,8 @@
         --gray-600: #475569;
         --gray-700: #334155;
         --gray-800: #1e293b;
+        --sky-blue: #38bdf8;
+        --sky-blue-dark: #0ea5e9;
         --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
@@ -47,29 +49,49 @@
         padding: 1rem 0;
     }
 
-    /* Page Header */
+    /* Page Header - image jaisa blue banner style */
     .page-header-modern {
         margin-bottom: 1.75rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid var(--gray-200);
+        padding: 1.25rem 1.75rem;
+        border-radius: var(--radius-xl);
+        background: linear-gradient(135deg, #1d9bf0 0%, #38bdf8 100%);
+        box-shadow: var(--shadow-lg);
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .page-title-modern {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: 700;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+        color: #ffffff;
+        background: none;
+        -webkit-background-clip: unset;
+        background-clip: unset;
         display: inline-flex;
         align-items: center;
         gap: 0.75rem;
     }
 
+    .page-title-modern i {
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.22);
+        border-radius: var(--radius-lg);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
     .page-sub-modern {
-        color: var(--gray-500);
+        color: rgba(255, 255, 255, 0.9);
         margin-top: 0.25rem;
-        font-size: 0.875rem;
+        font-size: 0.85rem;
+        width: 100%;
     }
 
     /* Stats Grid */
@@ -189,14 +211,16 @@
         vertical-align: middle;
     }
 
+    /* Table Header - Sky Blue */
     .user-table-modern thead th {
-        background: var(--gray-50);
-        color: var(--gray-600);
+        background: linear-gradient(135deg, var(--sky-blue) 0%, var(--sky-blue-dark) 100%);
+        color: #ffffff;
         font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.8px;
-        border-bottom: 2px solid var(--gray-200);
+        border-bottom: 2px solid var(--sky-blue-dark);
+        border-color: var(--sky-blue-dark);
     }
 
     .user-table-modern tbody tr {
