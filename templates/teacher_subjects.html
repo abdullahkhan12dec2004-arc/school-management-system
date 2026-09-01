@@ -3,13 +3,13 @@
 
 {% block extra_css %}
 <style>
-    /* ===== PROFESSIONAL TEACHER SUBJECT ASSIGNMENT STYLES ===== */
+    /* ===== PROFESSIONAL TEACHER SUBJECT ASSIGNMENT STYLES (SKY BLUE THEME) ===== */
 
     :root {
-        --primary-dark: #0f2b3d;
-        --primary: #1a4a6f;
-        --primary-light: #2c6e9e;
-        --primary-bg: #e8f1f8;
+        --primary-dark: #0284c7;   /* sky-600 (was navy) */
+        --primary: #0ea5e9;        /* sky-500 (was navy) */
+        --primary-light: #38bdf8;  /* sky-400 (was navy-light) */
+        --primary-bg: #e0f2fe;     /* sky-100 */
         --secondary: #c6a43b;
         --secondary-dark: #a07d2a;
         --secondary-light: #e0c87c;
@@ -41,30 +41,54 @@
     /* Page Container */
     .assign-page {
         padding: 1rem 0;
+        background: #ffffff;
     }
 
-    /* Page Header */
+    /* ===== Page Header — sky blue banner (matches reference image) ===== */
     .page-header-modern {
         margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid var(--gray-200);
+        padding: 1.25rem 1.75rem;
+        border-bottom: none;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: var(--shadow-md);
+        flex-wrap: wrap;
+    }
+
+    .page-header-icon-modern {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        color: #ffffff;
+    }
+
+    .page-header-text-modern {
+        display: flex;
+        flex-direction: column;
     }
 
     .page-title-modern {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: 700;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
+        color: #ffffff;
+        background: none;
+        -webkit-background-clip: unset;
+        background-clip: unset;
+        display: block;
     }
 
     .page-sub-modern {
-        color: var(--gray-500);
-        margin-top: 0.25rem;
+        color: rgba(255, 255, 255, 0.85);
+        margin-top: 0.15rem;
         font-size: 0.875rem;
     }
 
@@ -115,7 +139,7 @@
 
     .field-modern label i {
         margin-right: 0.25rem;
-        color: var(--secondary);
+        color: var(--primary);
     }
 
     .field-modern select,
@@ -132,12 +156,12 @@
     .field-modern input:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.1);
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
     }
 
-    /* Teacher Card */
+    /* Teacher Card — sky blue gradient */
     .teacher-card-modern {
-        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
         border-radius: var(--radius-xl);
         padding: 1.25rem 1.5rem;
         margin-bottom: 1.5rem;
@@ -152,14 +176,14 @@
     .teacher-avatar-modern {
         width: 64px;
         height: 64px;
-        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+        background: rgba(255, 255, 255, 0.25);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.75rem;
         font-weight: 700;
-        color: var(--primary-dark);
+        color: #ffffff;
     }
 
     .teacher-meta-modern {
@@ -174,7 +198,7 @@
 
     .teacher-detail-modern {
         font-size: 0.75rem;
-        opacity: 0.8;
+        opacity: 0.9;
     }
 
     .teacher-stats-modern {
@@ -189,13 +213,13 @@
     .t-stat-val-modern {
         font-size: 1.5rem;
         font-weight: 700;
-        color: var(--secondary-light);
+        color: #ffffff;
     }
 
     .t-stat-lbl-modern {
         font-size: 0.65rem;
         text-transform: uppercase;
-        opacity: 0.7;
+        opacity: 0.85;
     }
 
     /* Existing Section */
@@ -207,27 +231,32 @@
         overflow: hidden;
     }
 
+    /* Section headers — sky blue banner (Existing Subjects / Assign New Subjects) */
     .section-header-modern {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 1rem 1.25rem;
-        background: var(--gray-50);
-        border-bottom: 1px solid var(--gray-200);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        border-bottom: none;
         flex-wrap: wrap;
         gap: 0.75rem;
     }
 
     .section-title-modern {
         font-weight: 600;
-        color: var(--gray-700);
+        color: #ffffff;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
+    .section-title-modern i {
+        color: #ffffff;
+    }
+
     .count-pill-modern {
-        background: var(--primary);
+        background: rgba(255, 255, 255, 0.3);
         color: white;
         padding: 0.125rem 0.5rem;
         border-radius: 20px;
@@ -251,7 +280,7 @@
         gap: 0.75rem;
         font-size: 0.875rem;
         font-weight: 500;
-        color: var(--primary);
+        color: var(--primary-dark);
         transition: all 0.2s ease;
     }
 
@@ -303,8 +332,9 @@
         vertical-align: middle;
     }
 
+    /* Table header — sky blue */
     .assign-table-modern thead th {
-        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         font-size: 0.7rem;
         font-weight: 600;
@@ -326,7 +356,7 @@
 
     .row-num-modern {
         font-weight: 600;
-        color: var(--secondary);
+        color: var(--primary);
         text-align: center;
     }
 
@@ -342,7 +372,7 @@
     .cell-input-modern:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(26, 74, 111, 0.1);
+        box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
     }
 
     .cell-input-modern.has-value {
@@ -450,6 +480,12 @@
         color: white;
     }
 
+    .btn-primary-modern i,
+    .btn-success-modern i,
+    .btn-danger-modern i {
+        color: #ffffff;
+    }
+
     .btn-success-modern {
         background: var(--success);
         color: white;
@@ -462,19 +498,19 @@
     }
 
     .btn-ghost-modern:hover {
-        border-color: var(--danger);
-        color: var(--danger);
+        border-color: var(--primary);
+        color: var(--primary);
     }
 
     .btn-danger-modern {
-        background: var(--danger-light);
-        color: var(--danger);
-        border: 1px solid var(--danger-light);
+        background: var(--danger);
+        color: white;
+        border: 1px solid var(--danger);
     }
 
     .btn-danger-modern:hover {
-        background: var(--danger);
-        color: white;
+        background: var(--danger-light);
+        color: var(--danger);
     }
 
     /* Loading Spinner */
@@ -500,6 +536,11 @@
         }
 
         .teacher-card-modern {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .page-header-modern {
             flex-direction: column;
             text-align: center;
         }
@@ -531,13 +572,14 @@
 
 <div class="assign-page">
 
-    <!-- Page Header -->
+    <!-- Page Header (sky blue banner, matches reference design) -->
     <div class="page-header-modern">
-        <div class="page-title-modern">
-            <i class="fas fa-chalkboard-teacher"></i> Teacher Subjects
+        <div class="page-header-icon-modern">
+            <i class="fas fa-chalkboard-teacher"></i>
         </div>
-        <div class="page-sub-modern">
-            Select a teacher, then assign multiple subjects at once
+        <div class="page-header-text-modern">
+            <div class="page-title-modern">Teacher Subjects</div>
+            <div class="page-sub-modern">Select a teacher, then assign multiple subjects at once</div>
         </div>
     </div>
 
@@ -624,7 +666,7 @@
     <div class="existing-section-modern" id="existing-section" style="display: none;">
         <div class="section-header-modern">
             <div class="section-title-modern">
-                <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                <i class="fas fa-check-circle"></i>
                 Previously Assigned Subjects
                 <span class="count-pill-modern" id="existing-count-pill">0</span>
             </div>
@@ -639,7 +681,7 @@
     <div class="entry-section-modern" id="entry-section" style="display: none;">
         <div class="section-header-modern">
             <div class="section-title-modern">
-                <i class="fas fa-plus-circle" style="color: var(--success);"></i>
+                <i class="fas fa-plus-circle"></i>
                 Assign New Subjects
                 <span class="count-pill-modern" id="new-count-pill">0</span>
             </div>
