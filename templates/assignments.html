@@ -13,24 +13,129 @@
     }
 
     body, .main-content, .container-fluid, .dashboard-container {
-        background-color: #ffffff !important;
+        background-color: #f8fafc !important;
     }
 
-    /* ===== Page Heading ===== */
-    .page-heading {
-        font-size: 30px;
+    /* ===== ROW 1: Top bar - icon, heading, refresh button ===== */
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 55%, var(--sky-light) 100%);
+        border-radius: 14px;
+        padding: 20px 26px;
+        margin-bottom: 28px;
+        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.25);
+    }
+
+    .top-bar .page-heading {
+        font-size: 26px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: 0.2px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .top-bar .page-heading i {
+        background: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+        font-size: 20px;
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+    }
+
+    .top-bar .btn-refresh {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1.5px solid rgba(255, 255, 255, 0.55);
+        color: #ffffff !important;
+        font-weight: 600;
+        border-radius: 9px;
+        padding: 10px 18px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .top-bar .btn-refresh:hover {
+        background: rgba(255, 255, 255, 0.28);
+        border-color: #ffffff;
+        color: #ffffff !important;
+        transform: translateY(-1px);
+    }
+
+    /* ===== ROW 2: Stat Cards ===== */
+    .stats-row {
+        display: flex;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .stat-card {
+        flex: 1;
+        background: #ffffff;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.10);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.18);
+    }
+
+    .stat-card-header {
+        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 60%, var(--sky-light) 100%);
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .stat-card-header i {
+        color: #ffffff;
+        font-size: 15px;
+    }
+
+    .stat-card-header span {
+        color: #ffffff;
+        font-size: 12.5px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+
+    .stat-card-body {
+        background: #ffffff;
+        padding: 18px 16px;
+        text-align: center;
+    }
+
+    .stat-card-body h3 {
+        font-size: 32px;
         font-weight: 800;
         color: var(--sky-dark);
-        letter-spacing: 0.2px;
+        margin: 0;
     }
 
-    .page-heading i {
-        color: var(--sky);
-        font-size: 30px;
-        margin-right: 6px;
+    .stat-card-body small {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
     }
 
-    /* ===== Assign Teacher Form Card ===== */
+    /* ===== ROW 3: Assign Teacher Form ===== */
+    .form-section-row {
+        margin-bottom: 28px;
+    }
+
     .form-card {
         background: white;
         border-radius: 14px;
@@ -120,7 +225,6 @@
         margin-left: 0;
     }
 
-    /* Buttons inside assign card -> sky blue */
     .form-card .btn-primary,
     .form-card button[type="submit"] {
         background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 100%);
@@ -141,20 +245,6 @@
         background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
     }
 
-    /* Refresh button -> sky blue outline */
-    .btn-outline-secondary {
-        color: var(--sky-dark) !important;
-        border-color: var(--sky) !important;
-        font-weight: 600;
-        border-radius: 8px;
-    }
-
-    .btn-outline-secondary:hover {
-        background: var(--sky) !important;
-        border-color: var(--sky) !important;
-        color: white !important;
-    }
-
     select[multiple] {
         min-height: 150px;
     }
@@ -173,53 +263,41 @@
         background: var(--sky-lighter);
     }
 
-    /* ===== Stat Row (Total / Class Teachers / Subject Teachers) ===== */
-    .stat-row {
+    /* ===== Assignments List Card ===== */
+    .assignments-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.10);
+        overflow: hidden;
+    }
+
+    .assignments-card-header {
+        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 55%, var(--sky-light) 100%);
+        padding: 16px 22px;
         display: flex;
-        gap: 10px;
-        margin-top: 14px;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    .stat-box {
-        flex: 1;
-        border: none;
-        border-radius: 10px;
-        text-align: center;
-        padding: 10px 6px;
-    }
-
-    .stat-box i {
+    .assignments-card-header h5 {
+        margin: 0;
+        color: #ffffff;
+        font-weight: 700;
         font-size: 16px;
-        display: block;
-        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .stat-box h6, .stat-box small {
-        font-size: 10.5px;
+    .assignments-card-header .badge-count {
+        background: rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 12.5px;
+        padding: 6px 14px;
+        border-radius: 999px;
     }
-
-    .stat-box h3, .stat-box h4 {
-        font-size: 20px;
-        margin: 2px 0 0 0;
-    }
-
-    .stat-total {
-        background: rgba(14, 165, 233, 0.10);
-    }
-
-    .stat-total i, .stat-total h3 { color: var(--sky-dark); }
-
-    .stat-class-teachers {
-        background: #fef3c7;
-    }
-
-    .stat-class-teachers h4 { color: #d97706; }
-
-    .stat-subject-teachers {
-        background: var(--sky-lighter);
-    }
-
-    .stat-subject-teachers h4 { color: var(--sky-dark); }
 
     /* ===== Table Styling ===== */
     .table-bordered-custom {
@@ -237,11 +315,11 @@
     }
 
     .table-bordered-custom thead th {
-        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 60%, var(--sky-light) 100%);
-        color: white;
-        border: 1px solid var(--sky-light) !important;
-        font-weight: 600;
-        font-size: 13px;
+        background: var(--sky-lighter);
+        color: var(--sky-dark);
+        border: 1px solid #d6ecfa !important;
+        font-weight: 700;
+        font-size: 12.5px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -262,6 +340,30 @@
         width: 50px;
     }
 
+    .badge-primary-teacher {
+        background: #fef3c7;
+        color: #d97706;
+        font-weight: 700;
+        font-size: 11.5px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .badge-subject-teacher {
+        background: var(--sky-lighter);
+        color: var(--sky-dark);
+        font-weight: 700;
+        font-size: 11.5px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .table-bordered-custom th,
@@ -269,8 +371,12 @@
             padding: 8px;
             font-size: 12px;
         }
-        .stat-row {
+        .stats-row {
             flex-wrap: wrap;
+        }
+        .top-bar {
+            flex-wrap: wrap;
+            gap: 14px;
         }
     }
 </style>
@@ -278,29 +384,64 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="page-heading mb-0">
+<!-- ROW 1: Icon + Heading (left) + Refresh (right) -->
+<div class="top-bar">
+    <h2 class="page-heading">
         <i class="fas fa-chalkboard-teacher"></i> Teacher-Class Assignments
     </h2>
-    <div>
-        <button class="btn btn-outline-secondary" onclick="window.location.reload()">
-            <i class="fas fa-sync-alt"></i> Refresh
-        </button>
+    <button class="btn btn-refresh" onclick="window.location.reload()">
+        <i class="fas fa-sync-alt"></i> Refresh
+    </button>
+</div>
+
+<!-- ROW 2: Stat Cards -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <i class="fas fa-users"></i>
+            <span>Total</span>
+        </div>
+        <div class="stat-card-body">
+            <h3>{{ assignments|length }}</h3>
+            <small>Total Assignments</small>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <i class="fas fa-star"></i>
+            <span>Class Teacher</span>
+        </div>
+        <div class="stat-card-body">
+            <h3>{{ assignments|selectattr('is_primary')|list|length }}</h3>
+            <small>Class Teachers</small>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <i class="fas fa-book"></i>
+            <span>Subject Teacher</span>
+        </div>
+        <div class="stat-card-body">
+            <h3>{{ assignments|rejectattr('is_primary')|list|length }}</h3>
+            <small>Subject Teachers</small>
+        </div>
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Assignment Form -->
-    <div class="col-md-4">
-        <div class="form-card">
-            <div class="form-card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-user-plus"></i> Assign Teacher to Class
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
+<!-- ROW 3: Assign Teacher to Class Form -->
+<div class="form-section-row">
+    <div class="form-card">
+        <div class="form-card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-user-plus"></i> Assign Teacher to Class
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">
                             <i class="fas fa-user"></i> Teacher <span class="text-danger">*</span>
                         </label>
@@ -312,7 +453,7 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">
                             <i class="fas fa-door-open"></i> Classes <span class="text-danger">*</span>
                         </label>
@@ -327,116 +468,95 @@
                             <i class="fas fa-info-circle"></i> Hold <kbd>Ctrl</kbd> to select multiple classes
                         </div>
                     </div>
+                </div>
 
-                    <div class="form-check">
-                        <input type="checkbox" name="is_primary" value="1" class="form-check-input" id="isPrimary">
-                        <label class="form-check-label fw-semibold" for="isPrimary">
-                            <i class="fas fa-star" style="color: #f59e0b;"></i> Set as Class Teacher (Primary)
-                        </label>
-                        <div class="form-text">Class Teacher will have additional responsibilities</div>
-                    </div>
+                <div class="form-check">
+                    <input type="checkbox" name="is_primary" value="1" class="form-check-input" id="isPrimary">
+                    <label class="form-check-label fw-semibold" for="isPrimary">
+                        <i class="fas fa-star" style="color: #f59e0b;"></i> Set as Class Teacher (Primary)
+                    </label>
+                    <div class="form-text">Class Teacher will have additional responsibilities</div>
+                </div>
 
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-link"></i> Assign Teacher
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Quick Stats: single row, reduced width -->
-        <div class="stat-row">
-            <div class="stat-box stat-total">
-                <i class="fas fa-users"></i>
-                <h6 class="mb-0">Total</h6>
-                <h3 class="mb-0">{{ assignments|length }}</h3>
-            </div>
-            <div class="stat-box stat-class-teachers">
-                <i class="fas fa-star" style="color:#d97706;"></i>
-                <small class="text-muted d-block">Class Tchr</small>
-                <h4 class="mb-0">{{ assignments|selectattr('is_primary')|list|length }}</h4>
-            </div>
-            <div class="stat-box stat-subject-teachers">
-                <i class="fas fa-book" style="color: var(--sky-dark);"></i>
-                <small class="text-muted d-block">Subject Tchr</small>
-                <h4 class="mb-0">{{ assignments|rejectattr('is_primary')|list|length }}</h4>
-            </div>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-link"></i> Assign Teacher
+                </button>
+            </form>
         </div>
     </div>
+</div>
 
-    <!-- Assignments List -->
-    <div class="col-md-8">
-        <div >
-            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="fas fa-list-check" style="color: var(--sky-dark);"></i> Current Assignments
-                </h5>
-                <span class="badge rounded-pill" style="background: var(--sky);">{{ assignments|length }} Total</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table-bordered-custom">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;">#</th>
-                                <th>Teacher</th>
-                                <th>Class</th>
-                                <th>Section</th>
-                                <th>Assignment Type</th>
-                                <th style="width: 100px;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for a in assignments %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td class="fw-semibold">
-                                    <i class="fas fa-chalkboard-user" style="color: var(--sky-dark);"></i>
-                                    {{ a.teacher_name }}
-                                </td>
-                                <td>
-                                    <i class="fas fa-door-open"></i>
-                                    {{ a.class_name }}
-                                </td>
-                                <td>{{ a.section or '—' }}</td>
-                                <td>
-                                    {% if a.is_primary %}
-                                    <span class="badge-primary-teacher">
-                                        <i class="fas fa-star"></i> Class Teacher
-                                    </span>
-                                    {% else %}
-                                    <span class="badge-subject-teacher">
-                                        <i class="fas fa-book"></i> Subject Teacher
-                                    </span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    {% if a.is_primary %}
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-check-circle"></i> Active
-                                    </span>
-                                    {% else %}
-                                    <span class="badge bg-secondary">
-                                        <i class="fas fa-clock"></i> Assigned
-                                    </span>
-                                    {% endif %}
-                                </td>
-                            </tr>
+<!-- Assignments List -->
+<div class="assignments-card">
+    <div class="assignments-card-header">
+        <h5>
+            <i class="fas fa-list-check"></i> Current Assignments
+        </h5>
+        <span class="badge-count">{{ assignments|length }} Total</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-bordered-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Teacher</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Assignment Type</th>
+                        <th style="width: 100px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in assignments %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="fw-semibold">
+                            <i class="fas fa-chalkboard-user" style="color: var(--sky-dark);"></i>
+                            {{ a.teacher_name }}
+                        </td>
+                        <td>
+                            <i class="fas fa-door-open"></i>
+                            {{ a.class_name }}
+                        </td>
+                        <td>{{ a.section or '—' }}</td>
+                        <td>
+                            {% if a.is_primary %}
+                            <span class="badge-primary-teacher">
+                                <i class="fas fa-star"></i> Class Teacher
+                            </span>
                             {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <i class="fas fa-users-slash fa-3x text-muted mb-3 d-block"></i>
-                                    <p class="text-muted mb-0 fs-5">No assignments yet</p>
-                                    <small class="text-muted">Use the form to assign teachers to classes</small>
-                                    <div class="mt-3">
-                                        <i class="fas fa-arrow-left"></i> Select a teacher and classes above
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                            <span class="badge-subject-teacher">
+                                <i class="fas fa-book"></i> Subject Teacher
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if a.is_primary %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="fas fa-clock"></i> Assigned
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="fas fa-users-slash fa-3x text-muted mb-3 d-block"></i>
+                            <p class="text-muted mb-0 fs-5">No assignments yet</p>
+                            <small class="text-muted">Use the form to assign teachers to classes</small>
+                            <div class="mt-3">
+                                <i class="fas fa-arrow-left"></i> Select a teacher and classes above
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
