@@ -39,13 +39,18 @@
         --radius-lg: 0.75rem;
         --radius-xl: 1rem;
         --radius-2xl: 1.5rem;
+        /* naya shared banner gradient (image wala blue) */
+        --banner-gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     }
 
-    /* Welcome Section */
+    /* Welcome Section - ab image jaisa blue banner */
     .welcome-section-modern {
+        background: var(--banner-gradient);
+        border-radius: var(--radius-2xl);
+        padding: 1.5rem 1.75rem;
         margin-bottom: 1.75rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid var(--gray-200);
+        border-bottom: none;
+        box-shadow: var(--shadow-md);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -54,18 +59,42 @@
     }
 
     .welcome-title-modern {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: 700;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        margin-bottom: 0.25rem;
+        color: #ffffff;
+        background: none;
+        -webkit-background-clip: unset;
+        background-clip: unset;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .welcome-title-modern i {
+        color: #ffffff !important;
+    }
+
+    .welcome-icon-modern {
+        width: 46px;
+        height: 46px;
+        background: rgba(255, 255, 255, 0.22);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #ffffff;
+        flex-shrink: 0;
     }
 
     .welcome-subtitle-modern {
-        color: var(--gray-500);
+        color: rgba(255, 255, 255, 0.9);
         font-size: 0.875rem;
+    }
+
+    .welcome-subtitle-modern strong {
+        color: #ffffff;
     }
 
     .school-logo-modern {
@@ -73,7 +102,7 @@
         height: 60px;
         object-fit: cover;
         border-radius: var(--radius-xl);
-        border: 2px solid var(--gray-200);
+        border: 2px solid rgba(255, 255, 255, 0.6);
         box-shadow: var(--shadow-sm);
     }
 
@@ -211,7 +240,7 @@
     }
 
     .table-header-modern {
-        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+        background: var(--banner-gradient);
         padding: 1rem 1.5rem;
         display: flex;
         align-items: center;
@@ -360,17 +389,18 @@
         box-shadow: var(--shadow-md);
     }
 
+    /* Card headers - ab image jaisa blue gradient */
     .info-card-header-modern {
-        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        background: var(--banner-gradient);
         padding: 1rem 1.25rem;
-        border-bottom: 1px solid var(--gray-200);
+        border-bottom: none;
         display: flex;
         align-items: center;
         gap: 0.65rem;
     }
 
     .info-card-header-modern i {
-        color: var(--secondary);
+        color: #ffffff;
         font-size: 1.1rem;
     }
 
@@ -378,7 +408,7 @@
         margin: 0;
         font-size: 0.9rem;
         font-weight: 700;
-        color: var(--gray-700);
+        color: #ffffff;
         letter-spacing: -0.2px;
     }
 
@@ -421,7 +451,7 @@
         color: var(--secondary);
     }
 
-    /* Fee Collection Card - Redesigned to match theme perfectly */
+    /* Fee Collection Card */
     .fee-collection-card {
         background: white;
         border-radius: var(--radius-xl);
@@ -437,7 +467,7 @@
     }
 
     .fee-collection-header {
-        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        background: var(--banner-gradient);
         padding: 1rem 1.25rem;
         display: flex;
         align-items: center;
@@ -445,7 +475,7 @@
     }
 
     .fee-collection-header i {
-        color: var(--secondary);
+        color: #ffffff;
         font-size: 1.2rem;
     }
 
@@ -599,10 +629,12 @@
     <!-- Welcome Section -->
     <div class="welcome-section-modern">
         <div>
-            <div class="welcome-title-modern">
-                <i class="fas fa-chart-line" style="color: var(--secondary); font-size: 1.5rem;"></i>
-                Dashboard
-            </div>
+       <div class="welcome-title-modern">
+           <span class="welcome-icon-modern">
+               <i class="fas fa-chart-line"></i>
+           </span>
+           Dashboard
+        </div>
             <div class="welcome-subtitle-modern">
                 Welcome back, <strong>{{ session['full_name'] }}</strong>
             </div>
