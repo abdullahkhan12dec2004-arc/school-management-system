@@ -1,30 +1,135 @@
 {% extends "base.html" %}
 {% block title %}Pending School Admins{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <div class="card shadow">
-        <div class="card-header bg-warning text-dark">
-            <h4 class="mb-0">⏳ Pending School Admin Requests</h4>
+<style>
+    body, .container {
+        background-color: #ffffff !important;
+    }
+
+    .pending-card {
+        border: none;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        background: #ffffff;
+    }
+
+    .pending-header {
+        background: linear-gradient(90deg, #29b6f6, #4fc3f7);
+        color: #ffffff;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .pending-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pending-badge {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .pending-table thead {
+        background: #f7f9fc;
+    }
+
+    .pending-table thead th {
+        border: none;
+        color: #6b7280;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
+        font-weight: 700;
+        padding: 14px 16px;
+    }
+
+    .pending-table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #eef1f5;
+        color: #374151;
+    }
+
+    .pending-table tbody tr:hover {
+        background-color: #f8fbff;
+    }
+
+    .school-name-cell strong {
+        color: #1f2937;
+        font-size: 0.95rem;
+    }
+
+    .btn-approve {
+        background-color: #29b6f6;
+        border: none;
+        color: #fff;
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-right: 6px;
+    }
+
+    .btn-approve:hover {
+        background-color: #039be5;
+        color: #fff;
+    }
+
+    .btn-reject {
+        background-color: #ffffff;
+        border: 1px solid #f3d3d3;
+        color: #e53935;
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .btn-reject:hover {
+        background-color: #fdeeee;
+        color: #e53935;
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+    <div class="pending-card">
+        <div class="pending-header">
+            <h4>⏳ Pending School Admin Requests</h4>
+            {% if pending_list %}
+            <span class="pending-badge">{{ pending_list|length }} Pending</span>
+            {% endif %}
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             {% if pending_list %}
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-dark">
+                    <table class="table pending-table mb-0">
+                        <thead>
                             <tr>
-                                <th>School Name</th>
+                                <th>School</th>
                                 <th>Admin Name</th>
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Phone</th>
-                                <th>Registered Date</th>
+                                <th>Registered</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for pending in pending_list %}
                             <tr>
-                                <td>
+                                <td class="school-name-cell">
                                     <strong>{{ pending.school_name }}</strong><br>
                                     <small class="text-muted">{{ pending.school_city }}</small>
                                 </td>
@@ -35,12 +140,12 @@
                                 <td>{{ pending.created_date.strftime('%Y-%m-%d') if pending.created_date else '-' }}</td>
                                 <td>
                                     <a href="{{ url_for('approve_admin', user_id=pending.user_id) }}"
-                                       class="btn btn-success btn-sm"
+                                       class="btn btn-approve"
                                        onclick="return confirm('Approve this school admin?')">
                                         ✅ Approve
                                     </a>
                                     <a href="{{ url_for('reject_admin', user_id=pending.user_id) }}"
-                                       class="btn btn-danger btn-sm"
+                                       class="btn btn-reject"
                                        onclick="return confirm('Reject and delete this request?')">
                                         ❌ Reject
                                     </a>
