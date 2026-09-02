@@ -30,6 +30,11 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        color: #ffffff;
+    }
+
+    .pending-header h4 .header-icon {
+        color: #ffffff;
     }
 
     .pending-badge {
@@ -71,42 +76,42 @@
         font-size: 0.95rem;
     }
 
-    .btn-approve {
+    .date-cell {
+        white-space: nowrap;
+    }
+
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+    .btn-approve,
+    .btn-reject {
         background-color: #29b6f6;
         border: none;
         color: #fff;
-        padding: 6px 16px;
+        padding: 6px 14px;
         border-radius: 8px;
         font-size: 0.85rem;
         font-weight: 500;
         margin-right: 6px;
+        display: inline-block;
     }
 
-    .btn-approve:hover {
+    .btn-approve:hover,
+    .btn-reject:hover {
         background-color: #039be5;
         color: #fff;
     }
 
     .btn-reject {
-        background-color: #ffffff;
-        border: 1px solid #f3d3d3;
-        color: #e53935;
-        padding: 6px 16px;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-
-    .btn-reject:hover {
-        background-color: #fdeeee;
-        color: #e53935;
+        margin-right: 0;
     }
 </style>
 
 <div class="container mt-4 mb-5">
     <div class="pending-card">
         <div class="pending-header">
-            <h4>⏳ Pending School Admin Requests</h4>
+            <h4><span class="header-icon">⏳</span> Pending School Admin Requests</h4>
             {% if pending_list %}
             <span class="pending-badge">{{ pending_list|length }} Pending</span>
             {% endif %}
@@ -137,17 +142,17 @@
                                 <td>{{ pending.username }}</td>
                                 <td>{{ pending.email or '-' }}</td>
                                 <td>{{ pending.phone or '-' }}</td>
-                                <td>{{ pending.created_date.strftime('%Y-%m-%d') if pending.created_date else '-' }}</td>
-                                <td>
+                                <td class="date-cell">{{ pending.created_date.strftime('%Y-%m-%d') if pending.created_date else '-' }}</td>
+                                <td class="actions-cell">
                                     <a href="{{ url_for('approve_admin', user_id=pending.user_id) }}"
                                        class="btn btn-approve"
                                        onclick="return confirm('Approve this school admin?')">
-                                        ✅ Approve
+                                        Approve
                                     </a>
                                     <a href="{{ url_for('reject_admin', user_id=pending.user_id) }}"
                                        class="btn btn-reject"
                                        onclick="return confirm('Reject and delete this request?')">
-                                        ❌ Reject
+                                        Reject
                                     </a>
                                 </td>
                             </tr>
