@@ -14,7 +14,7 @@
         padding: 1.5rem;
     }
 
-    /* Top Info Bar */
+    /* ===== Top Info Bar ===== */
     .top-info-card {
         background: #ffffff;
         border-radius: 20px;
@@ -24,17 +24,36 @@
         overflow: hidden;
     }
 
+    .top-info-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 12px;
+    }
+
+    .child-identity-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0; /* allow text to truncate instead of wrapping to a new line */
+        flex: 1 1 auto;
+    }
+
     .child-avatar-large {
         width: 55px;
         height: 55px;
+        min-width: 55px;
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid #1a4a6f;
+        flex-shrink: 0;
     }
 
     .child-avatar-placeholder {
         width: 55px;
         height: 55px;
+        min-width: 55px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -43,6 +62,11 @@
         font-size: 1.5rem;
         font-weight: 700;
         background: linear-gradient(135deg, #1a4a6f 0%, #2c6e9e 100%);
+        flex-shrink: 0;
+    }
+
+    .child-identity-text {
+        min-width: 0;
     }
 
     /* Child name (row with avatar/logo) */
@@ -53,6 +77,9 @@
         color: #1a2c3e;
         letter-spacing: 0.2px;
         margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* Class / school meta line */
@@ -62,6 +89,9 @@
         font-weight: 500;
         color: #64748b;
         letter-spacing: 0.15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .child-meta-line i {
@@ -74,6 +104,16 @@
     }
 
     /* Switch buttons */
+    .switcher-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        overflow-x: auto;
+        max-width: 45%;
+        scrollbar-width: thin;
+    }
+
     .switch-btn {
         font-size: 0.8rem;
         font-weight: 600;
@@ -84,6 +124,8 @@
         gap: 6px;
         transition: all 0.2s;
         text-decoration: none;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .switch-btn-active {
@@ -101,31 +143,49 @@
         background: #e9eef4;
     }
 
-    /* Quick Cards */
+    /* ===== Quick Action Buttons (single row, compact) ===== */
+    .quick-actions-row {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.6rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .quick-actions-row > a {
+        flex: 1 1 0;
+        min-width: 0;
+        text-decoration: none;
+    }
+
     .quick-card {
         background: #ffffff;
         border: 1px solid #eef2f8 !important;
-        border-radius: 20px;
+        border-radius: 14px;
         transition: all 0.25s ease;
         text-align: center;
-        box-shadow: 0 8px 20px rgba(15, 43, 61, 0.02) !important;
+        box-shadow: 0 6px 16px rgba(15, 43, 61, 0.02) !important;
+        height: 100%;
     }
 
     .quick-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 15px 30px rgba(15, 43, 61, 0.08) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px rgba(15, 43, 61, 0.08) !important;
         border-color: #1a4a6f !important;
     }
 
+    .quick-card .card-body {
+        padding: 0.7rem 0.4rem;
+    }
+
     .icon-wrapper-custom {
-        width: 48px;
-        height: 48px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 0.75rem;
-        font-size: 1.15rem;
+        margin-bottom: 0.4rem;
+        font-size: 0.9rem;
     }
 
     .icon-wrapper-custom.blue {
@@ -149,15 +209,27 @@
     }
 
     .quick-card-title {
-        font-size: 0.9rem;
+        font-size: 0.76rem;
         font-weight: 600;
         color: #1a2c3e;
-        margin-bottom: 2px;
+        margin-bottom: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .quick-card-sub {
-        font-size: 0.72rem;
+        font-size: 0.62rem;
         color: #8a99b0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    @media (max-width: 480px) {
+        .quick-card-sub { display: none; }
+        .icon-wrapper-custom { width: 30px; height: 30px; font-size: 0.8rem; }
+        .quick-card-title { font-size: 0.68rem; }
     }
 
     /* Dashboard Cards */
@@ -348,9 +420,9 @@
     <!-- ===== TOP BAR ===== -->
     <div class="top-info-card">
         <div class="card-body p-4">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <!-- Logo + Child Name in one row -->
-                <div class="d-flex align-items-center gap-3">
+            <div class="top-info-row">
+                <!-- Avatar + Name + Meta -- always one row -->
+                <div class="child-identity-row">
                     {% if child.profile_pic %}
                         <img src="{{ url_for('static', filename='uploads/students/' + child.profile_pic) }}"
                              class="child-avatar-large">
@@ -359,7 +431,7 @@
                             {{ child.full_name[0].upper() }}
                         </div>
                     {% endif %}
-                    <div>
+                    <div class="child-identity-text">
                         <div class="child-name-heading">{{ child.full_name }}</div>
                         <div class="child-meta-line">
                             {% if child.class_name %}
@@ -373,8 +445,8 @@
 
                 <!-- Child Switcher (agar multiple children hain) -->
                 {% if all_children | length > 1 %}
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted me-1" style="font-size: 0.82rem; font-weight: 500;">Switch:</span>
+                <div class="switcher-row">
+                    <span class="text-muted me-1" style="font-size: 0.82rem; font-weight: 500; flex-shrink: 0;">Switch:</span>
                     {% for c_item in all_children %}
                         <a href="{{ url_for('switch_child', child_id=c_item.id) }}"
                            class="switch-btn {% if c_item.id == child.id %}switch-btn-active{% else %}switch-btn-inactive{% endif %}">
@@ -391,63 +463,55 @@
         </div>
     </div>
 
-    <!-- ===== QUICK ACTION BUTTONS ===== -->
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
-            <a href="{{ url_for('result_card', student_id=child.id) }}" class="text-decoration-none">
-                <div class="card quick-card py-3 h-100">
-                    <div class="card-body">
-                        <div class="icon-wrapper-custom blue">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="quick-card-title">Result Card</div>
-                        <div class="quick-card-sub">Marks & Grades</div>
+    <!-- ===== QUICK ACTION BUTTONS (one row, compact) ===== -->
+    <div class="quick-actions-row">
+        <a href="{{ url_for('result_card', student_id=child.id) }}">
+            <div class="card quick-card">
+                <div class="card-body">
+                    <div class="icon-wrapper-custom blue">
+                        <i class="fas fa-file-alt"></i>
                     </div>
+                    <div class="quick-card-title">Result Card</div>
+                    <div class="quick-card-sub">Marks & Grades</div>
                 </div>
-            </a>
-        </div>
+            </div>
+        </a>
 
-        <div class="col-6 col-md-3">
-            <a href="#attendanceSection" class="text-decoration-none">
-                <div class="card quick-card py-3 h-100">
-                    <div class="card-body">
-                        <div class="icon-wrapper-custom green">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="quick-card-title">Attendance</div>
-                        <div class="quick-card-sub">Hazri Summary</div>
+        <a href="#attendanceSection">
+            <div class="card quick-card">
+                <div class="card-body">
+                    <div class="icon-wrapper-custom green">
+                        <i class="fas fa-calendar-check"></i>
                     </div>
+                    <div class="quick-card-title">Attendance</div>
+                    <div class="quick-card-sub">Hazri Summary</div>
                 </div>
-            </a>
-        </div>
+            </div>
+        </a>
 
-        <div class="col-6 col-md-3">
-            <a href="#feesSection" class="text-decoration-none">
-                <div class="card quick-card py-3 h-100">
-                    <div class="card-body">
-                        <div class="icon-wrapper-custom gold">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="quick-card-title">Fees</div>
-                        <div class="quick-card-sub">Payment History</div>
+        <a href="#feesSection">
+            <div class="card quick-card">
+                <div class="card-body">
+                    <div class="icon-wrapper-custom gold">
+                        <i class="fas fa-money-bill-wave"></i>
                     </div>
+                    <div class="quick-card-title">Fees</div>
+                    <div class="quick-card-sub">Payment History</div>
                 </div>
-            </a>
-        </div>
+            </div>
+        </a>
 
-        <div class="col-6 col-md-3">
-            <a href="{{ url_for('view_notices') }}" class="text-decoration-none">
-                <div class="card quick-card py-3 h-100">
-                    <div class="card-body">
-                        <div class="icon-wrapper-custom red">
-                            <i class="fas fa-bullhorn"></i>
-                        </div>
-                        <div class="quick-card-title">Notices</div>
-                        <div class="quick-card-sub">School Notices</div>
+        <a href="{{ url_for('view_notices') }}">
+            <div class="card quick-card">
+                <div class="card-body">
+                    <div class="icon-wrapper-custom red">
+                        <i class="fas fa-bullhorn"></i>
                     </div>
+                    <div class="quick-card-title">Notices</div>
+                    <div class="quick-card-sub">School Notices</div>
                 </div>
-            </a>
-        </div>
+            </div>
+        </a>
     </div>
 
     <!-- ===== ATTENDANCE (full width) ===== -->
@@ -604,10 +668,10 @@
                 <div class="dashboard-card-body text-center py-4 d-flex flex-column justify-content-center h-100">
                     <p class="text-muted mb-4" style="font-size: 0.9rem;">
                         <i class="fas fa-info-circle me-1 text-primary"></i>
-                        {{ child.full_name }} ke saalana results, subject-wise marks aur grade reports dekhne ke liye card ko open karein.
+                        {{ child.full_name }} To see her/his annual results, subject-wise marks, and grade reports, open this card.
                     </p>
                     <a href="{{ url_for('result_card', student_id=child.id) }}" class="btn btn-primary px-5 py-2 fw-bold" style="border-radius: 30px;">
-                        <i class="fas fa-file-invoice me-2"></i>Result Card Kholo
+                        <i class="fas fa-file-invoice me-2"></i>Open Result Card
                     </a>
                 </div>
             </div>
