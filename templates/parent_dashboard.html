@@ -3,10 +3,10 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
     body {
-        background: #f5f7fb !important;
+        background: #ffffff !important;
         font-family: 'Inter', sans-serif;
     }
 
@@ -43,6 +43,34 @@
         font-size: 1.5rem;
         font-weight: 700;
         background: linear-gradient(135deg, #1a4a6f 0%, #2c6e9e 100%);
+    }
+
+    /* Child name (row with avatar/logo) */
+    .child-name-heading {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: #1a2c3e;
+        letter-spacing: 0.2px;
+        margin-bottom: 2px;
+    }
+
+    /* Class / school meta line */
+    .child-meta-line {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #64748b;
+        letter-spacing: 0.15px;
+    }
+
+    .child-meta-line i {
+        color: #38bdf8;
+    }
+
+    .child-meta-divider {
+        color: #cbd5e1;
+        margin: 0 8px;
     }
 
     /* Switch buttons */
@@ -150,16 +178,11 @@
         align-items: center;
     }
 
-    .dashboard-card-header.success {
-        background: linear-gradient(98deg, #0f3d23 0%, #16a34a 100%);
-    }
-
-    .dashboard-card-header.warning {
-        background: linear-gradient(98deg, #5c4308 0%, #c6a43b 100%);
-    }
-
+    /* All headers now sky blue */
+    .dashboard-card-header.success,
+    .dashboard-card-header.warning,
     .dashboard-card-header.primary {
-        background: linear-gradient(98deg, #0f2b3d 0%, #1a4a6f 100%);
+        background: linear-gradient(98deg, #0284c7 0%, #38bdf8 100%);
     }
 
     .dashboard-card-header h6 {
@@ -326,7 +349,7 @@
     <div class="top-info-card">
         <div class="card-body p-4">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <!-- Child Info -->
+                <!-- Logo + Child Name in one row -->
                 <div class="d-flex align-items-center gap-3">
                     {% if child.profile_pic %}
                         <img src="{{ url_for('static', filename='uploads/students/' + child.profile_pic) }}"
@@ -337,13 +360,14 @@
                         </div>
                     {% endif %}
                     <div>
-                        <h4 class="mb-1 fw-bold" style="color: #1a2c3e;">{{ child.full_name }}</h4>
-                        <small class="text-muted" style="font-size: 0.8rem;">
+                        <div class="child-name-heading">{{ child.full_name }}</div>
+                        <div class="child-meta-line">
                             {% if child.class_name %}
-                                <i class="fas fa-chalkboard me-1"></i>Class {{ child.class_name }}{% if child.section %} - {{ child.section }}{% endif %} &nbsp;|&nbsp;
+                                <i class="fas fa-chalkboard me-1"></i>Class {{ child.class_name }}{% if child.section %} - {{ child.section }}{% endif %}
+                                <span class="child-meta-divider">|</span>
                             {% endif %}
                             <i class="fas fa-school me-1"></i>{{ child.school_name }}
-                        </small>
+                        </div>
                     </div>
                 </div>
 
@@ -426,10 +450,9 @@
         </div>
     </div>
 
-    <!-- ===== ATTENDANCE + FEES ===== -->
-    <div class="row g-4">
-        <!-- ATTENDANCE -->
-        <div class="col-lg-6" id="attendanceSection">
+    <!-- ===== ATTENDANCE (full width) ===== -->
+    <div class="row g-4 mb-1">
+        <div class="col-12" id="attendanceSection">
             <div class="dashboard-card h-100">
                 <div class="dashboard-card-header success">
                     <h6>
@@ -517,7 +540,10 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- ===== FEES + ACADEMICS (same row, reduced width each) ===== -->
+    <div class="row g-4 mt-1">
         <!-- FEES -->
         <div class="col-lg-6" id="feesSection">
             <div class="dashboard-card h-100">
@@ -566,18 +592,16 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ===== RESULT PREVIEW ===== -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="dashboard-card">
+        <!-- ACADEMICS / RESULT PREVIEW (moved next to Fees, same width) -->
+        <div class="col-lg-6">
+            <div class="dashboard-card h-100">
                 <div class="dashboard-card-header primary">
                     <h6>
                         <i class="fas fa-chart-bar"></i> Academics & Results Preview
                     </h6>
                 </div>
-                <div class="dashboard-card-body text-center py-4">
+                <div class="dashboard-card-body text-center py-4 d-flex flex-column justify-content-center h-100">
                     <p class="text-muted mb-4" style="font-size: 0.9rem;">
                         <i class="fas fa-info-circle me-1 text-primary"></i>
                         {{ child.full_name }} ke saalana results, subject-wise marks aur grade reports dekhne ke liye card ko open karein.
