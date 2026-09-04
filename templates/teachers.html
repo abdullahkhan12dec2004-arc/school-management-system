@@ -15,11 +15,13 @@
         vertical-align: middle;
     }
     .table-bordered-custom thead th {
-        background-color: #0ea5e9;
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
         color: white;
         border: 1px solid #38bdf8 !important;
         font-weight: 600;
         font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
     }
     .table-bordered-custom tbody tr:nth-child(even) {
         background-color: #f8fafc;
@@ -34,12 +36,13 @@
         width: 50px;
     }
     .badge-code {
-        background: #0f2b3d;
-        color: #7dd3fc;
+        background: transparent;
+        color: #0ea5e9;
         font-family: monospace;
         font-size: 11px;
         padding: 4px 8px;
         border-radius: 4px;
+        font-weight: 700;
     }
     .dashboard-container {
         background-color: #ffffff !important;
@@ -48,25 +51,37 @@
         background-color: #ffffff !important;
     }
 
-    /* Heading + icon row */
-    .page-heading {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: #0ea5e9 !important;
-    }
-    .page-heading i {
-        color: #0ea5e9 !important;
-        font-size: 1.2rem;
-    }
-
-    /* Header row: heading on left, buttons on right (DESKTOP DEFAULT) */
+    /* Header row: sky blue gradient box, icon+heading left, buttons right (DESKTOP DEFAULT) */
     .header-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: nowrap;
         margin-bottom: 24px;
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        padding: 22px 28px;
+        border-radius: 14px;
+        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.25);
+    }
+
+    /* Heading + icon */
+    .page-heading {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: #ffffff !important;
+        font-size: 1.6rem;
+        letter-spacing: 0.3px;
+    }
+    .page-heading i {
+        color: #ffffff !important;
+        font-size: 1.2rem;
+        background: rgba(255, 255, 255, 0.22);
+        padding: 12px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Top-right action buttons — DESKTOP DEFAULT (auto width, NOT 100%) */
@@ -80,21 +95,26 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 8px 16px;
-        border-radius: 6px;
+        padding: 9px 18px;
+        border-radius: 50px;
         font-weight: 500;
-        background-color: #1a2332;
-        border-color: #1a2332;
+        background-color: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        color: #ffffff;
+    }
+    .top-actions .btn i {
         color: #ffffff;
     }
     .top-actions .btn:hover {
-        background-color: #0f1621;
-        border-color: #0f1621;
+        background-color: rgba(255, 255, 255, 0.32);
+        border-color: rgba(255, 255, 255, 0.6);
         color: #ffffff;
     }
 
     .table-card {
         margin-top: 28px;
+        border-radius: 14px;
+        overflow: hidden;
     }
 
     .empty-state-icon {
