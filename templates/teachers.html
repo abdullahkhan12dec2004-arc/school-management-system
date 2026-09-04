@@ -57,7 +57,7 @@
     }
     .page-heading i {
         color: #0ea5e9 !important;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
 
     /* Header row: heading on left, buttons pushed to right corner, one row */
@@ -74,15 +74,19 @@
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
-        margin-left: auto;
+        margin-left: 0;
+        width: 100% ;
     }
     .top-actions .btn {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 8px 16px;
+        flex: 1;
+        justify-content: center;
+        font-size: 13px;
+        padding: 8px 10px;
         border-radius: 6px;
-        font-weight: 500;
+        width: 100%;
         background-color: #1a2332;
         border-color: #1a2332;
         color: #ffffff;
@@ -111,6 +115,18 @@
         font-size: 1.05rem;
         margin-bottom: 12px;
     }
+       /* Responsive fix for header row */
+    @media (max-width: 768px) {
+        .header-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+    }
+    @media (max-width: 480px) {
+       .top-actions {
+            flex-direction: column;
+    }
+        
 </style>
 {% endblock %}
 {% block content %}
