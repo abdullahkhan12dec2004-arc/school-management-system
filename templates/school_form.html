@@ -37,31 +37,58 @@
         margin: 1.5rem auto;
         padding: 0 1rem;
     }
-
     .page-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--sky);
+    border-radius: 20px;
+    padding: 1.1rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(14, 165, 233, 0.25);
+    text-align: left;
+    flex-wrap: wrap;
+}
 
-    .page-header h1 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--sky);
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-    }
+.page-header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+}
 
-    .page-header h1 i {
-        color: var(--sky);
-    }
+.page-header h1 i {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
 
-    .page-header p {
-        color: #6c7a91;
-        font-size: 0.9rem;
-    }
+.page-header p {
+    display: none;
+}
+
+.edit-badge {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-left: auto;
+}
+   
 
     .form-card {
         background: #ffffff;
@@ -440,20 +467,7 @@
         color: var(--sky-dark);
     }
 
-    .edit-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--sky-light);
-        color: var(--sky-dark);
-        border: 1px solid var(--sky);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.72rem;
-        font-weight: 700;
-        margin-left: 10px;
-        vertical-align: middle;
-    }
+ 
 
     .input-wrapper input:disabled,
     .input-wrapper select:disabled {
