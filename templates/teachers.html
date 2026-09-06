@@ -15,11 +15,11 @@
         vertical-align: middle;
     }
     .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        background: linear-gradient(135deg, #7dd3fc, #38bdf8);
         color: white;
-        border: 1px solid #38bdf8 !important;
+        border: 1px solid #7dd3fc !important;
         font-weight: 600;
-        font-size: 13px;
+        font-size: 12.5px;
         text-transform: uppercase;
         letter-spacing: 0.4px;
     }
@@ -111,14 +111,49 @@
         color: #ffffff;
     }
 
+    /* ===== NEW: rounded table card, no white border showing at corners ===== */
     .table-card.card {
         margin-top: 28px;
-        border-radius: 0 !important;
+        border-radius: 14px !important;
         overflow: hidden;
+        border: none;
+        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.15);
     }
     .table-card .card-body,
     .table-card .table-responsive {
         border-radius: 0 !important;
+    }
+
+    /* Blue header bar inside the card, like the reference image */
+    .table-card-header {
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .table-card-header h5 {
+        margin: 0;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .table-card-header h5 i {
+        font-size: 1rem;
+    }
+    .total-badge {
+        background: rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 12.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .empty-state-icon {
@@ -154,6 +189,11 @@
         .page-heading {
             font-size: 1.2rem;
         }
+        .table-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
     }
 
     @media (max-width: 480px) {
@@ -183,6 +223,10 @@
 
 
 <div class="card border-0 shadow-sm table-card">
+    <div class="table-card-header">
+        <h5><i class="fas fa-list-ul"></i> Teachers List</h5>
+        <span class="total-badge"><i class="fas fa-chalkboard-teacher"></i> Total: {{ teachers|length }}</span>
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table-bordered-custom">
