@@ -28,7 +28,7 @@
 
     /* ===== HEADING (user.html jaisa blue banner) ===== */
     .students-page-header {
-        margin-bottom: 1.75rem;
+        margin-bottom: 1.25rem;
         padding: 1.25rem 1.75rem;
         border-radius: var(--radius-xl);
         background: linear-gradient(135deg, #1d9bf0 0%, #38bdf8 100%);
@@ -84,9 +84,108 @@
         box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
     }
 
+    /* ===== STATS ROW (compact, 1 row, 4 cards) ===== */
+    .stats-mini-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .stats-mini-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #ffffff;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 10px 14px;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .stats-mini-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stats-mini-icon {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+    }
+
+    .stats-mini-card.total .stats-mini-icon {
+        background: rgba(26, 74, 111, 0.12);
+        color: var(--primary);
+    }
+
+    .stats-mini-card.boys .stats-mini-icon {
+        background: rgba(37, 99, 235, 0.12);
+        color: #2563eb;
+    }
+
+    .stats-mini-card.girls .stats-mini-icon {
+        background: rgba(219, 39, 119, 0.12);
+        color: #db2777;
+    }
+
+    .stats-mini-card.enrolled .stats-mini-icon {
+        background: rgba(217, 119, 6, 0.12);
+        color: #d97706;
+    }
+
+    .stats-mini-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.15;
+        min-width: 0;
+    }
+
+    .stats-mini-value {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+
+    .stats-mini-label {
+        font-size: 11px;
+        color: var(--gray-500);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    @media (max-width: 768px) {
+        .stats-mini-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stats-mini-card {
+            padding: 8px 10px;
+        }
+
+        .stats-mini-value {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .stats-mini-row {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+    }
+
     /* ===== TABLE CARD (user.html jaisa rounded card) ===== */
     .students-table-card {
-        margin-top: 1.5rem;
+        margin-top: 0;
         border-radius: var(--radius-2xl);
         border: 1px solid var(--gray-200);
         overflow: hidden;
@@ -262,6 +361,40 @@
     </div>
 </div>
 
+<!-- Stats Summary (ab heading k neachy, 1 row, 4 cards) -->
+{% if students %}
+<div class="stats-mini-row">
+    <div class="stats-mini-card total">
+        <div class="stats-mini-icon"><i class="fas fa-users"></i></div>
+        <div class="stats-mini-text">
+            <span class="stats-mini-value">{{ students|length }}</span>
+            <span class="stats-mini-label">Total Students</span>
+        </div>
+    </div>
+    <div class="stats-mini-card boys">
+        <div class="stats-mini-icon"><i class="fas fa-mars"></i></div>
+        <div class="stats-mini-text">
+            <span class="stats-mini-value">{{ students|selectattr('gender', 'equalto', 'Male')|list|length }}</span>
+            <span class="stats-mini-label">Boys</span>
+        </div>
+    </div>
+    <div class="stats-mini-card girls">
+        <div class="stats-mini-icon"><i class="fas fa-venus"></i></div>
+        <div class="stats-mini-text">
+            <span class="stats-mini-value">{{ students|selectattr('gender', 'equalto', 'Female')|list|length }}</span>
+            <span class="stats-mini-label">Girls</span>
+        </div>
+    </div>
+    <div class="stats-mini-card enrolled">
+        <div class="stats-mini-icon"><i class="fas fa-door-open"></i></div>
+        <div class="stats-mini-text">
+            <span class="stats-mini-value">{{ students|selectattr('class_name')|list|length }}</span>
+            <span class="stats-mini-label">Enrolled</span>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Students Table Card -->
 <div class="card shadow-sm students-table-card">
     <div class="card-body p-0">
@@ -350,50 +483,6 @@
         </div>
     </div>
 </div>
-
-<!-- Stats Summary -->
-{% if students %}
-<div class="row mt-4 g-3">
-    <div class="col-md-3">
-        <div class="card bg-primary bg-opacity-10 border-0">
-            <div class="card-body text-center">
-                <h3 class="mb-0 text-primary">{{ students|length }}</h3>
-                <small class="text-muted">Total Students</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-success bg-opacity-10 border-0">
-            <div class="card-body text-center">
-                <h3 class="mb-0 text-success">
-                    {{ students|selectattr('gender', 'equalto', 'Male')|list|length }}
-                </h3>
-                <small class="text-muted"><i class="fas fa-mars"></i> Boys</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-danger bg-opacity-10 border-0">
-            <div class="card-body text-center">
-                <h3 class="mb-0 text-danger">
-                    {{ students|selectattr('gender', 'equalto', 'Female')|list|length }}
-                </h3>
-                <small class="text-muted"><i class="fas fa-venus"></i> Girls</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-warning bg-opacity-10 border-0">
-            <div class="card-body text-center">
-                <h3 class="mb-0 text-warning">
-                    {{ students|selectattr('class_name')|list|length }}
-                </h3>
-                <small class="text-muted">Enrolled</small>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 {% endblock %}
 
