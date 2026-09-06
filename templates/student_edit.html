@@ -21,6 +21,9 @@
     align-items: flex-start;
     justify-content: space-between;
     margin-bottom: 1.5rem;
+    max-width: 780px;
+    margin-left: auto;
+    margin-right: auto;
   }
   .edu-page-title {
     display: flex;
@@ -57,13 +60,15 @@
     text-decoration: none;
   }
 
-  /* Card */
+  /* Card — narrower, centered like the reference design */
   .edu-card {
     background: #fff;
     border-radius: var(--radius-lg);
     box-shadow: 0 2px 12px rgba(30,42,58,0.08);
     overflow: hidden;
     border: none;
+    max-width: 780px;
+    margin: 0 auto;
   }
   .edu-card-header {
     background: var(--edu-gradient);
@@ -149,7 +154,7 @@
   }
   .edu-section-label:first-child { margin-top: 0; }
 
-  /* Form grid */
+  /* Form grid — 2 fields per row by default */
   .edu-row {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
@@ -162,11 +167,14 @@
   .col-12 { grid-column: span 12; }
 
   .edu-form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  /* Labels — sky blue, uppercase, like the reference design */
   .edu-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #495057;
-    letter-spacing: 0.2px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--edu-primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
   }
   .edu-label .req { color: #e24b4a; }
 
@@ -244,7 +252,7 @@
   }
   .edu-entry-card:hover { border-color: var(--edu-primary-bd); }
 
-  /* Buttons */
+  /* Buttons — sky blue */
   .edu-btn-add {
     display: flex;
     align-items: center;
@@ -255,7 +263,7 @@
     border: 1.5px dashed #ced4da;
     border-radius: var(--radius-md);
     background: none;
-    color: #6c757d;
+    color: var(--edu-primary);
     font-size: 13px;
     cursor: pointer;
     transition: all .15s;
@@ -263,7 +271,7 @@
   }
   .edu-btn-add:hover {
     border-color: var(--edu-primary);
-    color: var(--edu-primary);
+    color: var(--edu-primary-dark);
     background: var(--edu-primary-lt);
   }
 
@@ -305,7 +313,7 @@
     font-size: 14px;
     font-weight: 600;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: 30px;
     cursor: pointer;
     transition: background .15s, transform .1s;
     box-shadow: 0 2px 8px rgba(30,136,229,0.35);
@@ -317,16 +325,16 @@
     gap: 7px;
     padding: 10px 22px;
     background: #fff;
-    color: #495057;
+    color: var(--edu-primary-dark);
     font-size: 14px;
     font-weight: 500;
-    border: 1.5px solid #dee2e6;
-    border-radius: var(--radius-md);
+    border: 1.5px solid var(--edu-primary-bd);
+    border-radius: 30px;
     cursor: pointer;
     text-decoration: none;
     transition: background .15s;
   }
-  .edu-btn-cancel:hover { background: #f8f9fa; color: #495057; }
+  .edu-btn-cancel:hover { background: var(--edu-primary-lt); }
 
   @media (max-width: 768px) {
     .col-6, .col-4, .col-3 { grid-column: span 12; }
@@ -346,7 +354,7 @@
   <div class="edu-page-header">
     <div>
       <h1 class="edu-page-title">
-        <i class="bi bi-person-gear me-2" style="color:var(--edu-gold)"></i>
+        <i class="bi bi-person-gear me-2"></i>
         Edit Student
       </h1>
       <div class="edu-breadcrumb">
@@ -413,12 +421,12 @@
               <input type="text" name="phone" class="edu-input"
                      value="{{ student.phone or '' }}">
             </div>
-            <div class="col-4 edu-form-group">
+            <div class="col-6 edu-form-group">
               <label class="edu-label">Date of Birth</label>
               <input type="date" name="date_of_birth" class="edu-input"
                      value="{{ student.date_of_birth }}">
             </div>
-            <div class="col-4 edu-form-group">
+            <div class="col-6 edu-form-group">
               <label class="edu-label">Gender</label>
               <select name="gender" class="edu-select">
                 <option value="">— Select —</option>
@@ -426,7 +434,7 @@
                 <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
               </select>
             </div>
-            <div class="col-4 edu-form-group">
+            <div class="col-6 edu-form-group">
               <label class="edu-label">Class</label>
               <select name="class_id" class="edu-select">
                 <option value="">— Select Class —</option>
@@ -452,17 +460,17 @@
               <input type="text" name="address_line2" class="edu-input"
                      value="{{ student.address_line2 or '' }}">
             </div>
-            <div class="col-4 edu-form-group">
+            <div class="col-6 edu-form-group">
               <label class="edu-label">City</label>
               <input type="text" name="city" class="edu-input"
                      value="{{ student.city or '' }}">
             </div>
-            <div class="col-4 edu-form-group">
+            <div class="col-6 edu-form-group">
               <label class="edu-label">State</label>
               <input type="text" name="state" class="edu-input"
                      value="{{ student.state or '' }}">
             </div>
-            <div class="col-4 edu-form-group">
+            <div class="col-6 edu-form-group">
               <label class="edu-label">Postal Code</label>
               <input type="text" name="postal_code" class="edu-input"
                      value="{{ student.postal_code or '' }}">
@@ -483,7 +491,7 @@
                 <span>Click to upload or drag &amp; drop</span>
                 {% if student.profile_pic %}
                 <span>Current: <b><a href="/static/uploads/students/{{ student.profile_pic }}"
-                     target="_blank" style="color:var(--edu-gold)">View photo</a></b></span>
+                     target="_blank" style="color:var(--edu-primary-dark)">View photo</a></b></span>
                 {% else %}
                 <span>PNG, JPG up to 5MB</span>
                 {% endif %}
@@ -524,7 +532,7 @@
                   <input type="text" name="parent_phone[]" class="edu-input"
                          value="{{ parent.phone or '' }}">
                 </div>
-                <div class="col-12 edu-form-group">
+                <div class="col-6 edu-form-group">
                   <label class="edu-label">Email</label>
                   <input type="email" name="parent_email[]" class="edu-input"
                          value="{{ parent.email or '' }}">
@@ -549,28 +557,28 @@
                 <i class="bi bi-trash3"></i> Remove
               </button>
               <div class="edu-row">
-                <div class="col-4 edu-form-group">
+                <div class="col-6 edu-form-group">
                   <label class="edu-label">Sibling Name</label>
                   <input type="text" name="sibling_name[]" class="edu-input"
                          value="{{ sibling.sibling_name }}">
                 </div>
-                <div class="col-2 edu-form-group">
+                <div class="col-6 edu-form-group">
                   <label class="edu-label">Age</label>
                   <input type="number" name="sibling_age[]" class="edu-input"
                          value="{{ sibling.age or '' }}">
                 </div>
-                <div class="col-3 edu-form-group">
+                <div class="col-6 edu-form-group">
                   <label class="edu-label">Class</label>
                   <input type="text" name="sibling_class[]" class="edu-input"
                          value="{{ sibling.class or '' }}">
                 </div>
-                <div class="col-3 edu-form-group">
+                <div class="col-6 edu-form-group">
                   <label class="edu-label">School Name</label>
                   <input type="text" name="sibling_school_name[]" class="edu-input"
                          value="{{ sibling.school_name or '' }}">
                 </div>
                 <div class="col-12 edu-form-group">
-                  <label class="edu-label">Linked Student <span style="color:#adb5bd;font-weight:400">(Optional)</span></label>
+                  <label class="edu-label">Linked Student <span style="color:#adb5bd;font-weight:400;text-transform:none;letter-spacing:0">(Optional)</span></label>
                   <select name="sibling_student_id[]" class="edu-select">
                     <option value="">None</option>
                     {% for s in all_students %}
@@ -642,7 +650,7 @@
           <label class="edu-label">Phone</label>
           <input type="text" name="parent_phone[]" class="edu-input">
         </div>
-        <div class="col-12 edu-form-group">
+        <div class="col-6 edu-form-group">
           <label class="edu-label">Email</label>
           <input type="email" name="parent_email[]" class="edu-input">
         </div>
@@ -660,24 +668,24 @@
         <i class="bi bi-trash3"></i> Remove
       </button>
       <div class="edu-row">
-        <div class="col-4 edu-form-group">
+        <div class="col-6 edu-form-group">
           <label class="edu-label">Sibling Name</label>
           <input type="text" name="sibling_name[]" class="edu-input">
         </div>
-        <div class="col-2 edu-form-group">
+        <div class="col-6 edu-form-group">
           <label class="edu-label">Age</label>
           <input type="number" name="sibling_age[]" class="edu-input">
         </div>
-        <div class="col-3 edu-form-group">
+        <div class="col-6 edu-form-group">
           <label class="edu-label">Class</label>
           <input type="text" name="sibling_class[]" class="edu-input">
         </div>
-        <div class="col-3 edu-form-group">
+        <div class="col-6 edu-form-group">
           <label class="edu-label">School Name</label>
           <input type="text" name="sibling_school_name[]" class="edu-input">
         </div>
         <div class="col-12 edu-form-group">
-          <label class="edu-label">Linked Student <span style="color:#adb5bd;font-weight:400">(Optional)</span></label>
+          <label class="edu-label">Linked Student <span style="color:#adb5bd;font-weight:400;text-transform:none;letter-spacing:0">(Optional)</span></label>
           <select name="sibling_student_id[]" class="edu-select">
             <option value="">None</option>
             {% for s in all_students %}
