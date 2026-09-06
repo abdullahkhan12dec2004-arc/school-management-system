@@ -17,11 +17,15 @@
     .table-bordered-custom thead th {
         background: linear-gradient(135deg, #7dd3fc, #38bdf8);
         color: white;
-        border: 1px solid #7dd3fc !important;
+        border: 1px solid rgba(255, 255, 255, 0.35) !important;
+        border-top: none !important;
         font-weight: 600;
         font-size: 12.5px;
         text-transform: uppercase;
         letter-spacing: 0.4px;
+    }
+    .table-bordered-custom thead tr:first-child th {
+        border-top: none !important;
     }
     .table-bordered-custom tbody tr:nth-child(even) {
         background-color: #f8fafc;
