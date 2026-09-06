@@ -3,7 +3,96 @@
 
 {% block extra_css %}
 <style>
-    /* Custom table styles with borders */
+    :root {
+        --primary-dark: #0f2b3d;
+        --primary: #1a4a6f;
+        --primary-light: #2c6e9e;
+        --primary-bg: #e8f1f8;
+        --secondary: #c6a43b;
+        --secondary-dark: #a07d2a;
+        --secondary-light: #e0c87c;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-800: #1e293b;
+        --sky-blue: #38bdf8;
+        --sky-blue-dark: #0ea5e9;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --radius-2xl: 1.5rem;
+    }
+
+    /* ===== HEADING (user.html jaisa blue banner) ===== */
+    .students-page-header {
+        margin-bottom: 1.75rem;
+        padding: 1.25rem 1.75rem;
+        border-radius: var(--radius-xl);
+        background: linear-gradient(135deg, #1d9bf0 0%, #38bdf8 100%);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .students-page-header h2 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .students-page-header h2 i {
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.22);
+        border-radius: var(--radius-lg);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        color: #ffffff;
+    }
+
+    .students-page-header h2 .heading-text {
+        color: #ffffff;
+    }
+
+    /* Add Student button -> sky blue */
+    .students-page-header .btn-primary {
+        background: #ffffff;
+        color: var(--sky-blue-dark);
+        border: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: var(--radius-lg);
+        transition: all 0.2s ease;
+    }
+
+    .students-page-header .btn-primary:hover {
+        background: var(--sky-blue);
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
+    }
+
+    /* ===== TABLE CARD (user.html jaisa rounded card) ===== */
+    .students-table-card {
+        margin-top: 1.5rem;
+        border-radius: var(--radius-2xl);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
     .table-bordered-custom {
         width: 100%;
         border-collapse: collapse;
@@ -11,40 +100,44 @@
 
     .table-bordered-custom th,
     .table-bordered-custom td {
-        border: 1px solid #dee2e6 !important;
+        border: 1px solid var(--gray-200) !important;
         padding: 12px;
         vertical-align: middle;
     }
 
     .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-        color: white;
-        border: 1px solid #38bdf8 !important;
-        font-weight: 600;
-        font-size: 13px;
+        background: linear-gradient(135deg, var(--sky-blue) 0%, var(--sky-blue-dark) 100%);
+        color: #ffffff;
+        border: 1px solid var(--sky-blue-dark) !important;
+        font-weight: 700;
+        font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
+    }
+
+    .table-bordered-custom tbody tr {
+        transition: background 0.2s ease;
     }
 
     .table-bordered-custom tbody tr:nth-child(even) {
-        background-color: #f8fafc;
+        background-color: var(--gray-50);
     }
 
     .table-bordered-custom tbody tr:hover {
-        background-color: #e8f1f8;
+        background-color: var(--gray-50);
     }
 
     .table-bordered-custom td:first-child {
         font-weight: 700;
-        color: #c6a43b;
+        color: var(--secondary);
         text-align: center;
         width: 50px;
     }
 
     /* Student Code Badge */
     .student-code-badge {
-        background: #0f2b3d;
-        color: #e0c87c;
+        background: var(--primary-dark);
+        color: var(--secondary-light);
         font-family: 'Courier New', monospace;
         font-size: 11px;
         font-weight: 600;
@@ -56,8 +149,8 @@
 
     /* Class Badge */
     .class-badge {
-        background: #e8f1f8;
-        color: #1a4a6f;
+        background: var(--primary-bg);
+        color: var(--primary);
         padding: 4px 10px;
         border-radius: 20px;
         font-size: 12px;
@@ -112,45 +205,15 @@
     }
 
     .btn-result {
-        background: #0f2b3d;
+        background: var(--primary-dark);
         color: white;
         border: none;
     }
 
     .btn-result:hover {
-        background: #1a4a6f;
+        background: var(--primary);
         transform: translateY(-1px);
         box-shadow: 0 2px 8px rgba(26, 74, 111, 0.3);
-    }
-
-    /* Page Header Row: icon + heading + Add Student button */
-    .students-page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 1.75rem;
-    }
-
-    .students-page-header h2 {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 0;
-    }
-
-    .students-page-header h2 i {
-        color: #38bdf8;
-    }
-
-    .students-page-header h2 .heading-text {
-        color: #38bdf8;
-    }
-
-    /* Push the students table card down a bit from the header row */
-    .students-table-card {
-        margin-top: 1.5rem;
     }
 
     /* Responsive */
@@ -175,6 +238,7 @@
             gap: 10px;
         }
     }
+
     .dashboard-container {
         background-color: #ffffff !important;
     }
