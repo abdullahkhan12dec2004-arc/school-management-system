@@ -90,6 +90,19 @@
         color: white;
     }
 
+    /* Reliable gap between Parent Details & Link Children columns,
+       regardless of Bootstrap gutter behavior */
+    .form-container-custom form .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .form-container-custom form .row > [class*="col-"] {
+        flex: 1 1 320px;
+        max-width: 100%;
+    }
+
     .card-header-custom.primary {
         background: var(--sky);
     }
