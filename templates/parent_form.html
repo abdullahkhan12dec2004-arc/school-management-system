@@ -5,6 +5,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+    :root {
+        --sky: #0ea5e9;
+        --sky-dark: #0284c7;
+        --sky-light: #e0f2fe;
+    }
+
     body {
         background: #ffffff !important;
         font-family: 'Inter', sans-serif;
@@ -17,59 +23,77 @@
         padding: 0 1rem;
     }
 
+    /* ===== HEADER (same design/size as Edit School) ===== */
     .page-header {
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        background: var(--sky);
+        border-radius: 20px;
+        padding: 1.1rem 1.5rem;
         margin-bottom: 2rem;
+        box-shadow: 0 10px 25px rgba(14, 165, 233, 0.25);
+        text-align: left;
+        flex-wrap: wrap;
     }
 
     .page-header h1 {
-        font-size: 1.8rem;
+        font-size: 1.3rem;
         font-weight: 700;
-        color: #0ea5e9;
-        margin-bottom: 0.5rem;
+        color: #ffffff;
+        margin-bottom: 0;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         gap: 12px;
     }
 
     .page-header h1 i {
-        color: #0ea5e9;
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
     }
 
     .page-header p {
-        color: #6c7a91;
-        font-size: 0.9rem;
+        display: none;
     }
 
+    /* ===== CARDS ===== */
     .card-custom {
         background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.08);
-        border: 1px solid #e7f4fc;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.05);
+        border: 1px solid #eef2f8;
         overflow: hidden;
         height: 100%;
         display: flex;
         flex-direction: column;
-        margin-top: 1.75rem;
+        margin-top: 0;
     }
 
     .card-header-custom {
-        padding: 1rem 1.5rem;
+        padding: 1.25rem 1.5rem;
         color: white;
     }
 
     .card-header-custom.primary {
-        background: linear-gradient(98deg, #0ea5e9 0%, #38bdf8 100%);
+        background: var(--sky);
     }
 
     .card-header-custom.success {
-        background: linear-gradient(98deg, #0284c7 0%, #38bdf8 100%);
+        background: var(--sky-dark);
     }
 
     .card-header-custom h3 {
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.05rem;
         font-weight: 600;
         display: flex;
         align-items: center;
@@ -86,20 +110,18 @@
 
     .card-header-custom h3 i {
         color: #ffffff;
-        background: rgba(255, 255, 255, 0.2);
-        padding: 6px;
-        border-radius: 8px;
     }
 
     .card-body-custom {
-        padding: 1.5rem;
+        padding: 2.2rem;
         flex-grow: 1;
     }
 
+    /* ===== FORM ELEMENTS ===== */
     .form-group {
         display: flex;
         flex-direction: column;
-        margin-bottom: 1.1rem;
+        margin-bottom: 1.25rem;
     }
 
     .form-label {
@@ -107,12 +129,12 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #0ea5e9;
+        color: var(--sky);
         margin-bottom: 0.4rem;
     }
 
     .form-label i {
-        color: #0ea5e9;
+        color: var(--sky);
         margin-right: 6px;
         width: 14px;
     }
@@ -131,32 +153,31 @@
         left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        color: #9aa9bf;
+        color: var(--sky);
         font-size: 0.9rem;
         pointer-events: none;
     }
 
     .input-wrapper input {
         width: 100%;
-        padding: 0.7rem 1rem 0.7rem 2.5rem;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
         border: 1.5px solid #e5eaf0;
         border-radius: 12px;
-        font-size: 0.82rem;
+        font-size: 0.85rem;
         font-family: 'Inter', sans-serif;
-        background: #f8fbfd;
+        background: #ffffff;
         transition: all 0.2s;
     }
 
     .input-wrapper input:focus {
         outline: none;
-        border-color: #0ea5e9;
-        background: #ffffff;
+        border-color: var(--sky);
         box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
     }
 
     .input-wrapper input::placeholder {
         color: #b9c2d0;
-        font-size: 0.8rem;
+        font-size: 0.82rem;
     }
 
     .help-text {
@@ -165,10 +186,10 @@
         margin-top: 5px;
     }
 
-    /* Children Search & List */
+    /* ===== Children Search & List ===== */
     .search-wrapper {
         position: relative;
-        margin-bottom: 1.1rem;
+        margin-bottom: 1.25rem;
     }
 
     .search-wrapper i {
@@ -176,22 +197,21 @@
         left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        color: #9aa9bf;
+        color: var(--sky);
     }
 
     .search-wrapper input {
         width: 100%;
-        padding: 0.7rem 1rem 0.7rem 2.5rem;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
         border: 1.5px solid #e5eaf0;
         border-radius: 12px;
-        font-size: 0.82rem;
-        background: #f8fbfd;
+        font-size: 0.85rem;
+        background: #ffffff;
     }
 
     .search-wrapper input:focus {
         outline: none;
-        border-color: #0ea5e9;
-        background: #ffffff;
+        border-color: var(--sky);
         box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
     }
 
@@ -203,7 +223,7 @@
 
     .student-item {
         background: #ffffff;
-        border: 1px solid #e7f4fc;
+        border: 1px solid #eef2f8;
         border-radius: 14px;
         padding: 0.8rem;
         margin-bottom: 0.6rem;
@@ -215,13 +235,13 @@
     }
 
     .student-item:hover {
-        background: #f0f9ff;
-        border-color: #0ea5e9;
+        background: var(--sky-light);
+        border-color: var(--sky);
     }
 
     .student-item.selected {
         background: #ecfeff;
-        border-color: #0ea5e9;
+        border-color: var(--sky);
     }
 
     .student-item input[type="checkbox"] {
@@ -240,7 +260,7 @@
         justify-content: center;
         font-weight: 700;
         color: white;
-        background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+        background: var(--sky);
         font-size: 0.85rem;
         margin-left: 4px;
     }
@@ -264,11 +284,12 @@
 
     .student-details i {
         margin-right: 4px;
+        color: var(--sky);
     }
 
     .badge-count {
-        background: white;
-        color: #0284c7;
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
         padding: 2px 8px;
         border-radius: 20px;
         font-size: 0.72rem;
@@ -276,28 +297,28 @@
     }
 
     .check-badge {
-        color: #0ea5e9;
+        color: var(--sky);
         font-size: 1.15rem;
         margin-left: 12px;
     }
 
-    /* Form Action Bar */
+    /* ===== Form Action Bar ===== */
     .action-bar {
         background: white;
         border-radius: 18px;
-        border: 1px solid #e7f4fc;
-        padding: 1rem 1.5rem;
+        border: 1px solid #eef2f8;
+        padding: 1.1rem 1.5rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-top: 1.5rem;
-        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
+        box-shadow: 0 10px 30px rgba(15, 43, 61, 0.05);
         flex-wrap: wrap;
         gap: 0.75rem;
     }
 
     .action-bar-text {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         color: #6c7c97;
         display: flex;
         align-items: center;
@@ -305,7 +326,7 @@
     }
 
     .action-bar-text i {
-        color: #0ea5e9;
+        color: var(--sky);
     }
 
     .btn-group-custom {
@@ -314,10 +335,10 @@
     }
 
     .btn-custom {
-        padding: 0.65rem 1.5rem;
+        padding: 0.75rem 1.8rem;
         border-radius: 40px;
         font-weight: 600;
-        font-size: 0.82rem;
+        font-size: 0.85rem;
         cursor: pointer;
         border: none;
         display: inline-flex;
@@ -329,36 +350,37 @@
     }
 
     .btn-custom-primary {
-        background: linear-gradient(105deg, #0ea5e9, #38bdf8);
+        background: var(--sky);
         color: white;
     }
 
     .btn-custom-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        background: var(--sky-dark);
     }
 
     .btn-custom-secondary {
-        background: #f0f9ff;
-        color: #0284c7;
-        border: 1px solid #bae6fd;
+        background: var(--sky-light);
+        color: var(--sky-dark);
+        border: 1px solid var(--sky);
     }
 
     .btn-custom-secondary:hover {
-        background: #e0f2fe;
+        background: #cdeaf9;
     }
 
     .info-box {
-        background: #f0f9ff;
-        border: 1px solid #bae6fd;
+        background: var(--sky-light);
+        border: 1px solid var(--sky);
         border-radius: 12px;
         padding: 9px 12px;
         font-size: 0.75rem;
-        color: #0284c7;
+        color: var(--sky-dark);
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 1.1rem;
+        margin-bottom: 1.25rem;
     }
 
     .password-toggle-btn {
