@@ -200,17 +200,66 @@
         .col-md-8, .col-md-4 {
             width: 100%;
         }
+            /* Page banner - same look as "User Management" banner */
+    .page-banner {
+        background-color: #0ea5e9;
+        border-radius: 16px;
+        padding: 26px 28px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+    }
+
+    .page-banner-icon {
+        width: 54px;
+        height: 54px;
+        min-width: 54px;
+        background-color: rgba(255, 255, 255, 0.18);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .page-banner-icon i {
+        color: #ffffff;
+        font-size: 1.6rem;
+    }
+
+    .page-banner-text h2 {
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 1.6rem;
+        margin: 0 0 4px 0;
+    }
+
+    .page-banner-text p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.85rem;
+        margin: 0;
+        font-weight: 400;
+    }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid py-3">
-  <!-- Heading in one line with icon - bigger & sky blue -->
-  <h2 class="d-flex align-items-center" style="font-weight: 800; color: #0ea5e9; font-size: 2.1rem; gap: 12px; margin-bottom: 28px;">
-    <i class="fas fa-file-upload" style="color: #0ea5e9; font-size: 2rem;"></i>
-    Bulk Upload — <span id="uploadTypeDisplay">{{ upload_type | title }}</span>
-  </h2>
+
+  <!-- Banner Heading (same style as User Management banner) -->
+  <div class="page-banner mb-4">
+    <div class="page-banner-icon">
+      <i class="fas fa-file-upload"></i>
+    </div>
+    <div class="page-banner-text">
+      <h2>Bulk Upload — <span id="uploadTypeDisplay">{{ upload_type | title }}</span></h2>
+      <p>Upload multiple {{ upload_type }} records at once using an Excel template</p>
+    </div>
+  </div>
+
+  <!-- 1 Card on top: Step A -->
+  <div class="row mb-4">
 
   <!-- 1 Card on top: Step A -->
   <div class="row mb-4">
