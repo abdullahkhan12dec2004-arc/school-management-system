@@ -3,6 +3,61 @@
 
 {% block extra_css %}
 <style>
+    /* Top action row - ab gradient banner ban jayega */
+.top-action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+    margin-bottom: 24px;
+}
+
+.top-action-row .action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+/* Heading - white text + icon andar white box mein */
+.page-heading {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0;
+}
+
+.page-heading i {
+    background: #ffffff;
+    color: #0ea5e9;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+/* Button - white bg, blue text (jaisa "+ Add Student" button image mein hai) */
+.btn-sky {
+    background: #ffffff;
+    border: none;
+    color: #0ea5e9;
+    font-weight: 700;
+}
+
+.btn-sky:hover {
+    background: #f0f9ff;
+    color: #0284c7;
+}
     /* Custom table styles with borders */
     .table-bordered-custom {
         width: 100%;
@@ -55,48 +110,15 @@
         min-width: 40px;
     }
 
-    /* Page heading */
-    .page-heading {
-        font-size: 32px;
-        font-weight: 800;
-        color: #0ea5e9;
-    }
 
-    .page-heading i {
-        color: #0ea5e9;
-        font-size: 30px;
-    }
 
     /* Top action row */
-    .top-action-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .top-action-row .action-buttons {
-        display: flex;
-        gap: 10px;
-        margin-left: auto;
-    }
 
     .top-action-row {
         margin-bottom: 24px; /* gap between heading row and stat cards below */
     }
 
-    .btn-sky {
-        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-        border: none;
-        color: #fff;
-        font-weight: 600;
-    }
 
-    .btn-sky:hover {
-        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-        color: #fff;
-    }
 
     .btn-outline-sky {
         border: 1px solid #0ea5e9;
