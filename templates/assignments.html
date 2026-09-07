@@ -3,13 +3,13 @@
 
 {% block extra_css %}
 <style>
-    /* ===== Global Palette ===== */
+    /* ===== Global Palette (Sky Blue from screenshot) ===== */
     :root {
-        --sky-dark: #0369a1;
-        --sky: #0ea5e9;
-        --sky-light: #38bdf8;
-        --sky-lighter: #e0f2fe;
-        --sky-text: #0284c7;
+        --sky-dark: #1E90C4;
+        --sky: #29ABE2;
+        --sky-light: #29ABE2;
+        --sky-lighter: #E8F7FD;
+        --sky-text: #1E90C4;
     }
 
     body, .main-content, .container-fluid, .dashboard-container {
@@ -21,11 +21,11 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 55%, var(--sky-light) 100%);
+        background: var(--sky);
         border-radius: 14px;
         padding: 20px 26px;
         margin-bottom: 28px;
-        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.25);
+        box-shadow: 0 6px 18px rgba(41, 171, 226, 0.25);
     }
 
     .top-bar .page-heading {
@@ -82,13 +82,13 @@
         border-radius: 14px;
         overflow: hidden;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.10);
+        box-shadow: 0 4px 14px rgba(41, 171, 226, 0.10);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .stat-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.18);
+        box-shadow: 0 8px 20px rgba(41, 171, 226, 0.18);
     }
 
     .stat-card-header {
@@ -141,18 +141,18 @@
         background: white;
         border-radius: 14px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.10);
+        box-shadow: 0 4px 14px rgba(41, 171, 226, 0.10);
         overflow: hidden;
         font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
         transition: box-shadow 0.25s ease;
     }
 
     .form-card:hover {
-        box-shadow: 0 8px 22px rgba(14, 165, 233, 0.18);
+        box-shadow: 0 8px 22px rgba(41, 171, 226, 0.18);
     }
 
     .form-card-header {
-        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 55%, var(--sky-light) 100%);
+        background: var(--sky);
         color: white;
         padding: 18px 22px;
         border-bottom: 1px solid var(--sky-light);
@@ -196,7 +196,7 @@
 
     .form-card .form-select:focus {
         border-color: var(--sky);
-        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+        box-shadow: 0 0 0 3px rgba(41, 171, 226, 0.15);
     }
 
     .form-card .form-text {
@@ -228,22 +228,22 @@
 
     .form-card .btn-primary,
     .form-card button[type="submit"] {
-        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 100%);
+        background: var(--sky);
         border: none;
         font-weight: 600;
         font-size: 14.5px;
         padding: 11px 18px;
         border-radius: 9px;
         letter-spacing: 0.3px;
-        box-shadow: 0 3px 10px rgba(14, 165, 233, 0.30);
+        box-shadow: 0 3px 10px rgba(41, 171, 226, 0.30);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .form-card .btn-primary:hover,
     .form-card button[type="submit"]:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(14, 165, 233, 0.40);
-        background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
+        box-shadow: 0 6px 16px rgba(41, 171, 226, 0.40);
+        background: var(--sky-dark);
     }
 
     select[multiple] {
@@ -269,12 +269,12 @@
         background: #ffffff;
         border-radius: 14px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.10);
+        box-shadow: 0 4px 14px rgba(41, 171, 226, 0.10);
         overflow: hidden;
     }
 
     .assignments-card-header {
-        background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky) 55%, var(--sky-light) 100%);
+        background: var(--sky);
         padding: 16px 22px;
         display: flex;
         justify-content: space-between;
