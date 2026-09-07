@@ -379,6 +379,48 @@
             .stat-box-content h4 {
                 font-size: 17px;
             }
+         /* ================================================================
+       PAGE HEADING — matches "User Management" style
+       ================================================================ */
+.page-heading-banner {
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    border-radius: 14px;
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+}
+
+.page-heading-icon-box {
+    width: 54px;
+    height: 54px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.page-heading-icon-box i {
+    color: #ffffff;
+    font-size: 24px;
+}
+
+.page-heading-text h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.page-heading-text p {
+    margin: 4px 0 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13.5px;
+    font-weight: 400;
+}
         }
     </style>
 {% endblock %}
@@ -388,11 +430,15 @@
 <div class="subjects-page-wrap">
 
     <!-- 1. TOP: Icon + Heading -->
-    <div class="d-flex justify-content-between align-items-center">
-        <h2 class="subjects-heading">
-            <i class="fas fa-book" style="color: #c6a43b;"></i> Subjects
-        </h2>
-    </div>
+ <div class="page-heading-banner">
+       <div class="page-heading-icon-box">
+          <i class="fas fa-book"></i>
+       </div>
+       <div class="page-heading-text">
+         <h2>Subjects</h2>
+             <p>Manage all subjects, marks distribution, and class assignments</p>
+       </div>
+</div>
 
     <!-- 2. STATS CARDS — always one row, equal width & height -->
     {% if subjects %}
