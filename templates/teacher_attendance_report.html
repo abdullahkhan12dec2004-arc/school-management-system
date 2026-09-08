@@ -12,7 +12,7 @@
 body{
     background:#ffffff;
 }
-    /* ─── FIX: base.html .content override ───────────────────── */
+/* ─── FIX: base.html .content override ───────────────────── */
 .content {
     overflow-x: hidden;
     min-width: 0;
@@ -22,11 +22,11 @@ body{
 .tar {
     width: 100%;
     max-width: 100%;
-    padding: 12px;
+    padding: 16px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 22px;                 /* ↑ zyada spacing sections ke darmiyan */
     min-width: 0;
 }
 
@@ -53,35 +53,57 @@ body{
     display: block;
 }
 
-/* ─── TOP BAR ────────────────────────────────────────────── */
+/* ─── TOP BAR (Sky Blue Heading) ─────────────────────────── */
 .tar-topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
-    background: #ffffff;
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    gap: 12px;
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    padding: 18px 22px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(14,165,233,0.25);
 }
 .tar-title-group { display: flex; align-items: center; gap: 10px; }
-.tar-title-group h2 { margin: 0; font-size: 18px; color: #1e293b; font-weight: 700; }
-.tar-title-group p { margin: 3px 0 0; font-size: 12px; color: #64748b; }
+.tar-title-group h2 {
+    margin: 0;
+    font-size: 19px;
+    color: #ffffff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tar-title-group p {
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
 .tar-filter-form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.tar-filter-form label { font-size: 13px; font-weight: 500; color: #475569; }
+.tar-filter-form label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
 .tar-filter-form input[type="month"] {
-    padding: 7px 10px;
-    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+    border: none;
     border-radius: 6px;
     font-size: 13px;
     outline: none;
-    color: #334155;
+    color: #0f172a;
+    background: #ffffff;
 }
 .tar-btn-apply, .tar-btn-back {
-    padding: 7px 13px;
+    padding: 8px 16px;
     border-radius: 6px;
     font-size: 13px;
     text-decoration: none;
@@ -89,90 +111,82 @@ body{
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.2s;
+    border: none;
 }
-.tar-btn-apply { background: #2563eb; color: #fff; border: none; }
-.tar-btn-apply:hover { background: #1d4ed8; }
-.tar-btn-back { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-.tar-btn-back:hover { background: #e2e8f0; }
+.tar-btn-apply { background: #ffffff; color: #0ea5e9; }
+.tar-btn-apply:hover { background: #eff6ff; }
+.tar-btn-back { background: #ffffff; color: #0ea5e9; }
+.tar-btn-back:hover { background: #eff6ff; }
 
-/* ─── STATS CARDS (compact) ──────────────────────────────── */
+/* ─── STATS CARDS (compact, more breathing space) ────────── */
 .tar-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);   /* always 4 in a row */
-    gap: 8px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
 }
 @media (max-width: 640px) {
     .tar-stats { grid-template-columns: repeat(2, 1fr); }
 }
 .tar-stat {
     background: #fff;
-    padding: 10px 12px;
-    border-radius: 10px;
+    padding: 16px 16px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 .tar-stat-icon {
-    width: 36px; height: 36px;
-    border-radius: 8px;
+    width: 40px; height: 40px;
+    border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
+    font-size: 17px;
     flex-shrink: 0;
 }
 .ic-blue { background: #dbeafe; color: #1d4ed8; }
 .ic-green { background: #dcfce7; color: #15803d; }
 .ic-gold { background: #fef3c7; color: #b45309; }
 .ic-navy { background: #e0f2fe; color: #0369a1; }
-.tar-stat-val { font-size: 20px; font-weight: 700; color: #0f172a; line-height: 1.2; }
-.tar-stat-lbl { font-size: 11px; color: #64748b; margin-top: 1px; }
+.tar-stat-val { font-size: 21px; font-weight: 700; color: #0f172a; line-height: 1.2; }
+.tar-stat-lbl { font-size: 11.5px; color: #64748b; margin-top: 2px; }
 
-/* ─── CHART CARD (smaller height) ───────────────────────── */
+/* ─── CHART CARD ─────────────────────────────────────────── */
 .tar-chart-card {
     background: #fff;
     border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 14px 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 .tar-chart-hdr {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
 }
-.tar-chart-hdr h3 { margin: 0; font-size: 14px; color: #1e293b; }
+.tar-chart-hdr h3 { margin: 0; font-size: 14.5px; color: #1e293b; }
 .tar-month-pill {
-    background: #f1f5f9;
-    padding: 3px 10px;
+    background: #e0f2fe;
+    padding: 4px 12px;
     border-radius: 20px;
     font-size: 11px;
-    color: #475569;
-    font-weight: 500;
+    color: #0369a1;
+    font-weight: 600;
 }
 
 /* ─── TABLE CARD ─────────────────────────────────────────── */
 .tar-tbl-card {
     background: #ffffff;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
     width: 100%;
-    overflow: hidden;       /* clip outer radius */
+    overflow: hidden;
 }
 
-/* Scrollable wrapper — KEY FIX */
-.tar-tbl-scroll {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    /* Ensure it never stretches parent */
-    display: block;
-}
 .tar-tbl-scroll::-webkit-scrollbar { height: 8px; }
 .tar-tbl-scroll::-webkit-scrollbar-track { background: #f8fafc; }
 .tar-tbl-scroll::-webkit-scrollbar-thumb {
@@ -185,27 +199,27 @@ table.tar-tbl {
     border-collapse: separate;
     border-spacing: 0;
     font-size: 12.5px;
-    /* Do NOT set width:100% here — let it be natural width so scroll kicks in */
-    min-width: 700px;   /* minimum so it triggers scroll on small screens */
+    min-width: 700px;
     table-layout: auto;
 }
 
-table.tar-tbl thead tr { background: #0f172a; }
+/* Sky Blue table header */
+table.tar-tbl thead tr { background: #0ea5e9; }
 
 table.tar-tbl th {
     text-align: center;
-    padding: 11px 8px;
+    padding: 13px 8px;
     font-size: 10.5px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.88);
+    font-weight: 700;
+    color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 0.4px;
     white-space: nowrap;
-    border-bottom: 1px solid #1e293b;
+    border-bottom: 1px solid #0284c7;
 }
 
 table.tar-tbl td {
-    padding: 9px 8px;
+    padding: 10px 8px;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
     color: #334155;
@@ -232,7 +246,7 @@ table.tar-tbl td:nth-child(1) {
     max-width: 36px;
     text-align: center;
 }
-table.tar-tbl th:nth-child(1) { background: #0f172a; }
+table.tar-tbl th:nth-child(1) { background: #0ea5e9; }
 table.tar-tbl td:nth-child(1) { background: #ffffff; font-weight: 600; color: #94a3b8; }
 
 /* Sticky col 2 — Teacher Name */
@@ -245,14 +259,12 @@ table.tar-tbl td:nth-child(2) {
     min-width: 150px;
     max-width: 150px;
 }
-table.tar-tbl th:nth-child(2) { background: #0f172a; }
+table.tar-tbl th:nth-child(2) { background: #0ea5e9; }
 table.tar-tbl td:nth-child(2) {
     background: #ffffff;
-    /* Right shadow separates sticky from scrolling content */
     box-shadow: 3px 0 6px -2px rgba(0,0,0,0.12);
 }
 
-/* Row hover — must override sticky bg too */
 table.tar-tbl tbody tr:hover td { background: #f8fafc !important; }
 
 .tar-tbl .t-name { font-weight: 600; color: #1e293b; font-size: 13px; }
@@ -287,8 +299,8 @@ table.tar-tbl tbody tr:hover td { background: #f8fafc !important; }
 .tar-legend {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 10px 14px;
+    border-radius: 12px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     gap: 10px;
