@@ -14,11 +14,11 @@
 
     /* Card styling */
     .card {
-        border-radius: 14px !important;
-        border: 1px solid #e2e8f0 !important;
-        margin-bottom: 24px;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
-        transition: box-shadow 0.2s ease;
+       border-radius: 14px !important;
+       border: 1px solid #e2e8f0 !important;
+       margin-bottom: 32px; /* pehle 24px tha, ab thora zyada */
+       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+       transition: box-shadow 0.2s ease;
     }
 
     .card:hover {
@@ -173,12 +173,16 @@
 
     /* Row / Col layout */
     /* Row / Col layout */
-    .row {
-        display: flex;
-        flex-wrap: wrap;
-        margin: 0 -14px;
-    }
 
+    .row {
+       display: flex;
+       flex-wrap: wrap;
+       margin: 0 -14px;
+   }
+
+   .row.mb-4 {
+       margin-bottom: 32px !important; /* naya rule add karen */
+   }
     .col-12 {
         width: 100%;
         padding: 0 14px;
@@ -202,14 +206,15 @@
         }
     }
             /* Page banner - same look as "User Management" banner */
-    .page-banner {
-        background-color: #0ea5e9;
-        border-radius: 16px;
-        padding: 26px 28px;
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+   .page-banner {
+       background-color: #0ea5e9;
+       border-radius: 16px;
+       padding: 26px 28px;
+       display: flex;
+       align-items: center;
+       gap: 18px;
+       box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+       margin-bottom: 32px; /* naya - banner aur cards ke darmiyan gap */   
     }
 
     .page-banner-icon {
