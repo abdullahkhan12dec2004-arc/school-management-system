@@ -4,9 +4,9 @@
 {% block content %}
 <style>
     :root {
-        --sky-blue: #0ea5e9;
-        --sky-blue-dark: #0284c7;
-        --sky-blue-light: #e0f2fe;
+        --sky-blue: #3b82f6;
+        --sky-blue-dark: #2563eb;
+        --sky-blue-light: #dbeafe;
     }
 
     body {
@@ -16,11 +16,10 @@
     .notices-page-heading {
         font-family: 'Segoe UI', 'Poppins', sans-serif;
         font-weight: 700;
-        color: var(--sky-blue);
-        font-size: 2.1rem;
-        letter-spacing: 0.3px;
-        margin-bottom: 1.75rem;
-        padding-bottom: 0.6rem;
+        color: #1e293b;
+        font-size: 1.9rem;
+        letter-spacing: 0.2px;
+        margin-bottom: 0.25rem;
         display: block;
         text-align: left;
     }
@@ -28,6 +27,13 @@
     .notices-page-heading i {
         color: var(--sky-blue);
         margin-right: 8px;
+    }
+
+    .notices-breadcrumb {
+        font-size: 0.85rem;
+        color: var(--sky-blue);
+        margin-bottom: 1.75rem;
+        display: block;
     }
 
     /* ===== Card general ===== */
@@ -94,7 +100,7 @@
     .compact-form .form-control:focus,
     .compact-form .form-select:focus {
         border-color: var(--sky-blue);
-        box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.2);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2);
     }
 
     .compact-form textarea.form-control {
@@ -182,32 +188,33 @@
         background-color: var(--sky-blue-dark);
         color: #ffffff !important;
     }
+
     .notice-row {
-    display: flex;
-    gap: 25px;
-    justify-content: flex-start;
-    align-items: stretch;
-}
+        display: flex;
+        gap: 25px;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
 
-.notice-col {
-    width: 50%;
-}
-
-@media (max-width: 992px) {
     .notice-col {
         width: 50%;
     }
-}
 
-@media (max-width: 768px) {
-    .notice-row {
-        flex-direction: column;
+    @media (max-width: 992px) {
+        .notice-col {
+            width: 50%;
+        }
     }
 
-    .notice-col {
-        width: 100%;
+    @media (max-width: 768px) {
+        .notice-row {
+            flex-direction: column;
+        }
+
+        .notice-col {
+            width: 100%;
+        }
     }
-}
 </style>
 
 <div class="container mt-4">
