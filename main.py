@@ -331,105 +331,72 @@ def generate_excel_report(records, upload_type):
     wb.save(buf)
     return buf.getvalue()
 
+
 def safe_read_excel(file_storage, header_row_index=2, max_rows=5000):
+    """
+    Safe Excel reader.
+    Uses python-calamine instead of openpyxl.
+    """
+
     import io
-    import openpyxl
     import pandas as pd
 
+    # Start from beginning
     file_storage.stream.seek(0)
+
+    # Read uploaded file
     file_bytes = file_storage.stream.read()
 
-    # Maximum upload size: 10 MB
+    print(
+        f"DEBUG: uploaded Excel size = {len(file_bytes)} bytes",
+        flush=True
+    )
+
+    # 10 MB limit
     if len(file_bytes) > 10 * 1024 * 1024:
-        raise ValueError("Excel file is too large. Maximum size is 10 MB.")
+        raise ValueError(
+            "Excel file is too large. Maximum allowed size is 10 MB."
+        )
 
     if not file_bytes:
         raise ValueError("Uploaded Excel file is empty.")
 
-    print(f"DEBUG: Excel bytes read: {len(file_bytes)}", flush=True)
-
-    wb = None
+    print("DEBUG: before calamine read_excel", flush=True)
 
     try:
-        print("DEBUG: loading workbook...", flush=True)
-
-        wb = openpyxl.load_workbook(
-            filename=io.BytesIO(file_bytes),
-            read_only=True,
-            data_only=True
+        df = pd.read_excel(
+            io.BytesIO(file_bytes),
+            engine="calamine",
+            header=header_row_index,
+            nrows=max_rows
         )
 
-        print("DEBUG: workbook loaded", flush=True)
-
-        ws = wb.active
-
+    except Exception as e:
         print(
-            f"DEBUG: sheet={ws.title}, max_row={ws.max_row}, max_column={ws.max_column}",
+            f"DEBUG: calamine Excel error = {repr(e)}",
             flush=True
         )
-
-        if ws.max_column > 100:
-            raise ValueError("Excel file has too many columns.")
-
-        if ws.max_row > max_rows + header_row_index + 1:
-            raise ValueError(
-                f"Excel file has too many rows. Maximum {max_rows} data rows allowed."
-            )
-
-        rows = ws.iter_rows(values_only=True)
-
-        header = None
-
-        for i, row in enumerate(rows):
-            if i == header_row_index:
-                header = list(row)
-                break
-
-        if not header:
-            raise ValueError("Excel header row not found.")
-
-        # Remove empty columns from end
-        while header and header[-1] is None:
-            header.pop()
-
-        if not header:
-            raise ValueError("Excel header is empty.")
-
-        data_rows = []
-
-        for row_number, row in enumerate(rows, start=header_row_index + 2):
-
-            if row is None:
-                continue
-
-            row = list(row[:len(header)])
-
-            # Skip completely empty row
-            if not any(value is not None for value in row):
-                continue
-
-            if len(row) < len(header):
-                row.extend([None] * (len(header) - len(row)))
-
-            data_rows.append(row)
-
-            if len(data_rows) >= max_rows:
-                break
-
-        df = pd.DataFrame(data_rows, columns=header)
-
-        print(
-            f"DEBUG: DataFrame created: shape={df.shape}",
-            flush=True
+        raise ValueError(
+            f"Excel file could not be read: {str(e)}"
         )
 
-        return df
+    print(
+        f"DEBUG: calamine read_excel complete, shape={df.shape}",
+        flush=True
+    )
 
-    finally:
-        if wb is not None:
-            wb.close()
-            print("DEBUG: workbook closed", flush=True)
+    # Clean completely empty rows
+    df = df.dropna(how="all").reset_index(drop=True)
 
+    # Clean empty columns
+    df = df.dropna(axis=1, how="all")
+
+    print(
+        f"DEBUG: final dataframe shape={df.shape}",
+        flush=True
+    )
+
+    return df
 
 
 
@@ -3154,14 +3121,14 @@ def bulk_upload_teachers():
     if request.method == 'POST':
         import sys
         file = request.files.get('file')
-
         if not file or not file.filename:
-           flash('Please select an Excel file.', 'error')
+          flash('Please select an Excel file.', 'error')
+          return redirect(request.url)
+
+        if not file.filename.lower().endswith(('.xlsx', '.xls')):
+          flash('Please upload an Excel file (.xlsx or .xls).', 'error')
            return redirect(request.url)
 
-        if not file.filename.lower().endswith('.xlsx'):
-           flash('Please upload an .xlsx Excel file only.', 'error')
-           return redirect(request.url)
 
         try:
             print("DEBUG: before read_excel", flush=True)
