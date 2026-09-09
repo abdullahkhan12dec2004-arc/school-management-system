@@ -16,6 +16,7 @@ opencv-python-headless==4.12.0.88
 openpyxl==3.1.5
 pandas==2.2.3
 psycopg2-binary==2.9.12
+python-calamine
 python-dateutil==2.9.0.post0
 PyYAML==6.0.3
 requests==2.33.1
