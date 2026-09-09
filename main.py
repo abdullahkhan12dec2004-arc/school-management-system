@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask import request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
 from functools import wraps
-
+import openpyxl
 import datetime
 import os
 import psycopg2
@@ -330,6 +330,65 @@ def generate_excel_report(records, upload_type):
     buf = io.BytesIO()
     wb.save(buf)
     return buf.getvalue()
+
+
+
+
+def safe_read_excel(file_storage, header_row_index=2, max_empty_rows_in_a_row=25):
+    """
+    file ko crash-proof tareeke se read karta hai.
+
+    Wajah: pd.read_excel() -> openpyxl ko NON-read-only mode mein call karta hai,
+    jo Excel ki poori "used range" ke liye Cell objects bana deta hai — agar user ne
+    kisi column ko poora select karke formatting ki hui hai to used range lakhon
+    rows tak phail jaati hai, RAM khatam ho jaata hai aur worker segfault kar jaata hai.
+
+    Fix: read_only=True mode + row-by-row streaming, aur jaise hi lagataar kai
+    khali rows mil jayein, wahin ruk jao (data ke baad ki garbage rows ignore).
+    """
+    wb = openpyxl.load_workbook(file_storage, read_only=True, data_only=True)
+    ws = wb.active
+
+    rows_iter = ws.iter_rows(values_only=True)
+
+    header = None
+    for i, row in enumerate(rows_iter):
+        if i == header_row_index:
+            header = list(row)
+            break
+
+    if header is None:
+        wb.close()
+        raise ValueError("File mein itni rows nahi hain ke header mil sake")
+
+    data_rows = []
+    consecutive_empty = 0
+
+    for row in rows_iter:
+        if row is None or all(v is None for v in row):
+            consecutive_empty += 1
+            if consecutive_empty >= max_empty_rows_in_a_row:
+                break
+            continue
+        consecutive_empty = 0
+        data_rows.append(row)
+
+    wb.close()
+
+    ncols = len(header)
+    fixed_rows = []
+    for row in data_rows:
+        row = list(row)
+        if len(row) < ncols:
+            row += [None] * (ncols - len(row))
+        elif len(row) > ncols:
+            row = row[:ncols]
+        fixed_rows.append(row)
+
+    df = pd.DataFrame(fixed_rows, columns=header)
+    return df
+
+
 
 # ========== AUTH ROUTES ==========
 
@@ -2973,12 +3032,12 @@ def bulk_upload_classes():
            not file.filename.lower().endswith(('.xlsx', '.xls')):
             flash('Please upload a valid Excel file (.xlsx or .xls)', 'error')
             return redirect(request.url)
-
         try:
-            df = pd.read_excel(file, header=2)
+            df = safe_read_excel(file, header_row_index=2)
         except Exception as e:
             flash(f'Error reading file: {str(e)}', 'error')
             return redirect(request.url)
+       
 
         df.columns = [str(col).strip().rstrip('*').strip() for col in df.columns]
 
@@ -3039,7 +3098,7 @@ def bulk_upload_teachers():
             return redirect(request.url)
         try:
             sys.stderr.write("DEBUG: before read_excel\n"); sys.stderr.flush()
-            df = pd.read_excel(file, header=2)
+            df = safe_read_excel(file, header_row_index=2)
             sys.stderr.write(f"DEBUG: read_excel done, shape={df.shape}\n"); sys.stderr.flush()
         except Exception as e:
             flash(f'Error reading file: {str(e)}', 'error')
@@ -3153,7 +3212,7 @@ def bulk_upload_students():
             return redirect(request.url)
 
         try:
-            df = pd.read_excel(file, header=2)
+            df = safe_read_excel(file, header_row_index=2)
         except Exception as e:
             flash(f'Error reading file: {str(e)}', 'error')
             return redirect(request.url)
