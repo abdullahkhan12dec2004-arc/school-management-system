@@ -331,78 +331,105 @@ def generate_excel_report(records, upload_type):
     wb.save(buf)
     return buf.getvalue()
 
+def safe_read_excel(file_storage, header_row_index=2, max_rows=5000):
+    import io
+    import openpyxl
+    import pandas as pd
 
-
-import io
-import openpyxl
-import pandas as pd
-
-def safe_read_excel(file_storage, header_row_index=2, max_empty_rows_in_a_row=25):
     file_storage.stream.seek(0)
     file_bytes = file_storage.stream.read()
 
-    # Basic upload-size protection
-    max_size = 10 * 1024 * 1024  # 10 MB
-    if len(file_bytes) > max_size:
-        raise ValueError("Excel file is too large. Maximum allowed size is 10 MB.")
+    # Maximum upload size: 10 MB
+    if len(file_bytes) > 10 * 1024 * 1024:
+        raise ValueError("Excel file is too large. Maximum size is 10 MB.")
+
+    if not file_bytes:
+        raise ValueError("Uploaded Excel file is empty.")
+
+    print(f"DEBUG: Excel bytes read: {len(file_bytes)}", flush=True)
 
     wb = None
 
     try:
+        print("DEBUG: loading workbook...", flush=True)
+
         wb = openpyxl.load_workbook(
-            io.BytesIO(file_bytes),
+            filename=io.BytesIO(file_bytes),
             read_only=True,
             data_only=True
         )
 
+        print("DEBUG: workbook loaded", flush=True)
+
         ws = wb.active
-        rows_iter = ws.iter_rows(values_only=True)
+
+        print(
+            f"DEBUG: sheet={ws.title}, max_row={ws.max_row}, max_column={ws.max_column}",
+            flush=True
+        )
+
+        if ws.max_column > 100:
+            raise ValueError("Excel file has too many columns.")
+
+        if ws.max_row > max_rows + header_row_index + 1:
+            raise ValueError(
+                f"Excel file has too many rows. Maximum {max_rows} data rows allowed."
+            )
+
+        rows = ws.iter_rows(values_only=True)
 
         header = None
 
-        for i, row in enumerate(rows_iter):
+        for i, row in enumerate(rows):
             if i == header_row_index:
                 header = list(row)
                 break
 
-        if header is None:
-            raise ValueError(
-                "File mein itni rows nahi hain ke header mil sake"
-            )
+        if not header:
+            raise ValueError("Excel header row not found.")
 
-        # Remove completely empty header columns
+        # Remove empty columns from end
         while header and header[-1] is None:
             header.pop()
 
         if not header:
-            raise ValueError("Excel header empty hai")
+            raise ValueError("Excel header is empty.")
 
         data_rows = []
-        consecutive_empty = 0
 
-        for row in rows_iter:
-            if row is None or all(v is None for v in row):
-                consecutive_empty += 1
+        for row_number, row in enumerate(rows, start=header_row_index + 2):
 
-                if consecutive_empty >= max_empty_rows_in_a_row:
-                    break
-
+            if row is None:
                 continue
 
-            consecutive_empty = 0
-
             row = list(row[:len(header)])
+
+            # Skip completely empty row
+            if not any(value is not None for value in row):
+                continue
 
             if len(row) < len(header):
                 row.extend([None] * (len(header) - len(row)))
 
             data_rows.append(row)
 
-        return pd.DataFrame(data_rows, columns=header)
+            if len(data_rows) >= max_rows:
+                break
+
+        df = pd.DataFrame(data_rows, columns=header)
+
+        print(
+            f"DEBUG: DataFrame created: shape={df.shape}",
+            flush=True
+        )
+
+        return df
 
     finally:
         if wb is not None:
             wb.close()
+            print("DEBUG: workbook closed", flush=True)
+
 
 
 
@@ -3127,17 +3154,35 @@ def bulk_upload_teachers():
     if request.method == 'POST':
         import sys
         file = request.files.get('file')
-        if not file or not file.filename or \
-           not file.filename.lower().endswith(('.xlsx', '.xls')):
-            flash('Please upload a valid Excel file (.xlsx or .xls)', 'error')
-            return redirect(request.url)
+
+        if not file or not file.filename:
+           flash('Please select an Excel file.', 'error')
+           return redirect(request.url)
+
+        if not file.filename.lower().endswith('.xlsx'):
+           flash('Please upload an .xlsx Excel file only.', 'error')
+           return redirect(request.url)
+
         try:
-            sys.stderr.write("DEBUG: before read_excel\n"); sys.stderr.flush()
-            df = safe_read_excel(file, header_row_index=2)
-            sys.stderr.write(f"DEBUG: read_excel done, shape={df.shape}\n"); sys.stderr.flush()
+            print("DEBUG: before read_excel", flush=True)
+
+            df = safe_read_excel(
+                file,
+                header_row_index=2,
+                max_rows=5000
+            )
+
+            print(
+               f"DEBUG: read_excel done, shape={df.shape}",
+               flush=True
+                
+            }
+    
+
         except Exception as e:
-            flash(f'Error reading file: {str(e)}', 'error')
-            return redirect(request.url)
+           print(f"DEBUG: Excel ERROR: {repr(e)}", flush=True)
+           flash(f'Error reading Excel file: {str(e)}', 'error')
+           return redirect(request.url)
 
         df.columns = [str(col).strip().rstrip('*').strip() for col in df.columns]
         sys.stderr.write(f"DEBUG: columns={list(df.columns)}\n"); sys.stderr.flush()
