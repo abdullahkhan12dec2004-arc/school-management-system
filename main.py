@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask import request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
 from functools import wraps
-import openpyxl
+
 import datetime
 import os
 import psycopg2
@@ -333,60 +333,76 @@ def generate_excel_report(records, upload_type):
 
 
 
+import io
+import openpyxl
+import pandas as pd
 
 def safe_read_excel(file_storage, header_row_index=2, max_empty_rows_in_a_row=25):
-    """
-    file ko crash-proof tareeke se read karta hai.
+    file_storage.stream.seek(0)
+    file_bytes = file_storage.stream.read()
 
-    Wajah: pd.read_excel() -> openpyxl ko NON-read-only mode mein call karta hai,
-    jo Excel ki poori "used range" ke liye Cell objects bana deta hai — agar user ne
-    kisi column ko poora select karke formatting ki hui hai to used range lakhon
-    rows tak phail jaati hai, RAM khatam ho jaata hai aur worker segfault kar jaata hai.
+    # Basic upload-size protection
+    max_size = 10 * 1024 * 1024  # 10 MB
+    if len(file_bytes) > max_size:
+        raise ValueError("Excel file is too large. Maximum allowed size is 10 MB.")
 
-    Fix: read_only=True mode + row-by-row streaming, aur jaise hi lagataar kai
-    khali rows mil jayein, wahin ruk jao (data ke baad ki garbage rows ignore).
-    """
-    wb = openpyxl.load_workbook(file_storage, read_only=True, data_only=True)
-    ws = wb.active
+    wb = None
 
-    rows_iter = ws.iter_rows(values_only=True)
+    try:
+        wb = openpyxl.load_workbook(
+            io.BytesIO(file_bytes),
+            read_only=True,
+            data_only=True
+        )
 
-    header = None
-    for i, row in enumerate(rows_iter):
-        if i == header_row_index:
-            header = list(row)
-            break
+        ws = wb.active
+        rows_iter = ws.iter_rows(values_only=True)
 
-    if header is None:
-        wb.close()
-        raise ValueError("File mein itni rows nahi hain ke header mil sake")
+        header = None
 
-    data_rows = []
-    consecutive_empty = 0
-
-    for row in rows_iter:
-        if row is None or all(v is None for v in row):
-            consecutive_empty += 1
-            if consecutive_empty >= max_empty_rows_in_a_row:
+        for i, row in enumerate(rows_iter):
+            if i == header_row_index:
+                header = list(row)
                 break
-            continue
+
+        if header is None:
+            raise ValueError(
+                "File mein itni rows nahi hain ke header mil sake"
+            )
+
+        # Remove completely empty header columns
+        while header and header[-1] is None:
+            header.pop()
+
+        if not header:
+            raise ValueError("Excel header empty hai")
+
+        data_rows = []
         consecutive_empty = 0
-        data_rows.append(row)
 
-    wb.close()
+        for row in rows_iter:
+            if row is None or all(v is None for v in row):
+                consecutive_empty += 1
 
-    ncols = len(header)
-    fixed_rows = []
-    for row in data_rows:
-        row = list(row)
-        if len(row) < ncols:
-            row += [None] * (ncols - len(row))
-        elif len(row) > ncols:
-            row = row[:ncols]
-        fixed_rows.append(row)
+                if consecutive_empty >= max_empty_rows_in_a_row:
+                    break
 
-    df = pd.DataFrame(fixed_rows, columns=header)
-    return df
+                continue
+
+            consecutive_empty = 0
+
+            row = list(row[:len(header)])
+
+            if len(row) < len(header):
+                row.extend([None] * (len(header) - len(row)))
+
+            data_rows.append(row)
+
+        return pd.DataFrame(data_rows, columns=header)
+
+    finally:
+        if wb is not None:
+            wb.close()
 
 
 
