@@ -3117,7 +3117,7 @@ def bulk_upload_teachers():
             return redirect(request.url)
         try:
             sys.stderr.write("DEBUG: before read_excel\n"); sys.stderr.flush()
-            df = safe_read_excel_isolated(file, header_row_index=2)
+            df = safe_read_excel(file, header_row_index=2)
             sys.stderr.write(f"DEBUG: read_excel done, shape={df.shape}\n"); sys.stderr.flush()
         except Exception as e:
             flash(f'Error reading file: {str(e)}', 'error')
