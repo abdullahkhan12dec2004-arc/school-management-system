@@ -3127,7 +3127,7 @@ def bulk_upload_teachers():
 
         if not file.filename.lower().endswith(('.xlsx', '.xls')):
           flash('Please upload an Excel file (.xlsx or .xls).', 'error')
-           return redirect(request.url)
+          return redirect(request.url)
 
 
         try:
@@ -3139,17 +3139,19 @@ def bulk_upload_teachers():
                 max_rows=5000
             )
 
-            print(
-               f"DEBUG: read_excel done, shape={df.shape}",
-               flush=True
-                
-            }
-    
+            sys.stderr.write(
+                f"DEBUG: read_excel done, shape={df.shape}\n"
+            )
+            sys.stderr.flush()
 
         except Exception as e:
-           print(f"DEBUG: Excel ERROR: {repr(e)}", flush=True)
-           flash(f'Error reading Excel file: {str(e)}', 'error')
-           return redirect(request.url)
+            sys.stderr.write(
+                f"DEBUG: Excel ERROR: {repr(e)}\n"
+            )
+            sys.stderr.flush()
+
+            flash(f'Error reading file: {str(e)}', 'error')
+            return redirect(request.url)
 
         df.columns = [str(col).strip().rstrip('*').strip() for col in df.columns]
         sys.stderr.write(f"DEBUG: columns={list(df.columns)}\n"); sys.stderr.flush()
