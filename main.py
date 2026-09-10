@@ -39,7 +39,41 @@ app.config['MAIL_PASSWORD'] = env('MAIL_PASSWORD').replace(' ', '')
 app.config['MAIL_DEFAULT_SENDER'] = env('MAIL_USERNAME')
 
 mail = Mail(app)
+import concurrent.futures
+import multiprocessing as mp
 
+def _read_excel_worker(file_bytes, header_row_index, max_rows):
+    import io, pandas as pd
+    df = pd.read_excel(
+        io.BytesIO(file_bytes),
+        engine="openpyxl",
+        header=header_row_index,
+        nrows=max_rows
+    )
+    return df
+
+def safe_read_excel(file_storage, header_row_index=2, max_rows=5000):
+    file_storage.stream.seek(0)
+    file_bytes = file_storage.stream.read()
+
+    if len(file_bytes) > 10 * 1024 * 1024:
+        raise ValueError("Excel file is too large. Maximum allowed size is 10 MB.")
+    if not file_bytes:
+        raise ValueError("Uploaded Excel file is empty.")
+
+    ctx = mp.get_context("spawn")
+    with concurrent.futures.ProcessPoolExecutor(max_workers=1, mp_context=ctx) as ex:
+        future = ex.submit(_read_excel_worker, file_bytes, header_row_index, max_rows)
+        try:
+            df = future.result(timeout=30)
+        except concurrent.futures.process.BrokenProcessPool:
+            raise ValueError("Excel file corrupt hai ya crash ho gayi — kripya file check karein ya dobara save karke upload karein.")
+        except concurrent.futures.TimeoutError:
+            raise ValueError("Excel processing timeout ho gaya. File bohot bari ya complex hai.")
+
+    df = df.dropna(how="all").reset_index(drop=True)
+    df = df.dropna(axis=1, how="all")
+    return df
 
 
 
@@ -340,71 +374,6 @@ def generate_excel_report(records, upload_type):
     return buf.getvalue()
 
 
-def safe_read_excel(file_storage, header_row_index=2, max_rows=5000):
-    """
-    Safe Excel reader.
-    Uses python-calamine instead of openpyxl.
-    """
-
-    import io
-    import pandas as pd
-
-    # Start from beginning
-    file_storage.stream.seek(0)
-
-    # Read uploaded file
-    file_bytes = file_storage.stream.read()
-
-    print(
-        f"DEBUG: uploaded Excel size = {len(file_bytes)} bytes",
-        flush=True
-    )
-
-    # 10 MB limit
-    if len(file_bytes) > 10 * 1024 * 1024:
-        raise ValueError(
-            "Excel file is too large. Maximum allowed size is 10 MB."
-        )
-
-    if not file_bytes:
-        raise ValueError("Uploaded Excel file is empty.")
-
-    print("DEBUG: before calamine read_excel", flush=True)
-
-    try:
-        df = pd.read_excel(
-            io.BytesIO(file_bytes),
-            engine="openpyxl",
-            header=header_row_index,
-            nrows=max_rows
-        )
-
-    except Exception as e:
-        print(
-            f"DEBUG: calamine Excel error = {repr(e)}",
-            flush=True
-        )
-        raise ValueError(
-            f"Excel file could not be read: {str(e)}"
-        )
-
-    print(
-        f"DEBUG: calamine read_excel complete, shape={df.shape}",
-        flush=True
-    )
-
-    # Clean completely empty rows
-    df = df.dropna(how="all").reset_index(drop=True)
-
-    # Clean empty columns
-    df = df.dropna(axis=1, how="all")
-
-    print(
-        f"DEBUG: final dataframe shape={df.shape}",
-        flush=True
-    )
-
-    return df
 
 
 
