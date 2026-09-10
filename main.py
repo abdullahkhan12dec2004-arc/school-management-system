@@ -53,7 +53,7 @@ def _read_excel_from_bytes(file_bytes, header_row_index=2, max_rows=5000):
 
     df = pd.read_excel(
         io.BytesIO(file_bytes),
-        engine="calamine",
+        engine="openpyxl",
         header=header_row_index,
         nrows=max_rows
     )
@@ -407,7 +407,7 @@ def safe_read_excel(file_storage, header_row_index=2, max_rows=5000):
     try:
         df = pd.read_excel(
             io.BytesIO(file_bytes),
-            engine="calamine",
+            engine="openpyxl",
             header=header_row_index,
             nrows=max_rows
         )
