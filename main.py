@@ -3096,22 +3096,41 @@ def bulk_upload_classes():
     return render_template('bulk_upload_updated.html', upload_type='classes')
 
 #######################################################################################################
-from concurrent.futures import ProcessPoolExecutor, TimeoutError as FutureTimeoutError
+def _read_excel_from_bytes(file_bytes, header_row_index=2, max_rows=5000):
+    import io, pandas as pd
+    if len(file_bytes) > 10 * 1024 * 1024:
+        raise ValueError("Excel file is too large. Maximum allowed size is 10 MB.")
+    if not file_bytes:
+        raise ValueError("Uploaded Excel file is empty.")
 
-def _load_excel_worker(file_bytes, header_row_index, max_empty_rows_in_a_row):
-    import io
-    return safe_read_excel(io.BytesIO(file_bytes), header_row_index, max_empty_rows_in_a_row)
+    df = pd.read_excel(
+        io.BytesIO(file_bytes),
+        engine="calamine",
+        header=header_row_index,
+        nrows=max_rows
+    )
+    df = df.dropna(how="all").reset_index(drop=True)
+    df = df.dropna(axis=1, how="all")
+    return df
 
-def safe_read_excel_isolated(file_storage, header_row_index=2, max_empty_rows_in_a_row=25, timeout=30):
-    file_bytes = file_storage.read()
+
+def _load_excel_worker(file_bytes, header_row_index):
+    return _read_excel_from_bytes(file_bytes, header_row_index)
+
+
+def safe_read_excel_isolated(file_storage, header_row_index=2, timeout=30):
+    file_storage.stream.seek(0)
+    file_bytes = file_storage.stream.read()
+
     with ProcessPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_load_excel_worker, file_bytes, header_row_index, max_empty_rows_in_a_row)
+        future = executor.submit(_load_excel_worker, file_bytes, header_row_index)
         try:
             return future.result(timeout=timeout)
         except FutureTimeoutError:
             raise ValueError("File processing timed out — file corrupt ya bohot bari ho sakti hai")
         except Exception as e:
-            # BrokenProcessPool aayega agar subprocess segfault ho gaya
+            # Agar subprocess segfault ho, future.result() BrokenProcessPool raise karega —
+            # yeh Python-level exception hai, so it's catchable, worker crash nahi hoga.
             raise ValueError(f"File read nahi ho saki (corrupt ya invalid Excel file): {e}")
 
 @app.route('/bulk/teachers', methods=['GET', 'POST'])
@@ -3129,29 +3148,16 @@ def bulk_upload_teachers():
           flash('Please upload an Excel file (.xlsx or .xls).', 'error')
           return redirect(request.url)
 
-
         try:
-            print("DEBUG: before read_excel", flush=True)
-
-            df = safe_read_excel(
-                file,
-                header_row_index=2,
-                max_rows=5000
-            )
-
-            sys.stderr.write(
-                f"DEBUG: read_excel done, shape={df.shape}\n"
-            )
-            sys.stderr.flush()
-
+           print("DEBUG: before read_excel (isolated)", flush=True)
+           df = safe_read_excel_isolated(file, header_row_index=2)
+           sys.stderr.write(f"DEBUG: read_excel done, shape={df.shape}\n")
+           sys.stderr.flush()
         except Exception as e:
-            sys.stderr.write(
-                f"DEBUG: Excel ERROR: {repr(e)}\n"
-            )
-            sys.stderr.flush()
-
-            flash(f'Error reading file: {str(e)}', 'error')
-            return redirect(request.url)
+           sys.stderr.write(f"DEBUG: Excel ERROR: {repr(e)}\n")
+           sys.stderr.flush()
+           flash(f'Error reading file: {str(e)}', 'error')
+           return redirect(request.url)
 
         df.columns = [str(col).strip().rstrip('*').strip() for col in df.columns]
         sys.stderr.write(f"DEBUG: columns={list(df.columns)}\n"); sys.stderr.flush()
