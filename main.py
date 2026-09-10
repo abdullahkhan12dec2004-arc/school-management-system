@@ -51,6 +51,8 @@ def _read_excel_worker(file_bytes, header_row_index, max_rows):
     )
     return df
 
+import signal
+
 def safe_read_excel(file_storage, header_row_index=2, max_rows=5000, timeout=30):
     import io
     file_storage.stream.seek(0)
@@ -61,11 +63,21 @@ def safe_read_excel(file_storage, header_row_index=2, max_rows=5000, timeout=30)
     if not file_bytes:
         raise ValueError("Uploaded Excel file is empty.")
 
+    def _handler(signum, frame):
+        raise TimeoutError("Excel processing timeout ho gaya.")
+
+    old_handler = signal.signal(signal.SIGALRM, _handler)
+    signal.alarm(timeout)
     try:
         df = pd.read_excel(io.BytesIO(file_bytes), engine="openpyxl",
                             header=header_row_index, nrows=max_rows)
+    except TimeoutError:
+        raise ValueError("Excel processing timeout ho gaya. File bohot bari ya complex hai.")
     except Exception as e:
-        raise ValueError(f"Excel file corrupt hai ya read nahi ho saka: {e}")
+        raise ValueError(f"Excel file corrupt hai ya crash ho gayi: {e}")
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, old_handler)
 
     df = df.dropna(how="all").reset_index(drop=True)
     df = df.dropna(axis=1, how="all")
@@ -2343,20 +2355,9 @@ def debug_columns():
 
 
 @app.route('/teacher/<int:teacher_id>')
-@login_required
-@teacher_required
 def view_teacher(teacher_id):
-    conn = get_db()
-    c = conn.cursor()
-    c.execute("SELECT * FROM teachers WHERE id=%s", (teacher_id,))
-    teacher = fetchone_dict(c)
-    if not teacher:
-        flash('Teacher nahi mila', 'error')
-        conn.close()
-        return redirect(url_for('teachers'))
-    c.execute("SELECT * FROM teacher_documents WHERE teacher_id=%s ORDER BY id DESC", (teacher_id,))
-    documents = fetchall_dict(c)
-    conn.close()
+    teacher = Teacher.query.get_or_404(teacher_id)
+    documents = TeacherDocument.query.filter_by(teacher_id=teacher_id).all()
     return render_template('view_teacher.html', teacher=teacher, documents=documents)
 
 
