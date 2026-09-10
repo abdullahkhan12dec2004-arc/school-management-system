@@ -903,6 +903,7 @@ def students():
 
 @app.route('/students/add', methods=['GET', 'POST'])
 @login_required
+@teacher_required
 @school_admin_only_required
 def add_student():
     school_id = session.get('active_school_id', session.get('school_id'))
