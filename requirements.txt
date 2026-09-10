@@ -13,10 +13,10 @@ Jinja2==3.1.6
 MarkupSafe==3.0.3
 numpy==2.0.2
 opencv-python-headless==4.12.0.88
-openpyxl==3.1.5
+openpyxl>=3.1.0
 pandas==2.2.3
 psycopg2-binary==2.9.12
-python-calamine
+
 python-dateutil==2.9.0.post0
 PyYAML==6.0.3
 requests==2.33.1
