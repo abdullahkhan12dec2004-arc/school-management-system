@@ -39,8 +39,6 @@ app.config['MAIL_PASSWORD'] = env('MAIL_PASSWORD').replace(' ', '')
 app.config['MAIL_DEFAULT_SENDER'] = env('MAIL_USERNAME')
 
 mail = Mail(app)
-import concurrent.futures
-import multiprocessing as mp
 
 def _read_excel_worker(file_bytes, header_row_index, max_rows):
     import io, pandas as pd
@@ -52,7 +50,10 @@ def _read_excel_worker(file_bytes, header_row_index, max_rows):
     )
     return df
 
-def safe_read_excel(file_storage, header_row_index=2, max_rows=5000):
+import signal
+
+def safe_read_excel(file_storage, header_row_index=2, max_rows=5000, timeout=30):
+    import io
     file_storage.stream.seek(0)
     file_bytes = file_storage.stream.read()
 
@@ -61,15 +62,21 @@ def safe_read_excel(file_storage, header_row_index=2, max_rows=5000):
     if not file_bytes:
         raise ValueError("Uploaded Excel file is empty.")
 
-    ctx = mp.get_context("spawn")
-    with concurrent.futures.ProcessPoolExecutor(max_workers=1, mp_context=ctx) as ex:
-        future = ex.submit(_read_excel_worker, file_bytes, header_row_index, max_rows)
-        try:
-            df = future.result(timeout=30)
-        except concurrent.futures.process.BrokenProcessPool:
-            raise ValueError("Excel file corrupt hai ya crash ho gayi — kripya file check karein ya dobara save karke upload karein.")
-        except concurrent.futures.TimeoutError:
-            raise ValueError("Excel processing timeout ho gaya. File bohot bari ya complex hai.")
+    def _handler(signum, frame):
+        raise TimeoutError("Excel processing timeout ho gaya.")
+
+    old_handler = signal.signal(signal.SIGALRM, _handler)
+    signal.alarm(timeout)
+    try:
+        df = pd.read_excel(io.BytesIO(file_bytes), engine="openpyxl",
+                            header=header_row_index, nrows=max_rows)
+    except TimeoutError:
+        raise ValueError("Excel processing timeout ho gaya. File bohot bari ya complex hai.")
+    except Exception as e:
+        raise ValueError(f"Excel file corrupt hai ya crash ho gayi: {e}")
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, old_handler)
 
     df = df.dropna(how="all").reset_index(drop=True)
     df = df.dropna(axis=1, how="all")
