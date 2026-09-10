@@ -40,6 +40,47 @@ app.config['MAIL_DEFAULT_SENDER'] = env('MAIL_USERNAME')
 
 mail = Mail(app)
 
+from concurrent.futures import ProcessPoolExecutor, TimeoutError as FutureTimeoutError
+import io
+
+
+def _read_excel_from_bytes(file_bytes, header_row_index=2, max_rows=5000):
+    import pandas as pd
+    if len(file_bytes) > 10 * 1024 * 1024:
+        raise ValueError("Excel file is too large. Maximum allowed size is 10 MB.")
+    if not file_bytes:
+        raise ValueError("Uploaded Excel file is empty.")
+
+    df = pd.read_excel(
+        io.BytesIO(file_bytes),
+        engine="calamine",
+        header=header_row_index,
+        nrows=max_rows
+    )
+    df = df.dropna(how="all").reset_index(drop=True)
+    df = df.dropna(axis=1, how="all")
+    return df
+
+
+def _load_excel_worker(file_bytes, header_row_index):
+    return _read_excel_from_bytes(file_bytes, header_row_index)
+
+
+def safe_read_excel_isolated(file_storage, header_row_index=2, timeout=30):
+    file_storage.stream.seek(0)
+    file_bytes = file_storage.stream.read()
+
+    with ProcessPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_load_excel_worker, file_bytes, header_row_index)
+        try:
+            return future.result(timeout=timeout)
+        except FutureTimeoutError:
+            raise ValueError("File processing timed out — file corrupt ya bohot bari ho sakti hai")
+        except Exception as e:
+            raise ValueError(f"File read nahi ho saki (corrupt ya invalid Excel file): {e}")
+
+
+
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
@@ -3096,42 +3137,7 @@ def bulk_upload_classes():
     return render_template('bulk_upload_updated.html', upload_type='classes')
 
 #######################################################################################################
-def _read_excel_from_bytes(file_bytes, header_row_index=2, max_rows=5000):
-    import io, pandas as pd
-    if len(file_bytes) > 10 * 1024 * 1024:
-        raise ValueError("Excel file is too large. Maximum allowed size is 10 MB.")
-    if not file_bytes:
-        raise ValueError("Uploaded Excel file is empty.")
 
-    df = pd.read_excel(
-        io.BytesIO(file_bytes),
-        engine="calamine",
-        header=header_row_index,
-        nrows=max_rows
-    )
-    df = df.dropna(how="all").reset_index(drop=True)
-    df = df.dropna(axis=1, how="all")
-    return df
-
-
-def _load_excel_worker(file_bytes, header_row_index):
-    return _read_excel_from_bytes(file_bytes, header_row_index)
-
-
-def safe_read_excel_isolated(file_storage, header_row_index=2, timeout=30):
-    file_storage.stream.seek(0)
-    file_bytes = file_storage.stream.read()
-
-    with ProcessPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_load_excel_worker, file_bytes, header_row_index)
-        try:
-            return future.result(timeout=timeout)
-        except FutureTimeoutError:
-            raise ValueError("File processing timed out — file corrupt ya bohot bari ho sakti hai")
-        except Exception as e:
-            # Agar subprocess segfault ho, future.result() BrokenProcessPool raise karega —
-            # yeh Python-level exception hai, so it's catchable, worker crash nahi hoga.
-            raise ValueError(f"File read nahi ho saki (corrupt ya invalid Excel file): {e}")
 
 @app.route('/bulk/teachers', methods=['GET', 'POST'])
 @login_required
