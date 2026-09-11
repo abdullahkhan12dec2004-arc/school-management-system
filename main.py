@@ -131,25 +131,6 @@ School Management System""",
         return False
 
 
-
-
-
-
-
-
-
-
-
-# app.py mein import
-from models import (
-    School, Student, StudentParent, StudentSibling,
-    Teacher, TeacherDocument, FeeCollection,
-    StudentAttendance, TeacherAttendance, Class
-)
-
-
-
-
 def get_active_school_id():
     if session.get('role') == 'school_admin':
         return session.get('school_id')
@@ -380,7 +361,6 @@ def generate_excel_report(records, upload_type):
     buf = io.BytesIO()
     wb.save(buf)
     return buf.getvalue()
-
 
 
 
@@ -2356,9 +2336,32 @@ def debug_columns():
 
 
 @app.route('/teacher/<int:teacher_id>')
+@login_required
+@teacher_required
 def view_teacher(teacher_id):
-    teacher = Teacher.query.get_or_404(teacher_id)
-    documents = TeacherDocument.query.filter_by(teacher_id=teacher_id).all()
+    conn = get_db()
+    c = conn.cursor()
+
+    school_id = session.get('active_school_id') or session.get('school_id')
+
+    c.execute("SELECT * FROM teachers WHERE id=%s", (teacher_id,))
+    teacher = fetchone_dict(c)
+
+    if not teacher:
+        flash('Teacher nahi mila', 'error')
+        conn.close()
+        return redirect(url_for('teachers'))
+
+    # School admin/teacher sirf apne school ke teacher dekh sakte hain
+    if session.get('role') in ('school_admin', 'teacher') and teacher.get('school_id') != school_id:
+        flash('Aapko is teacher ka access nahi hai', 'error')
+        conn.close()
+        return redirect(url_for('teachers'))
+
+    c.execute("SELECT * FROM teacher_documents WHERE teacher_id=%s ORDER BY id DESC", (teacher_id,))
+    documents = fetchall_dict(c)
+
+    conn.close()
     return render_template('view_teacher.html', teacher=teacher, documents=documents)
 
 
@@ -2505,7 +2508,6 @@ def delete_notice(notice_id):
     return redirect(url_for('manage_notices'))
 
 
-# ========== SCHOOL ADMIN SIGNUP (Public - koi bhi access kar sakta hai) ==========
 # ========== SCHOOL ADMIN SIGNUP (Public - koi bhi access kar sakta hai) ==========
 @app.route('/school_admin_signup', methods=['GET', 'POST'])
 def school_admin_signup():
@@ -2675,10 +2677,6 @@ def resend_otp():
     send_otp_email(pending['admin_email'], otp, pending['full_name'])
     flash('A new OTP has been sent.', 'success')
     return redirect(url_for('verify_otp'))
-
-
-
-
 
 
 # ========== SUPER ADMIN: Pending School Admins Dekhna aur Approve Karna ==========
