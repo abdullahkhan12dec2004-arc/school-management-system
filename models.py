@@ -2,6 +2,12 @@
 models.py - Business Logic Models for School Management System
 Compatible with database.py (Connection Pooling Version)
 All database operations yahan handle hongi
+
+NOTE: Ye file PostgreSQL (psycopg2) ke liye convert ki gayi hai:
+  - Placeholders: ?  ->  %s
+  - OUTPUT INSERTED.id  ->  RETURNING id
+  - GETDATE()  ->  NOW()
+  - MONTH(col) / YEAR(col)  ->  EXTRACT(MONTH FROM col) / EXTRACT(YEAR FROM col)
 """
 
 import datetime
@@ -27,8 +33,8 @@ class AuditMixin:
         if user_id:
             cursor.execute(f"""
                 UPDATE {table_name} 
-                SET created_by = ?, created_date = GETDATE() 
-                WHERE id = ?
+                SET created_by = %s, created_date = NOW() 
+                WHERE id = %s
             """, (user_id, record_id))
 
     @staticmethod
@@ -38,8 +44,8 @@ class AuditMixin:
         if user_id:
             cursor.execute(f"""
                 UPDATE {table_name} 
-                SET updated_by = ?, updated_date = GETDATE() 
-                WHERE id = ?
+                SET updated_by = %s, updated_date = NOW() 
+                WHERE id = %s
             """, (user_id, record_id))
 
 
@@ -62,7 +68,7 @@ class School:
         """ID se school fetch karo"""
         conn = get_db()
         c = conn.cursor()
-        c.execute("SELECT * FROM schools WHERE id=?", (school_id,))
+        c.execute("SELECT * FROM schools WHERE id=%s", (school_id,))
         school = fetchone_dict(c)
         conn.close()
         return school
@@ -85,8 +91,8 @@ class School:
         c.execute("""
             INSERT INTO schools 
             (name, address, phone, email, logo, country, city, area, latitude, longitude)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             data.get('name'),
             data.get('address', ''),
@@ -119,9 +125,9 @@ class School:
 
             c.execute("""
                 UPDATE schools 
-                SET name=?, address=?, phone=?, email=?, country=?, city=?, 
-                    area=?, latitude=?, longitude=?, logo=?
-                WHERE id=?
+                SET name=%s, address=%s, phone=%s, email=%s, country=%s, city=%s, 
+                    area=%s, latitude=%s, longitude=%s, logo=%s
+                WHERE id=%s
             """, (
                 data.get('name'), data.get('address'), data.get('phone'),
                 data.get('email'), data.get('country'), data.get('city'),
@@ -131,9 +137,9 @@ class School:
         else:
             c.execute("""
                 UPDATE schools 
-                SET name=?, address=?, phone=?, email=?, country=?, city=?, 
-                    area=?, latitude=?, longitude=?
-                WHERE id=?
+                SET name=%s, address=%s, phone=%s, email=%s, country=%s, city=%s, 
+                    area=%s, latitude=%s, longitude=%s
+                WHERE id=%s
             """, (
                 data.get('name'), data.get('address'), data.get('phone'),
                 data.get('email'), data.get('country'), data.get('city'),
@@ -168,10 +174,10 @@ class Student:
         params = []
 
         if school_id:
-            query += " AND st.school_id = ?"
+            query += " AND st.school_id = %s"
             params.append(school_id)
         if class_id:
-            query += " AND st.class_id = ?"
+            query += " AND st.class_id = %s"
             params.append(class_id)
 
         query += " ORDER BY st.full_name"
@@ -197,7 +203,7 @@ class Student:
             JOIN users u ON st.user_id = u.id
             LEFT JOIN users cr ON st.created_by = cr.id
             LEFT JOIN users up ON st.updated_by = up.id
-            WHERE st.id = ?
+            WHERE st.id = %s
         """, (student_id,))
         student = fetchone_dict(c)
         conn.close()
@@ -212,7 +218,7 @@ class Student:
             SELECT st.*, c.class_name, c.section
             FROM students st
             LEFT JOIN classes c ON st.class_id = c.id
-            WHERE st.user_id = ?
+            WHERE st.user_id = %s
         """, (user_id,))
         student = fetchone_dict(c)
         conn.close()
@@ -238,8 +244,8 @@ class Student:
         c.execute("""
             INSERT INTO users 
             (school_id, username, password, role, full_name, email, phone)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             data.get('school_id'),
             data.get('username'),
@@ -261,8 +267,8 @@ class Student:
             (user_id, school_id, student_code, full_name, father_name, email, phone,
              date_of_birth, gender, class_id, joining_date, profile_pic, medical_details,
              address_line1, address_line2, city, state, postal_code)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             user_id,
             data.get('school_id'),
@@ -308,11 +314,11 @@ class Student:
 
             c.execute("""
                 UPDATE students 
-                SET full_name=?, father_name=?, email=?, phone=?,
-                    date_of_birth=?, gender=?, class_id=?, joining_date=?,
-                    address_line1=?, address_line2=?, city=?, state=?,
-                    postal_code=?, medical_details=?, profile_pic=?
-                WHERE id=?
+                SET full_name=%s, father_name=%s, email=%s, phone=%s,
+                    date_of_birth=%s, gender=%s, class_id=%s, joining_date=%s,
+                    address_line1=%s, address_line2=%s, city=%s, state=%s,
+                    postal_code=%s, medical_details=%s, profile_pic=%s
+                WHERE id=%s
             """, (
                 data.get('full_name'), data.get('father_name'),
                 data.get('email'), data.get('phone'),
@@ -326,11 +332,11 @@ class Student:
         else:
             c.execute("""
                 UPDATE students 
-                SET full_name=?, father_name=?, email=?, phone=?,
-                    date_of_birth=?, gender=?, class_id=?, joining_date=?,
-                    address_line1=?, address_line2=?, city=?, state=?,
-                    postal_code=?, medical_details=?
-                WHERE id=?
+                SET full_name=%s, father_name=%s, email=%s, phone=%s,
+                    date_of_birth=%s, gender=%s, class_id=%s, joining_date=%s,
+                    address_line1=%s, address_line2=%s, city=%s, state=%s,
+                    postal_code=%s, medical_details=%s
+                WHERE id=%s
             """, (
                 data.get('full_name'), data.get('father_name'),
                 data.get('email'), data.get('phone'),
@@ -361,7 +367,7 @@ class StudentParent:
         c = conn.cursor()
         c.execute("""
             SELECT * FROM student_parents 
-            WHERE student_id = ? 
+            WHERE student_id = %s 
             ORDER BY is_primary DESC, id
         """, (student_id,))
         parents = fetchall_dict(c)
@@ -377,8 +383,8 @@ class StudentParent:
         c.execute("""
             INSERT INTO student_parents 
             (student_id, parent_name, relation, occupation, phone, email, address, is_primary)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             student_id,
             parent_data.get('parent_name'),
@@ -405,8 +411,8 @@ class StudentParent:
 
         c.execute("""
             UPDATE student_parents 
-            SET parent_name=?, relation=?, occupation=?, phone=?, email=?, address=?, is_primary=?
-            WHERE id=?
+            SET parent_name=%s, relation=%s, occupation=%s, phone=%s, email=%s, address=%s, is_primary=%s
+            WHERE id=%s
         """, (
             parent_data.get('parent_name'),
             parent_data.get('relation'),
@@ -429,7 +435,7 @@ class StudentParent:
         """Parent delete karo"""
         conn = get_db()
         c = conn.cursor()
-        c.execute("DELETE FROM student_parents WHERE id=?", (parent_id,))
+        c.execute("DELETE FROM student_parents WHERE id=%s", (parent_id,))
         conn.commit()
         conn.close()
         return True
@@ -439,7 +445,7 @@ class StudentParent:
         """Student ke saare parents delete karo"""
         conn = get_db()
         c = conn.cursor()
-        c.execute("DELETE FROM student_parents WHERE student_id=?", (student_id,))
+        c.execute("DELETE FROM student_parents WHERE student_id=%s", (student_id,))
         conn.commit()
         conn.close()
         return True
@@ -471,7 +477,7 @@ class StudentSibling:
             FROM student_siblings ss
             LEFT JOIN students s ON ss.sibling_student_id = s.id
             LEFT JOIN classes c ON s.class_id = c.id
-            WHERE ss.student_id = ?
+            WHERE ss.student_id = %s
             ORDER BY ss.id
         """, (student_id,))
         siblings = fetchall_dict(c)
@@ -491,8 +497,8 @@ class StudentSibling:
         c.execute("""
             INSERT INTO student_siblings 
             (student_id, sibling_name, age, class, school_name, sibling_student_id)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             student_id,
             sibling_data.get('sibling_name'),
@@ -521,8 +527,8 @@ class StudentSibling:
 
         c.execute("""
             UPDATE student_siblings 
-            SET sibling_name=?, age=?, class=?, school_name=?, sibling_student_id=?
-            WHERE id=?
+            SET sibling_name=%s, age=%s, class=%s, school_name=%s, sibling_student_id=%s
+            WHERE id=%s
         """, (
             sibling_data.get('sibling_name'),
             sibling_data.get('age'),
@@ -543,7 +549,7 @@ class StudentSibling:
         """Sibling delete karo"""
         conn = get_db()
         c = conn.cursor()
-        c.execute("DELETE FROM student_siblings WHERE id=?", (sibling_id,))
+        c.execute("DELETE FROM student_siblings WHERE id=%s", (sibling_id,))
         conn.commit()
         conn.close()
         return True
@@ -553,7 +559,7 @@ class StudentSibling:
         """Student ke saare siblings delete karo"""
         conn = get_db()
         c = conn.cursor()
-        c.execute("DELETE FROM student_siblings WHERE student_id=?", (student_id,))
+        c.execute("DELETE FROM student_siblings WHERE student_id=%s", (student_id,))
         conn.commit()
         conn.close()
         return True
@@ -577,14 +583,14 @@ class StudentSibling:
             c.execute("""
                 SELECT id, full_name, student_code, class_id 
                 FROM students 
-                WHERE school_id=? AND id != ?
+                WHERE school_id=%s AND id != %s
                 ORDER BY full_name
             """, (school_id, exclude_student_id))
         else:
             c.execute("""
                 SELECT id, full_name, student_code, class_id 
                 FROM students 
-                WHERE school_id=?
+                WHERE school_id=%s
                 ORDER BY full_name
             """, (school_id,))
 
@@ -613,7 +619,7 @@ class Teacher:
         params = []
 
         if school_id:
-            query += " AND t.school_id = ?"
+            query += " AND t.school_id = %s"
             params.append(school_id)
 
         query += " ORDER BY t.full_name"
@@ -636,7 +642,7 @@ class Teacher:
             JOIN schools s ON t.school_id = s.id
             LEFT JOIN users cr ON t.created_by = cr.id
             LEFT JOIN users up ON t.updated_by = up.id
-            WHERE t.id = ?
+            WHERE t.id = %s
         """, (teacher_id,))
         teacher = fetchone_dict(c)
         conn.close()
@@ -647,7 +653,7 @@ class Teacher:
         """User ID se teacher fetch karo"""
         conn = get_db()
         c = conn.cursor()
-        c.execute("SELECT * FROM teachers WHERE user_id = ?", (user_id,))
+        c.execute("SELECT * FROM teachers WHERE user_id = %s", (user_id,))
         teacher = fetchone_dict(c)
         conn.close()
         return teacher
@@ -672,8 +678,8 @@ class Teacher:
         c.execute("""
             INSERT INTO users 
             (school_id, username, password, role, full_name, email, phone)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             data.get('school_id'),
             data.get('username'),
@@ -694,8 +700,8 @@ class Teacher:
             INSERT INTO teachers 
             (user_id, school_id, teacher_code, full_name, email, phone,
              subject_specialization, qualification, joining_date, profile_pic, salary)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?,?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             user_id,
             data.get('school_id'),
@@ -731,9 +737,9 @@ class Teacher:
 
             c.execute("""
                 UPDATE teachers 
-                SET full_name=?, email=?, phone=?, subject_specialization=?,
-                    qualification=?, joining_date=?, salary=?, profile_pic=?
-                WHERE id=?
+                SET full_name=%s, email=%s, phone=%s, subject_specialization=%s,
+                    qualification=%s, joining_date=%s, salary=%s, profile_pic=%s
+                WHERE id=%s
             """, (
                 data.get('full_name'), data.get('email'), data.get('phone'),
                 data.get('subject_specialization'), data.get('qualification'),
@@ -743,9 +749,9 @@ class Teacher:
         else:
             c.execute("""
                 UPDATE teachers 
-                SET full_name=?, email=?, phone=?, subject_specialization=?,
-                    qualification=?, joining_date=?, salary=?
-                WHERE id=?
+                SET full_name=%s, email=%s, phone=%s, subject_specialization=%s,
+                    qualification=%s, joining_date=%s, salary=%s
+                WHERE id=%s
             """, (
                 data.get('full_name'), data.get('email'), data.get('phone'),
                 data.get('subject_specialization'), data.get('qualification'),
@@ -771,7 +777,7 @@ class TeacherDocument:
         c = conn.cursor()
         c.execute("""
             SELECT * FROM teacher_documents 
-            WHERE teacher_id = ?
+            WHERE teacher_id = %s
             ORDER BY upload_date DESC
         """, (teacher_id,))
         documents = fetchall_dict(c)
@@ -795,8 +801,8 @@ class TeacherDocument:
             c.execute("""
                 INSERT INTO teacher_documents 
                 (teacher_id, document_type, document_name, file_path)
-                OUTPUT INSERTED.id
-                VALUES (?,?,?,?)
+                VALUES (%s,%s,%s,%s)
+                RETURNING id
             """, (teacher_id, document_type, document_file.filename, filename))
 
             doc_id = c.fetchone()[0]
@@ -814,7 +820,7 @@ class TeacherDocument:
         """Document delete karo"""
         conn = get_db()
         c = conn.cursor()
-        c.execute("DELETE FROM teacher_documents WHERE id=?", (document_id,))
+        c.execute("DELETE FROM teacher_documents WHERE id=%s", (document_id,))
         conn.commit()
         conn.close()
         return True
@@ -837,8 +843,8 @@ class FeeCollection:
             (student_id, school_id, class_id, month, year, amount, 
              payment_mode, transaction_reference, remarks, collected_by, 
              receipt_number, created_by)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             data.get('student_id'),
             data.get('school_id'),
@@ -873,7 +879,7 @@ class FeeCollection:
             JOIN classes c ON fc.class_id = c.id
             JOIN schools sch ON fc.school_id = sch.id
             JOIN users u ON fc.collected_by = u.id
-            WHERE fc.id = ?
+            WHERE fc.id = %s
         """, (fee_id,))
         receipt = fetchone_dict(c)
         conn.close()
@@ -893,18 +899,18 @@ class FeeCollection:
             JOIN students s ON fc.student_id = s.id
             JOIN classes c ON fc.class_id = c.id
             JOIN users u ON fc.collected_by = u.id
-            WHERE fc.school_id = ?
+            WHERE fc.school_id = %s
         """
         params = [school_id]
 
         if class_id:
-            query += " AND fc.class_id = ?"
+            query += " AND fc.class_id = %s"
             params.append(class_id)
         if month:
-            query += " AND fc.month = ?"
+            query += " AND fc.month = %s"
             params.append(month)
         if year:
-            query += " AND fc.year = ?"
+            query += " AND fc.year = %s"
             params.append(year)
 
         query += " ORDER BY fc.created_date DESC"
@@ -924,15 +930,15 @@ class FeeCollection:
             SELECT fc.*, u.full_name AS collector_name
             FROM fee_collections fc
             JOIN users u ON fc.collected_by = u.id
-            WHERE fc.student_id = ?
+            WHERE fc.student_id = %s
         """
         params = [student_id]
 
         if month:
-            query += " AND fc.month = ?"
+            query += " AND fc.month = %s"
             params.append(month)
         if year:
-            query += " AND fc.year = ?"
+            query += " AND fc.year = %s"
             params.append(year)
 
         query += " ORDER BY fc.created_date DESC"
@@ -957,7 +963,7 @@ class StudentAttendance:
             # Check if already exists
             c.execute("""
                 SELECT id FROM student_attendance 
-                WHERE student_id=? AND attendance_date=?
+                WHERE student_id=%s AND attendance_date=%s
             """, (record['student_id'], record['attendance_date']))
 
             existing = c.fetchone()
@@ -965,9 +971,9 @@ class StudentAttendance:
             if existing:
                 c.execute("""
                     UPDATE student_attendance 
-                    SET status=?, remarks=?, marked_by=?,
-                        updated_by=?, updated_date=GETDATE()
-                    WHERE id=?
+                    SET status=%s, remarks=%s, marked_by=%s,
+                        updated_by=%s, updated_date=NOW()
+                    WHERE id=%s
                 """, (
                     record['status'],
                     record.get('remarks', ''),
@@ -980,7 +986,7 @@ class StudentAttendance:
                     INSERT INTO student_attendance 
                     (student_id, class_id, school_id, attendance_date, 
                      status, remarks, marked_by, created_by)
-                    VALUES (?,?,?,?,?,?,?,?)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
                 """, (
                     record['student_id'],
                     record['class_id'],
@@ -1005,7 +1011,7 @@ class StudentAttendance:
             SELECT sa.*, s.full_name AS student_name, s.student_code
             FROM student_attendance sa
             JOIN students s ON sa.student_id = s.id
-            WHERE sa.class_id=? AND sa.attendance_date=?
+            WHERE sa.class_id=%s AND sa.attendance_date=%s
             ORDER BY s.full_name
         """, (class_id, attendance_date))
         attendance = fetchall_dict(c)
@@ -1020,15 +1026,15 @@ class StudentAttendance:
 
         query = """
             SELECT * FROM student_attendance 
-            WHERE student_id = ?
+            WHERE student_id = %s
         """
         params = [student_id]
 
         if month and year:
-            query += " AND MONTH(attendance_date)=? AND YEAR(attendance_date)=?"
+            query += " AND EXTRACT(MONTH FROM attendance_date)=%s AND EXTRACT(YEAR FROM attendance_date)=%s"
             params.extend([month, year])
         elif year:
-            query += " AND YEAR(attendance_date)=?"
+            query += " AND EXTRACT(YEAR FROM attendance_date)=%s"
             params.append(year)
 
         query += " ORDER BY attendance_date DESC"
@@ -1051,7 +1057,7 @@ class TeacherAttendance:
         for record in attendance_list:
             c.execute("""
                 SELECT id FROM teacher_attendance 
-                WHERE teacher_id=? AND attendance_date=?
+                WHERE teacher_id=%s AND attendance_date=%s
             """, (record['teacher_id'], record['attendance_date']))
 
             existing = c.fetchone()
@@ -1059,9 +1065,9 @@ class TeacherAttendance:
             if existing:
                 c.execute("""
                     UPDATE teacher_attendance 
-                    SET status=?, remarks=?, marked_by=?,
-                        updated_by=?, updated_date=GETDATE()
-                    WHERE id=?
+                    SET status=%s, remarks=%s, marked_by=%s,
+                        updated_by=%s, updated_date=NOW()
+                    WHERE id=%s
                 """, (
                     record['status'],
                     record.get('remarks', ''),
@@ -1074,7 +1080,7 @@ class TeacherAttendance:
                     INSERT INTO teacher_attendance 
                     (teacher_id, school_id, attendance_date, 
                      status, remarks, marked_by, created_by)
-                    VALUES (?,?,?,?,?,?,?)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s)
                 """, (
                     record['teacher_id'],
                     record['school_id'],
@@ -1100,7 +1106,7 @@ class TeacherAttendance:
                 SELECT ta.*, t.full_name AS teacher_name, t.teacher_code
                 FROM teacher_attendance ta
                 JOIN teachers t ON ta.teacher_id = t.id
-                WHERE ta.school_id=? AND ta.attendance_date=?
+                WHERE ta.school_id=%s AND ta.attendance_date=%s
                 ORDER BY t.full_name
             """, (school_id, attendance_date))
         else:
@@ -1108,7 +1114,7 @@ class TeacherAttendance:
                 SELECT ta.*, t.full_name AS teacher_name, t.teacher_code
                 FROM teacher_attendance ta
                 JOIN teachers t ON ta.teacher_id = t.id
-                WHERE ta.school_id=?
+                WHERE ta.school_id=%s
                 ORDER BY ta.attendance_date DESC, t.full_name
             """, (school_id,))
 
@@ -1124,15 +1130,15 @@ class TeacherAttendance:
 
         query = """
             SELECT * FROM teacher_attendance 
-            WHERE teacher_id = ?
+            WHERE teacher_id = %s
         """
         params = [teacher_id]
 
         if month and year:
-            query += " AND MONTH(attendance_date)=? AND YEAR(attendance_date)=?"
+            query += " AND EXTRACT(MONTH FROM attendance_date)=%s AND EXTRACT(YEAR FROM attendance_date)=%s"
             params.extend([month, year])
         elif year:
-            query += " AND YEAR(attendance_date)=?"
+            query += " AND EXTRACT(YEAR FROM attendance_date)=%s"
             params.append(year)
 
         query += " ORDER BY attendance_date DESC"
@@ -1179,7 +1185,7 @@ class Class:
         params = []
 
         if school_id:
-            query += " AND c.school_id = ?"
+            query += " AND c.school_id = %s"
             params.append(school_id)
 
         query += " ORDER BY c.class_name, c.section"
@@ -1198,7 +1204,7 @@ class Class:
             SELECT c.*, s.name AS school_name
             FROM classes c
             JOIN schools s ON c.school_id = s.id
-            WHERE c.id = ?
+            WHERE c.id = %s
         """, (class_id,))
         class_info = fetchone_dict(c)
         conn.close()
@@ -1213,8 +1219,8 @@ class Class:
         c.execute("""
             INSERT INTO classes 
             (school_id, class_name, section, academic_year)
-            OUTPUT INSERTED.id
-            VALUES (?,?,?,?)
+            VALUES (%s,%s,%s,%s)
+            RETURNING id
         """, (
             data.get('school_id'),
             data.get('class_name'),
@@ -1247,7 +1253,7 @@ def get_audit_info(table_name, record_id):
             FROM {table_name} record
             LEFT JOIN users cr ON record.created_by = cr.id
             LEFT JOIN users up ON record.updated_by = up.id
-            WHERE record.id = ?
+            WHERE record.id = %s
         """, (record_id,))
 
         return fetchone_dict(c)
