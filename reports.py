@@ -600,6 +600,7 @@ def export_salary():
         mode = "payments"
     except Exception:
         # Fallback: use teachers.salary directly
+        conn.rollback()      # <-- ye add karo
         salary_rows = []
         mode = "base"
 
