@@ -15,6 +15,9 @@
       --primary: #1a4a6f;
       --primary-light: #2c6e9e;
       --primary-bg: #e8f1f8;
+      --sky: #0ea5e9;
+      --sky-light: #38bdf8;
+      --sky-dark: #0284c7;
       --secondary: #c6a43b;
       --secondary-dark: #a07d2a;
       --secondary-light: #e0c87c;
@@ -76,10 +79,10 @@
       flex-wrap: wrap;
       gap: 1rem;
       padding: 0.75rem 1.5rem;
-      background: white;
+      background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-md);
-      border: 1px solid var(--gray-200);
+      border: 1px solid var(--sky-dark);
     }
 
     .brand-modern {
@@ -91,25 +94,30 @@
     .brand-icon-modern {
       width: 44px;
       height: 44px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      background: rgba(255, 255, 255, 0.18);
       border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.25rem;
       box-shadow: var(--shadow-sm);
+      color: #ffffff;
+    }
+
+    .brand-icon-modern i {
+      color: #ffffff;
     }
 
     .brand-name-modern {
       font-weight: 800;
       font-size: 1.1rem;
-      color: var(--gray-800);
+      color: #ffffff;
       letter-spacing: -0.3px;
     }
 
     .brand-sub-modern {
       font-size: 0.65rem;
-      color: var(--gray-400);
+      color: rgba(255, 255, 255, 0.85);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -119,9 +127,9 @@
       align-items: center;
       gap: 0.75rem;
       padding: 0.375rem 1rem 0.375rem 0.375rem;
-      background: var(--gray-50);
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 40px;
-      border: 1px solid var(--gray-200);
+      border: 1px solid rgba(255, 255, 255, 0.35);
     }
 
     .avatar-modern {
@@ -139,7 +147,7 @@
     .username-modern {
       font-size: 0.8rem;
       font-weight: 500;
-      color: var(--gray-600);
+      color: #ffffff;
     }
 
     /* Hero Section */
@@ -158,7 +166,7 @@
       border-radius: 40px;
       font-size: 0.7rem;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--sky-dark);
       margin-bottom: 1rem;
       border: 1px solid var(--gray-200);
     }
@@ -177,9 +185,9 @@
     }
 
     .hero-title-modern em {
-      color: var(--primary);
+      color: var(--sky);
       font-style: normal;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -193,18 +201,22 @@
     /* Main Card */
     .main-card-modern {
       width: 100%;
-      max-width: 900px;
+      max-width: 560px;
+      margin: 0 auto;
       background: white;
       border-radius: var(--radius-2xl);
       border: 1px solid var(--gray-200);
       box-shadow: var(--shadow-xl);
       overflow: hidden;
+      display: flex;
+      flex-wrap: wrap;
     }
 
     .card-header-modern {
+      flex: 1 1 100%;
       padding: 1.25rem 1.75rem;
-      border-bottom: 1px solid var(--gray-200);
-      background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+      border-bottom: 1px solid var(--sky-dark);
+      background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -215,36 +227,42 @@
     .card-title-modern {
       font-weight: 700;
       font-size: 1rem;
-      color: var(--gray-800);
+      color: #ffffff;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
     .card-title-modern i {
-      color: var(--secondary);
+      color: #ffffff;
     }
 
     .card-sub-modern {
       font-size: 0.7rem;
-      color: var(--gray-400);
+      color: rgba(255, 255, 255, 0.85);
       margin-top: 0.25rem;
     }
 
     .count-tag-modern {
       padding: 0.25rem 0.75rem;
-      background: var(--primary-bg);
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 20px;
       font-size: 0.7rem;
       font-weight: 600;
-      color: var(--primary);
+      color: #ffffff;
+    }
+
+    /* Form flattened so its children lay out as direct grid items of the card */
+    .main-card-modern form {
+      display: contents;
     }
 
     /* Schools Grid */
     .schools-grid-modern {
-      padding: 1.75rem;
+      flex: 1 1 100%;
+      padding: 1.5rem;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 1rem;
     }
 
@@ -273,15 +291,15 @@
     }
 
     .school-card-modern:hover .school-item-modern {
-      border-color: var(--primary-light);
+      border-color: var(--sky-light);
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
     }
 
     .school-card-modern input:checked ~ .school-item-modern {
-      border-color: var(--primary);
+      border-color: var(--sky);
       background: var(--primary-bg);
-      box-shadow: 0 0 0 3px rgba(26, 74, 111, 0.1);
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
     }
 
     .school-logo-modern {
@@ -343,14 +361,14 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: var(--primary);
+      background: var(--sky);
       transform: scale(0);
       transition: transform 0.2s ease;
     }
 
     .school-card-modern input:checked ~ .school-item-modern .radio-indicator-modern {
-      border-color: var(--primary);
-      background: var(--primary);
+      border-color: var(--sky);
+      background: var(--sky);
     }
 
     .school-card-modern input:checked ~ .school-item-modern .radio-dot-modern {
@@ -360,6 +378,7 @@
 
     /* Empty State */
     .empty-state-modern {
+      flex: 1 1 100%;
       text-align: center;
       padding: 3rem;
     }
@@ -382,35 +401,23 @@
       color: var(--gray-400);
     }
 
-    /* Divider */
+    /* Divider hidden — buttons now sit together in one row */
     .divider-modern {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin: 0 1.75rem 1.25rem;
-      color: var(--gray-300);
-      font-size: 0.7rem;
+      display: none;
     }
 
-    .divider-modern::before,
-    .divider-modern::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--gray-200);
-    }
-
-    /* Buttons */
+    /* Buttons — one row, two columns, sky blue, gently rounded */
     .btn-submit-modern {
-      width: calc(100% - 3.5rem);
-      margin: 0 1.75rem 1.25rem;
-      padding: 0.875rem 1.5rem;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      flex: 1 1 0;
+      width: auto;
+      margin: 0 0.5rem 1.75rem 1.75rem;
+      padding: 0.875rem 1rem;
+      background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
       color: white;
       border: none;
-      border-radius: var(--radius-lg);
+      border-radius: 1.25rem;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
@@ -437,13 +444,14 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      width: calc(100% - 3.5rem);
-      margin: 0 1.75rem 1.75rem;
-      padding: 0.75rem 1.5rem;
-      background: transparent;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius-lg);
-      color: var(--gray-500);
+      flex: 1 1 0;
+      width: auto;
+      margin: 0 1.75rem 1.75rem 0.5rem;
+      padding: 0.875rem 1rem;
+      background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
+      border: none;
+      border-radius: 1.25rem;
+      color: white;
       font-weight: 500;
       font-size: 0.85rem;
       text-decoration: none;
@@ -451,9 +459,9 @@
     }
 
     .btn-logout-modern:hover {
-      border-color: var(--danger);
-      color: var(--danger);
-      background: var(--danger-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      opacity: 0.92;
     }
 
     /* Alert Styles */
@@ -528,12 +536,6 @@
 
       .btn-submit-modern,
       .btn-logout-modern {
-        width: calc(100% - 2rem);
-        margin-left: 1rem;
-        margin-right: 1rem;
-      }
-
-      .divider-modern {
         margin-left: 1rem;
         margin-right: 1rem;
       }
@@ -657,10 +659,6 @@
       </button>
       {% endif %}
     </form>
-
-    <div class="divider-modern">
-      <span>OR</span>
-    </div>
 
     <a href="{{ url_for('logout') }}" class="btn-logout-modern">
       <i class="fas fa-sign-out-alt"></i>
