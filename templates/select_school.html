@@ -71,14 +71,14 @@
     /* Navbar */
     .navbar-modern {
       width: 100%;
-      max-width: 900px;
-      margin-bottom: 2rem;
+      max-width: 560px;
+      margin: 0 auto 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 1rem;
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.25rem;
       background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-md);
@@ -148,54 +148,6 @@
       font-size: 0.8rem;
       font-weight: 500;
       color: #ffffff;
-    }
-
-    /* Hero Section */
-    .hero-modern {
-      text-align: center;
-      max-width: 700px;
-      margin-bottom: 2rem;
-    }
-
-    .hero-badge-modern {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.375rem 1rem;
-      background: linear-gradient(135deg, var(--primary-bg) 0%, white 100%);
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: var(--sky-dark);
-      margin-bottom: 1rem;
-      border: 1px solid var(--gray-200);
-    }
-
-    .hero-badge-modern i {
-      font-size: 0.6rem;
-      color: var(--secondary);
-    }
-
-    .hero-title-modern {
-      font-size: clamp(1.75rem, 5vw, 2.5rem);
-      font-weight: 800;
-      color: var(--gray-800);
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
-    }
-
-    .hero-title-modern em {
-      color: var(--sky);
-      font-style: normal;
-      background: linear-gradient(135deg, var(--sky) 0%, var(--sky-light) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero-subtitle-modern {
-      font-size: 0.9rem;
-      color: var(--gray-500);
     }
 
     /* Main Card */
@@ -586,26 +538,12 @@
     {% endfor %}
   {% endwith %}
 
-  <!-- Hero Section -->
-  <div class="hero-modern">
-    <div class="hero-badge-modern">
-      <i class="fas fa-school"></i>
-      School Selection
-    </div>
-    <h1 class="hero-title-modern">
-      Select Your <em>School</em>
-    </h1>
-    <p class="hero-subtitle-modern">
-      Choose a school to view and manage its data
-    </p>
-  </div>
-
   <!-- Main Card -->
   <div class="main-card-modern">
     <div class="card-header-modern">
       <div>
         <div class="card-title-modern">
-          <i class="fas fa-building"></i> Available Schools
+          <i class="fas fa-building"></i> Select Your School
         </div>
         <div class="card-sub-modern">Select one school to continue to dashboard</div>
       </div>
