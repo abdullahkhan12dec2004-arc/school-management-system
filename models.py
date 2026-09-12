@@ -18,17 +18,17 @@ from database import get_db, fetchall_dict, fetchone_dict, hash_password
 
 # ========== AUDIT MIXIN ==========
 class AuditMixin:
-    """Har model ke liye audit fields handle karta hai"""
+
 
     @staticmethod
     def get_current_user_id():
-        """Session se current user ID nikalta hai"""
+                          
         from flask import session
         return session.get('user_id')
 
     @staticmethod
     def add_create_audit(cursor, table_name, record_id):
-        """Create audit fields set karta hai"""
+      """Sets the create audit fields."""
         user_id = AuditMixin.get_current_user_id()
         if user_id:
             cursor.execute(f"""
@@ -39,7 +39,7 @@ class AuditMixin:
 
     @staticmethod
     def add_update_audit(cursor, table_name, record_id):
-        """Update audit fields set karta hai"""
+      """Sets the create audit fields."""
         user_id = AuditMixin.get_current_user_id()
         if user_id:
             cursor.execute(f"""
@@ -65,7 +65,7 @@ class School:
 
     @staticmethod
     def get_by_id(school_id):
-        """ID se school fetch karo"""
+       """Fetches the school by ID."""
         conn = get_db()
         c = conn.cursor()
         c.execute("SELECT * FROM schools WHERE id=%s", (school_id,))
@@ -75,7 +75,7 @@ class School:
 
     @staticmethod
     def create(data, logo_file=None):
-        """Naya school create karo with location details"""
+     """Create a new school with location details."""
         conn = get_db()
         c = conn.cursor()
 
