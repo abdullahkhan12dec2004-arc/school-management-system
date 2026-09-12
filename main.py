@@ -141,11 +141,10 @@ def allowed_file(filename):
 
 # ========== DECORATORS ==========
 def school_admin_only_required(f):
-   """Only the School Admin can access this — the Super Admin (admin) cannot."""
+    """Only the School Admin can access this — the Super Admin (admin) cannot."""
     @wraps(f)
     def decorated(*args, **kwargs):
         if session.get('role') != 'school_admin':
-            
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
@@ -201,10 +200,10 @@ def hash_password(password):
 
 
 def get_col(row_dict, *keys, default=''):
-"""
-Tries multiple column name variants.
-Case-insensitive, strips whitespace, and safely handles NaN values.
-"""
+    """
+      Tries multiple column name variants.
+       Case-insensitive, strips whitespace, and safely handles NaN values.
+    """
     import pandas as pd
     lower_map = {str(k).lower().strip(): v for k, v in row_dict.items()}
 
@@ -223,10 +222,9 @@ Case-insensitive, strips whitespace, and safely handles NaN values.
 
 
 def is_row_empty(row_dict):
-
-"""
-Returns True if the row does not contain any meaningful value.
-"""
+    """
+    Returns True if the row does not contain any meaningful value.
+    """
     import pandas as pd
     skip_keys = {'school id', 'school_id', 'schoolid'}
     for k, val in row_dict.items():
