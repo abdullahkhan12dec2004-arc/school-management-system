@@ -27,8 +27,8 @@ def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'user_id' not in session:
-            flash('Pehle login karein', 'error')
-            return redirect(url_for('login'))
+            `flash('Please log in first', 'error')`
+             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
 
@@ -37,17 +37,16 @@ def admin_required(f):
     def decorated(*args, **kwargs):
         if session.get('role') not in ['super_admin', 'school_admin']:
             flash(f"DEBUG role: {session.get('role')}", 'error')
-            flash('Sirf Admin access kar sakta hai', 'error')
+            flash('Only admins can access this', 'error')`
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
-
   
 def teacher_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if session.get('role') not in ['super_admin', 'school_admin', 'teacher']:
-            flash('Aapko is page ka access nahi hai', 'error')
+            flash('you cannot access this page', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
