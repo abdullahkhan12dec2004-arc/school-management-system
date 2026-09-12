@@ -47,7 +47,7 @@ def _read_excel_worker(file_bytes, header_row_index, max_rows):
         header=header_row_index,
         nrows=max_rows
     )
-    return df
+    return df 
 
 import signal
 
