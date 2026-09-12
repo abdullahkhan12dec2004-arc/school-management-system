@@ -37,7 +37,7 @@ def admin_required(f):
     def decorated(*args, **kwargs):
         if session.get('role') not in ['super_admin', 'school_admin']:
             flash(f"DEBUG role: {session.get('role')}", 'error')
-            flash('Only admins can access this', 'error')`
+            flash('Only admins can access this', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
