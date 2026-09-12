@@ -57,12 +57,12 @@ def safe_read_excel(file_storage, header_row_index=2, max_rows=5000, timeout=30)
     file_bytes = file_storage.stream.read()
 
     if len(file_bytes) > 10 * 1024 * 1024:
-        raise ValueError("Excel file is too large. Maximum allowed size is 10 MB.")
+        raise ValueError("The Excel file is too large. The maximum allowed file size is 10 MB.")
     if not file_bytes:
         raise ValueError("Uploaded Excel file is empty.")
 
     def _handler(signum, frame):
-        raise TimeoutError("Excel processing timeout ho gaya.")
+        raise TimeoutError("The Excel processing timed out.")
 
     old_handler = signal.signal(signal.SIGALRM, _handler)
     signal.alarm(timeout)
@@ -70,9 +70,9 @@ def safe_read_excel(file_storage, header_row_index=2, max_rows=5000, timeout=30)
         df = pd.read_excel(io.BytesIO(file_bytes), engine="openpyxl",
                             header=header_row_index, nrows=max_rows)
     except TimeoutError:
-        raise ValueError("Excel processing timeout ho gaya. File bohot bari ya complex hai.")
+        raise ValueError("Excel processing timed out. The file is too large or complex.")
     except Exception as e:
-        raise ValueError(f"Excel file corrupt hai ya crash ho gayi: {e}")
+        raise ValueError(f"The Excel file is corrupted or has crashed: {e}")
     finally:
         signal.alarm(0)
         signal.signal(signal.SIGALRM, old_handler)
@@ -108,16 +108,16 @@ def send_otp_email(to_email, otp, full_name):
                            'email': env('MAIL_SENDER')},
                 'to': [{'email': to_email, 'name': full_name}],
                 'subject': 'School Registration - Email Verification OTP',
-                'textContent': f"""Assalam-o-Alaikum {full_name},
+                'textContent': f"""Hello {full_name},
 
-Aapka School Management System registration ke liye OTP code hai: {otp}
+Your School Management System registration OTP code is: {otp}
 
-Yeh code 10 minute ke liye valid hai. Kisi ke saath share na karein.
+This code is valid for 10 minutes. Do not share it with anyone.
 
-Agar aapne registration nahi ki, is email ko ignore karein.
+If you did not register, please ignore this email.
 
 Regards,
-School Management System""",
+School Management System"""
             },
         )
         if r.status_code in (200, 201):
@@ -141,11 +141,11 @@ def allowed_file(filename):
 
 # ========== DECORATORS ==========
 def school_admin_only_required(f):
-    """Sirf School Admin access kar sakta hai — Super Admin (admin) nahi."""
+   """Only the School Admin can access this — the Super Admin (admin) cannot."""
     @wraps(f)
     def decorated(*args, **kwargs):
         if session.get('role') != 'school_admin':
-            flash('Yeh option sirf School Admin ke liye hai', 'error')
+            
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
@@ -154,7 +154,7 @@ def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'user_id' not in session:
-            flash('Pehle login karein', 'error')
+            flash('Please log in first.', 'error')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
@@ -165,7 +165,7 @@ def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if session.get('role') != 'admin':
-            flash('Sirf Admin access kar sakta hai', 'error')
+            flash('Only the Admin can access this.', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
 
@@ -176,7 +176,7 @@ def school_admin_or_super_admin_required(f):
     def decorated(*args, **kwargs):
         role = session.get('role')
         if role not in ['admin', 'school_admin']:
-            flash('Sirf Admin ya School Admin access kar sakta hai', 'error')
+            flash('Only the Admin or School Admin can access this.', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
@@ -185,7 +185,8 @@ def teacher_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if session.get('role') not in ['admin', 'school_admin', 'teacher']:
-            flash('Aapko is page ka access nahi hai', 'error')
+           
+            flash('You do not have access to this page.', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
 
@@ -200,10 +201,10 @@ def hash_password(password):
 
 
 def get_col(row_dict, *keys, default=''):
-    """
-    Multiple column name variants try karta hai.
-    Case-insensitive + strip + NaN safe.
-    """
+"""
+Tries multiple column name variants.
+Case-insensitive, strips whitespace, and safely handles NaN values.
+"""
     import pandas as pd
     lower_map = {str(k).lower().strip(): v for k, v in row_dict.items()}
 
@@ -222,9 +223,10 @@ def get_col(row_dict, *keys, default=''):
 
 
 def is_row_empty(row_dict):
-    """
-    True agar row mein koi bhi meaningful value nahi hai.
-    """
+
+"""
+Returns True if the row does not contain any meaningful value.
+"""
     import pandas as pd
     skip_keys = {'school id', 'school_id', 'schoolid'}
     for k, val in row_dict.items():
@@ -375,7 +377,7 @@ def login():
         password = request.form.get('password', '')
 
         if not username or not password:
-            flash('Username aur password dono zaruri hain', 'error')
+            flash('Both username and password are required.', 'error')
             return render_template('login.html')
 
         conn = None
@@ -405,7 +407,7 @@ def login():
                     return redirect(url_for('select_school'))
                 return redirect(url_for('dashboard'))
 
-            flash('Username ya password galat hai', 'error')
+            flash('The username or password is incorrect.','error')
         except Exception as e:
             print(f"Login error: {e}")
             flash('Technical issue. Please try again.', 'error')
@@ -475,7 +477,7 @@ def select_school():
 def edit_school(school_id):
     # School admin sirf apna school edit kar sakta hai
     if session.get('role') == 'school_admin' and school_id != session.get('school_id'):
-        flash('Aap sirf apna school edit kar sakte hain', 'error')
+        flash('You can only edit your own school.', 'error')
         return redirect(url_for('dashboard'))
 
     back_url = url_for('schools') if session.get('role') == 'admin' else url_for('dashboard')
@@ -487,7 +489,7 @@ def edit_school(school_id):
     school = fetchone_dict(c)
 
     if not school:
-        flash('School nahi mila', 'error')
+        flash('School not found.', 'error')
         conn.close()
         return redirect(back_url)
 
@@ -504,7 +506,7 @@ def edit_school(school_id):
             longitude = None
 
         if not name:
-            flash('School ka naam zaruri hai', 'error')
+            flash('The school name is required.', 'error')
             conn.close()
             return render_template('school_form.html', school=school)
 
@@ -530,13 +532,12 @@ def edit_school(school_id):
         except psycopg2.Error as e:
             conn.rollback()
             print(f"edit_school UPDATE error: {e}")
-            flash(f'School update nahi ho saka: {e}', 'error') 
+            flash(f'School update could not be completed: {e}', 'error')
             conn.close()
             return render_template('school_form.html', school=school)
         finally:
             conn.close()
-
-        flash('School details update ho gaye!', 'success')
+        flash('School details have been updated!', 'success')
         return redirect(back_url)
 
     conn.close()
@@ -716,7 +717,7 @@ def add_school():
         longitude = request.form.get('longitude', '')
 
         if not name:
-            flash('School ka naam zaruri hai', 'error')
+            flash('School name is required', 'error')
             return render_template('school_form.html')
 
         logo = None
@@ -740,7 +741,8 @@ def add_school():
         )
         conn.commit()
         conn.close()
-        flash('School successfully add ho gaya!', 'success')
+        
+        flash('School successfully added!', 'success')
         return redirect(url_for('schools'))
 
     return render_template('school_form.html')
@@ -799,7 +801,7 @@ def add_teacher():
         password = request.form.get('password', '')
 
         if not full_name or not username or not password:
-            flash('Naam, username aur password zaruri hain', 'error')
+            flash('Name, username, and password are required', 'error')
             conn.close()
             return render_template('teacher_form.html', schools=schools_list)
 
@@ -816,7 +818,7 @@ def add_teacher():
             user_id = int(row[0])
         except psycopg2.IntegrityError:
             conn.rollback()
-            flash('Yeh username pehle se maujood hai!', 'error')
+            flash('This username already exists!', 'error')
             conn.close()
             return render_template('teacher_form.html', schools=schools_list)
 
@@ -831,7 +833,7 @@ def add_teacher():
         )
         conn.commit()
         conn.close()
-        flash('Teacher successfully register ho gaya!', 'success')
+        flash('Teacher successfully registered!', 'success')
         return redirect(url_for('teachers'))
 
     conn.close()
@@ -915,7 +917,7 @@ def add_student():
         medical_details = request.form.get('medical_details', '')
 
         if not full_name or not username or not password:
-            flash('Naam, username aur password zaruri hain', 'error')
+            flash('Name, username, and password are required', 'error')
             return render_template('student_form.html',
                                    classes=classes_list,
                                    all_students=all_students,
@@ -1002,7 +1004,7 @@ def add_student():
                           sib_student_id, session['user_id']))
 
             conn.commit()
-            flash('Student successfully register ho gaya!', 'success')
+            flash('Student successfully registered!', 'success')
             return redirect(url_for('students'))
 
         except psycopg2.IntegrityError as e:
@@ -1086,7 +1088,7 @@ def subjects():
             passing_marks = request.form.get('passing_marks', 40)
 
             if not subject_name or not class_id:
-                flash('Subject ka naam aur class zaruri hain', 'error')
+                flash('Subject name and class are required', 'error')
             else:
                 c.execute(
                     "INSERT INTO subjects (school_id, class_id, subject_name, total_marks, passing_marks) VALUES (%s,%s,%s,%s,%s)",
@@ -1123,7 +1125,7 @@ def subjects():
                 passing_marks = request.form.get('passing_marks', 40)
 
                 if not subject_name or not class_id:
-                    flash('Subject ka naam aur class zaruri hain', 'error')
+                   flash('Subject name and class are required', 'error')
                 else:
                     c.execute(
                         "INSERT INTO subjects (school_id, class_id, subject_name, total_marks, passing_marks) VALUES (%s,%s,%s,%s,%s)",
@@ -1197,7 +1199,7 @@ def marks():
             teacher_id = teacher['id']
             c.execute("SELECT id FROM teacher_classes WHERE teacher_id=%s AND class_id=%s", (teacher_id, class_id))
             if not c.fetchone():
-                flash('Aapko is class ke marks enter karne ki permission nahi hai', 'error')
+                flash('You do not have permission to enter marks for this class', 'error')
                 conn.close()
                 return redirect(url_for('marks'))
         else:
@@ -1233,7 +1235,7 @@ def marks():
 
         conn.commit()
         conn.close()
-        flash(f'{saved} students ke marks save ho gaye!', 'success')
+        flash(f'{saved} students\' marks have been saved!', 'success')
         return redirect(url_for('marks'))
 
     conn.close()
@@ -1257,7 +1259,7 @@ def result_card(student_id):
         c.execute("SELECT id FROM students WHERE user_id=%s", (session['user_id'],))
         student_record = c.fetchone()
         if not student_record or student_record[0] != student_id:
-            flash('Aap sirf apna result dekh sakte hain', 'error')
+            flash('You can only view your own result', 'error')
             conn.close()
             return redirect(url_for('dashboard'))
     elif role == 'teacher':
@@ -1270,7 +1272,7 @@ def result_card(student_id):
                 AND class_id = %s
             """, (session['user_id'], student_class[0]))
             if not c.fetchone():
-                flash('Aap sirf apne class ke students ka result dekh sakte hain', 'error')
+                flash('You can only view the results of students in your own class', 'error')
                 conn.close()
                 return redirect(url_for('dashboard'))
 
@@ -1282,7 +1284,7 @@ def result_card(student_id):
               WHERE parent_user_id=%s AND student_id=%s
            """, (session['user_id'], student_id))
            if not c.fetchone():
-              flash('Aap is student ka result nahi dekh sakte', 'error')
+              flash('You cannot view this student\'s result', 'error')
               conn.close()
               return redirect(url_for('parent_dashboard'))
     exam_type = request.args.get('exam_type', 'Annual')
@@ -1301,7 +1303,7 @@ def result_card(student_id):
     student = fetchone_dict(c)
 
     if not student:
-        flash('Student nahi mila', 'error')
+        flash('Not find student', 'error')
         conn.close()
         return redirect(url_for('students' if role != 'student' else 'dashboard'))
 
@@ -1377,7 +1379,7 @@ def my_result():
     if student:
         return redirect(url_for('result_card', student_id=student['id']))
 
-    flash('Aapka student record nahi mila', 'error')
+    flash('Your student record was not found', 'error')
     return redirect(url_for('dashboard'))
 
 
@@ -1416,7 +1418,7 @@ def toggle_user(user_id):
         return redirect(url_for('users'))
 
     if session.get('role') == 'school_admin' and row[1] != school_id:
-        flash('Aap sirf apne school ke users ko manage kar sakte hain', 'error')
+        flash('You can only manage users from your own school', 'error')
         conn.close()
         return redirect(url_for('users'))
 
@@ -1424,7 +1426,7 @@ def toggle_user(user_id):
     c.execute("UPDATE users SET is_active=%s WHERE id=%s", (new_status, user_id))
     conn.commit()
     conn.close()
-    flash('User status update ho gaya!', 'success')
+    flash('User status has been updated!', 'success')
     return redirect(url_for('users'))
 
 
@@ -1448,7 +1450,7 @@ def assignments():
         is_primary = bool(int(request.form.get('is_primary', 0)))
 
         if not teacher_id or not class_ids:
-            flash('Teacher aur class dono select karein', 'error')
+            flash('Please select both a teacher and a class', 'error')
         else:
             for class_id in class_ids:
                 c.execute(
@@ -1461,7 +1463,7 @@ def assignments():
                         (teacher_id, class_id, school_id, is_primary)
                     )
             conn.commit()
-            flash('Teacher class ko assign ho gaya!', 'success')
+            flash('Teacher has been assigned to the class!', 'success')
 
     c.execute("""
         SELECT tc.*, t.full_name AS teacher_name, c.class_name, c.section
@@ -1558,7 +1560,7 @@ def teacher_subjects():
         passing_marks_l = request.form.getlist('passing_marks[]')
 
         if not teacher_id:
-            flash('Teacher select karna zaruri hai', 'error')
+            flash('Please select a teacher', 'error')
             conn.close()
             return redirect(url_for('teacher_subjects'))
 
@@ -1600,10 +1602,10 @@ def teacher_subjects():
                 saved += 1
 
         if saved == 0:
-            flash('Koi valid subject row nahi mili — Subject Name aur Class dono zaruri hain', 'error')
+            flash('No valid subject row found — Subject Name and Class are both required', 'error')
         else:
             conn.commit()
-            flash(f'{saved} subject(s) teacher ko assign ho gaye!', 'success')
+            flash(f'{saved} subject(s) have been assigned to the teacher!', 'success')
 
         conn.close()
         return redirect(url_for('teacher_subjects'))
@@ -1671,7 +1673,7 @@ def add_class():
         academic_year = request.form.get('academic_year', '')
 
         if not class_name:
-            flash('Class ka naam zaruri hai', 'error')
+            flash('Class name is required', 'error')
             conn.close()
             return render_template('class_form.html', schools=schools_list)
 
@@ -1681,7 +1683,7 @@ def add_class():
         )
         conn.commit()
         conn.close()
-        flash('Class successfully add ho gayi!', 'success')
+        flash('Class successfully added!', 'success')
         return redirect(url_for('classes'))
 
     conn.close()
@@ -1704,7 +1706,7 @@ def class_students(class_id):
     class_info = fetchone_dict(c)
 
     if not class_info:
-        flash('Class nahi mili', 'error')
+        flash('Class not found', 'error')
         conn.close()
         return redirect(url_for('classes'))
 
@@ -1715,7 +1717,7 @@ def class_students(class_id):
             AND class_id = %s
         """, (session['user_id'], class_id))
         if not c.fetchone():
-            flash('Aapko is class ka access nahi hai', 'error')
+            flash('You do not have access to this class', 'error')
             conn.close()
             return redirect(url_for('classes'))
 
@@ -1747,7 +1749,7 @@ def edit_student(student_id):
     c.execute("SELECT school_id FROM students WHERE id=%s", (student_id,))
     st_row = c.fetchone()
     if st_row and session.get('role') == 'school_admin' and st_row[0] != school_id:
-        flash('Aap sirf apne school ke students edit kar sakte hain', 'error')
+        flash('You can only edit students from your own school', 'error')
         conn.close()
         return redirect(url_for('students'))
 
@@ -1840,7 +1842,7 @@ def edit_student(student_id):
 
         conn.commit()
         conn.close()
-        flash('Student details update ho gaye!', 'success')
+        flash('Student details have been updated!', 'success')
         return redirect(url_for('students'))
 
     c.execute("""
@@ -1852,7 +1854,7 @@ def edit_student(student_id):
     student = fetchone_dict(c)
 
     if not student:
-        flash('Student nahi mila', 'error')
+        flash('Student not found', 'error')
         conn.close()
         return redirect(url_for('students'))
 
@@ -1894,7 +1896,7 @@ def edit_teacher(teacher_id):
     c.execute("SELECT school_id FROM teachers WHERE id=%s", (teacher_id,))
     t_row = c.fetchone()
     if t_row and session.get('role') == 'school_admin' and t_row[0] != school_id:
-        flash('Aap sirf apne school ke teachers edit kar sakte hain', 'error')
+        flash('You can only edit teachers from your own school', 'error')
         conn.close()
         return redirect(url_for('teachers'))
 
@@ -1967,14 +1969,14 @@ def edit_teacher(teacher_id):
 
         conn.commit()
         conn.close()
-        flash('Teacher details update ho gaye!', 'success')
+        flash('Teacher details have been updated!', 'success')
         return redirect(url_for('teachers'))
 
     c.execute("SELECT * FROM teachers WHERE id=%s", (teacher_id,))
     teacher = fetchone_dict(c)
 
     if not teacher:
-        flash('Teacher nahi mila', 'error')
+        flash('Teacher not found ', 'error')
         conn.close()
         return redirect(url_for('teachers'))
 
@@ -1999,7 +2001,7 @@ def delete_teacher_document(doc_id):
             os.remove(filepath)
         c.execute("DELETE FROM teacher_documents WHERE id=%s", (doc_id,))
         conn.commit()
-        flash('Document delete ho gaya!', 'success')
+        flash('Document deleted successfully!', 'success')
     conn.close()
     return redirect(request.referrer or url_for('teachers'))
 
@@ -2047,7 +2049,7 @@ def save_teacher_attendance():
     marked_by = session['user_id']
 
     if not attendance_date:
-        flash('Date zaruri hai', 'error')
+        flash('Date is required', 'error')
         return redirect(url_for('teacher_attendance'))
 
     conn = get_db()
@@ -2057,7 +2059,7 @@ def save_teacher_attendance():
     teachers = c.fetchall()
 
     if not teachers:
-        flash('Koi teacher nahi mila', 'error')
+        flash('No teacher found', 'error')
         conn.close()
         return redirect(url_for('teacher_attendance'))
 
@@ -2079,7 +2081,7 @@ def save_teacher_attendance():
 
     conn.commit()
     conn.close()
-    flash(f'{saved_count} teachers ki attendance save ho gayi!', 'success')
+    flash(f'{saved_count} teachers\' attendance has been saved!', 'success')
     return redirect(url_for('teacher_attendance'))
 
 
@@ -2204,7 +2206,7 @@ def save_student_attendance():
     remarks_list = request.form.getlist('remarks[]')
 
     if not attendance_date or not class_id or not student_ids:
-        flash('Class, date aur students ki attendance zaruri hai', 'error')
+        flash('Class, date, and student attendance are required', 'error')
         return redirect(url_for('student_attendance'))
 
     conn = get_db()
@@ -2232,7 +2234,7 @@ def save_student_attendance():
 
     conn.commit()
     conn.close()
-    flash(f'{len(student_ids)} students ki attendance save ho gayi!', 'success')
+    flash(f'{len(student_ids)} students\' attendance has been saved!', 'success')
     return redirect(url_for('student_attendance'))
 
 
@@ -2346,13 +2348,13 @@ def view_teacher(teacher_id):
     teacher = fetchone_dict(c)
 
     if not teacher:
-        flash('Teacher nahi mila', 'error')
+        flash('Teacher not found', 'error')
         conn.close()
         return redirect(url_for('teachers'))
 
     # School admin/teacher sirf apne school ke teacher dekh sakte hain
     if session.get('role') in ('school_admin', 'teacher') and teacher.get('school_id') != school_id:
-        flash('Aapko is teacher ka access nahi hai', 'error')
+        flash('You do not have access to this teacher', 'error')
         conn.close()
         return redirect(url_for('teachers'))
 
@@ -2413,7 +2415,7 @@ def manage_notices():
         recipient_role = request.form.get('recipient_role', 'all')
 
         if not title:
-            flash('Title zaroori hai', 'error')
+            flash('Title is required', 'error')
             return redirect(url_for('manage_notices'))
 
         image_filename = None
@@ -2498,10 +2500,9 @@ def delete_notice(notice_id):
     if c.fetchone():
         c.execute("UPDATE notices SET is_active=FALSE WHERE id=%s", (notice_id,))
         conn.commit()
-        flash('Notice delete ho gaya!', 'success')
+        flash('Notice deleted successfully!', 'success')
     else:
-        flash('Aap is notice ko delete nahi kar sakte', 'error')
-
+        flash('You cannot delete this notice', 'error')
     conn.close()
     return redirect(url_for('manage_notices'))
 
@@ -2527,11 +2528,11 @@ def school_admin_signup():
         confirm_password = request.form.get('confirm_password', '')
 
         if not school_name or not username or not password or not full_name:
-            flash('School name, username, password aur full name zaruri hain', 'error')
+            flash('School name, username, password, and full name are required', 'error')
             return render_template('school_form.html')
 
         if password != confirm_password:
-            flash('Password aur confirm password match nahi ho rahe', 'error')
+            flash('Password and confirm password do not match', 'error')
             return render_template('school_form.html')
 
         conn = get_db()
@@ -2539,7 +2540,7 @@ def school_admin_signup():
         try:
             c.execute("SELECT id FROM users WHERE username=%s", (username,))
             if c.fetchone():
-                flash('Yeh username pehle se exist karta hai!', 'error')
+                flash('This username already exists!', 'error')
                 return render_template('school_form.html')
 
             logo = None
@@ -2577,7 +2578,7 @@ def school_admin_signup():
             if email_sent:
                 flash(f'An OTP has been sent to your email ({admin_email}). Please check your inbox and verify it.', 'success')
             else:
-                flash('OTP email send nahi ho saka. Please try "Resend OTP".', 'error')
+                flash('OTP email could not be sent. Please try "Resend OTP".', 'error')
 
             return redirect(url_for('verify_otp'))
 
@@ -2640,7 +2641,7 @@ def verify_otp():
 
             except psycopg2.IntegrityError:
                 conn.rollback()
-                flash('Yeh username pehle se exist karta hai!', 'error')
+                flash('This username  is  already exist ', 'error')
                 return render_template('verify_otp.html', email=email)
             except Exception as e:
                 conn.rollback()
@@ -2682,7 +2683,7 @@ def resend_otp():
 @login_required
 def pending_admins():
     if session.get('role') != 'admin':
-        flash('Aap ye page nahi dekh sakte', 'error')
+        flash('You cannot view this page', 'error')
         return redirect(url_for('dashboard'))
 
     conn = get_db()
@@ -2709,7 +2710,7 @@ def pending_admins():
 @login_required
 def approve_admin(user_id):
     if session.get('role') != 'admin':
-        flash('Aap approve nahi kar sakte', 'error')
+        flash('You cannot approve this', 'error')
         return redirect(url_for('dashboard'))
 
     conn = get_db()
@@ -2729,7 +2730,7 @@ def approve_admin(user_id):
         """, (user_id,))
 
         conn.commit()
-        flash('School Admin approved successfully! Ab woh login kar sakta hai.', 'success')
+        flash('School Admin approved successfully! They can now log in.', 'success')
     except Exception as e:
         conn.rollback()
         flash(f'Error: {str(e)}', 'error')
@@ -2824,7 +2825,7 @@ def add_parent():
             return render_template('parent_form.html', students=students_list)
 
         if not child_ids:
-            flash('Kam se kam ek child select karein', 'error')
+            flash('Please select at least one child', 'error')
             conn.close()
             return render_template('parent_form.html', students=students_list)
 
@@ -2842,7 +2843,7 @@ def add_parent():
                 """, (parent_user_id, child_id, school_id, session['user_id']))
 
             conn.commit()
-            flash(f'Parent login ban gaya! Username: {username}', 'success')
+            flash(f'Parent login created successfully! Username: {username}', 'success')
             return redirect(url_for('parents'))
 
         except Exception as e:
@@ -2913,7 +2914,7 @@ def parent_dashboard():
     c.execute("SELECT id FROM parent_children WHERE parent_user_id=%s AND student_id=%s",
               (session['user_id'], child_id))
     if not c.fetchone():
-        flash('Aap is child ka data nahi dekh sakte', 'error')
+        flash('You cannot view this child\'s data', 'error')
         conn.close()
         return redirect(url_for('select_child'))
 
@@ -2988,7 +2989,7 @@ def add_school_admin():
             chosen_school_id = school_id
 
         if not full_name or not username or not password:
-            flash('Naam, username aur password zaruri hain', 'error')
+            flash('Naam, username or password must be required', 'error')
             conn.close()
             return render_template('add_school_admin.html', school=school)
 
@@ -2999,11 +3000,11 @@ def add_school_admin():
                 VALUES (%s, %s, %s, 'school_admin', %s, %s, %s, TRUE)
             """, (chosen_school_id, username, hash_password(password), full_name, email, phone))
             conn.commit()
-            flash(f'School Admin "{full_name}" ban gaya! Username: {username}', 'success')
+            flash(f'School Admin "{full_name}" created successfully! Username: {username}', 'success')
             return redirect(url_for('users'))
         except psycopg2.IntegrityError:
             conn.rollback()
-            flash('Yeh username pehle se exist karta hai!', 'error')
+            flash('This username is already exist !', 'error')
         except Exception as e:
             conn.rollback()
             flash(f'Error: {str(e)}', 'error')
@@ -3652,7 +3653,7 @@ def download_classes_template():
     ws.row_dimensions[1].height = 28
 
     ws.merge_cells('A2:D2')
-    sc(ws['A2'], '✅  School ID already filled (blue column). Sirf Class Name, Section bharein.',
+    sc(ws['A2'], '✅  School ID already filled (blue column). Only Class Name, Section are required.',
        bold=True, fg='7B3F00', bg='FFF2CC', center=True)
     ws.row_dimensions[2].height = 20
 
@@ -3727,7 +3728,7 @@ def download_teachers_template():
     ws.row_dimensions[1].height = 28
 
     ws.merge_cells(f'A2:{last_col}2')
-    sc(ws['A2'], '✅  School ID already filled (blue column). Remaining fields bharein.',
+    sc(ws['A2'], '✅  School ID already filled (blue column). Remaining fields are required.',
        bold=True, fg='7B3F00', bg='FFF2CC', center=True)
     ws.row_dimensions[2].height = 20
 
@@ -3825,9 +3826,9 @@ def download_students_template():
 
     ws.merge_cells(f'A2:{last_col}2')
     if selected_class_id:
-        note = f'✅  School ID aur Class ID ({selected_class_label}) already filled. Baqi fields bharein.'
+        note = f'✅ School ID and Class ID ({selected_class_label}) are already filled in. Please fill in the remaining fields.'
     else:
-        note = '✅  School ID already filled. Class ID dekhnay ke liye "Class Reference" sheet dekhein.'
+       note = '✅ School ID is already filled in. To view the Class ID, please check the "Class Reference" sheet.'
     sc(ws['A2'], note, bold=True, fg='7B3F00', bg='FFF2CC', center=True)
     ws.row_dimensions[2].height = 20
 
@@ -3896,7 +3897,7 @@ def download_students_template():
                     cell.border = bd()
                     cell.alignment = Alignment(horizontal='center', vertical='center')
         else:
-            ref.cell(1, 1).value = '⚠️ Koi class nahi mili! Pehle Classes upload karein, phir yeh template dobara download karein.'
+            ref.cell(1, 1).value = '⚠️ No classes found! Please upload Classes first, then download this template again.'
             ref.cell(1, 1).font = Font(bold=True, color='C00000', name='Arial')
             ref.cell(1, 1).fill = PatternFill('solid', start_color='FFFF00')
             ref.cell(1, 1).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
