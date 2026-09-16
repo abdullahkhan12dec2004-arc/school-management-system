@@ -1186,7 +1186,6 @@ def marks():
             """, (teacher['id'],))
             classes_list = fetchall_dict(c)
         teachers_list = []
-
     if request.method == 'POST':
         class_id = request.form.get('class_id')
         subject_id = request.form.get('subject_id')
@@ -1202,6 +1201,14 @@ def marks():
                 return redirect(url_for('marks'))
         else:
             teacher_id = request.form.get('teacher_id')
+            if not teacher_id or not teacher_id.strip():
+                teacher_id = None   # <-- FIX: empty string ko NULL bana diya
+
+        school_id_val = session.get('school_id') or session.get('active_school_id')
+        if not school_id_val:
+            flash('School not selected. Please select a school first.', 'error')
+            conn.close()
+            return redirect(url_for('marks'))
 
         student_ids = request.form.getlist('student_id[]')
         obtained_list = request.form.getlist('obtained_marks[]')
@@ -1226,7 +1233,7 @@ def marks():
                        (student_id, subject_id, class_id, school_id, teacher_id,
                         obtained_marks, exam_type, academic_year)
                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                    (sid, subject_id, class_id, session.get('school_id') or session.get('active_school_id'),
+                    (sid, subject_id, class_id, school_id_val,
                      teacher_id, marks_val, exam_type, academic_year)
                 )
             saved += 1
