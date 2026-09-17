@@ -81,6 +81,37 @@ def safe_read_excel(file_storage, header_row_index=2, max_rows=5000, timeout=30)
     df = df.dropna(axis=1, how="all")
     return df
 
+def parse_flexible_date(raw_val):
+    """
+    Handles pandas Timestamp, python datetime/date, or plain string values
+    coming straight from an Excel cell (BEFORE it gets str()'d by get_col()).
+    Returns a python date object or None.
+    """
+    if raw_val is None:
+        return None
+    if isinstance(raw_val, float) and pd.isna(raw_val):
+        return None
+    if isinstance(raw_val, pd.Timestamp):
+        return raw_val.date()
+    if isinstance(raw_val, datetime.datetime):
+        return raw_val.date()
+    if isinstance(raw_val, datetime.date):
+        return raw_val
+
+    s = str(raw_val).strip()
+    if not s or s.lower() in ('nan', 'none', ''):
+        return None
+
+    for fmt in ('%Y-%m-%d', '%d/%m/%Y', '%d-%m-%Y', '%m/%d/%Y', '%Y/%m/%d'):
+        try:
+            return datetime.datetime.strptime(s, fmt).date()
+        except (ValueError, TypeError):
+            continue
+
+    try:
+        return pd.to_datetime(s, dayfirst=True).date()
+    except Exception:
+        return None
 
 
 
@@ -3134,24 +3165,11 @@ def bulk_upload_teachers():
             phone         = get_col(row_dict, 'Phone', 'phone')
             subject_spec  = get_col(row_dict, 'Subject Specialization', 'subject_specialization')
             qualification = get_col(row_dict, 'Qualification', 'qualification')
-            joining_date = get_col(
-                row_dict,
-                'Joining Date',
-                'joining_date',
-                'JoiningDate'
-            )
-            sys.stderr.write(f"DEBUG: row {idx} raw joining_date={joining_date!r} type={type(joining_date)}\n"); sys.stderr.flush()
-            if pd.notna(joining_date) and joining_date:
-               joining_date_str = str(joining_date).strip()
-               joining_date = None
-               for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
-                  try:
-                     joining_date = datetime.datetime.strptime(joining_date_str, fmt).date()
-                     break
-                  except (ValueError, TypeError):
-                     continue
-            else:
-               joining_date = None
+            joining_date_raw = (row_dict.get('Joining Date')
+                     or row_dict.get('joining_date')
+                     or row_dict.get('JoiningDate'))
+            sys.stderr.write(f"DEBUG: row {idx} raw joining_date={joining_date_raw!r} type={type(joining_date_raw)}\n"); sys.stderr.flush()
+            joining_date = parse_flexible_date(joining_date_raw)
             sys.stderr.write(f"DEBUG: row {idx} parsed joining_date={joining_date}\n"); sys.stderr.flush()
 
             errors    = validate_teacher_row(row_dict, conn)
@@ -3191,25 +3209,10 @@ def bulk_upload_teachers():
         return redirect(url_for('review_teachers_upload'))
     return render_template('bulk_upload_updated.html', upload_type='teachers')
 
-
 @app.route('/bulk/students', methods=['GET', 'POST'])
 @login_required
 @school_admin_only_required
 def bulk_upload_students():
-
-    from datetime import datetime
-
-    def clean_date(dob):
-        try:
-            if not dob or str(dob).strip() == "":
-                return None
-
-            return datetime.strptime(str(dob), "%Y-%m-%d").date()
-        except:
-            try:
-                return datetime.strptime(str(dob), "%d/%m/%Y").date()
-            except:
-                return None
 
     if request.method == 'POST':
 
@@ -3256,8 +3259,15 @@ def bulk_upload_students():
             username     = get_col(row_dict, 'Username', 'username')
             password     = get_col(row_dict, 'Password', 'password')
 
-            dob = get_col(row_dict, 'Date of Birth', 'date_of_birth', 'DOB')
-            dob = clean_date(dob)
+            # NEW: Address & City — template ke exact column names
+            address_line1 = get_col(row_dict, 'Address', 'address_line1', 'Address Line 1')
+            city          = get_col(row_dict, 'City', 'city')
+
+            # DOB — raw value use karo, get_col (jo string bana deta hai) NAHI
+            dob_raw = (row_dict.get('Date of Birth')
+                       or row_dict.get('date_of_birth')
+                       or row_dict.get('DOB'))
+            dob = parse_flexible_date(dob_raw)
 
             class_id_db = None
             if class_id_str:
@@ -3277,8 +3287,9 @@ def bulk_upload_students():
                 INSERT INTO staging_students
                 (school_id, class_id, full_name, father_name, email, phone,
                  date_of_birth, gender, username, password,
+                 address_line1, city,
                  validation_status, error_message, uploaded_by)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
                 school_id,
                 class_id_db,
@@ -3290,6 +3301,8 @@ def bulk_upload_students():
                 gender,
                 username,
                 hashed_pwd,
+                address_line1,
+                city,
                 status,
                 error_msg,
                 session['user_id']
@@ -3491,14 +3504,16 @@ def confirm_students_upload():
 
     c.execute("""
         SELECT id, username, full_name, email, phone, password,
-               class_id, father_name, date_of_birth, gender
+               class_id, father_name, date_of_birth, gender,
+               address_line1, city
         FROM staging_students
         WHERE school_id=%s AND validation_status='VALID' AND uploaded_by=%s
     """, (school_id, session['user_id']))
     staging_records = c.fetchall()
 
     for record in staging_records:
-        staging_id, username, full_name, email, phone, pwd, class_id, father, dob, gender = record
+        (staging_id, username, full_name, email, phone, pwd, class_id,
+         father, dob, gender, address_line1, city) = record
 
         c.execute("""
             INSERT INTO users (school_id, username, password, role, full_name, email, phone, is_active)
@@ -3509,9 +3524,11 @@ def confirm_students_upload():
         student_code = f"STD-{staging_id}"
         c.execute("""
             INSERT INTO students (user_id, school_id, student_code, full_name, father_name,
-                                  email, phone, date_of_birth, gender, class_id)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        """, (user_id, school_id, student_code, full_name, father, email, phone, dob, gender, class_id))
+                                  email, phone, date_of_birth, gender, class_id,
+                                  address_line1, city)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (user_id, school_id, student_code, full_name, father, email, phone,
+              dob, gender, class_id, address_line1, city))
 
     c.execute("DELETE FROM staging_students WHERE school_id=%s AND uploaded_by=%s",
               (school_id, session['user_id']))
