@@ -204,19 +204,19 @@ def export_students():
     ws.title = "Students Summary"
     ws.row_dimensions[1].height = 30
 
-    ws.merge_cells("A1:N1")
+    ws.merge_cells("A1:M1")
     ws["A1"] = f"{school_name} – Student Report"
     ws["A1"].font = TITLE_FONT
     ws["A1"].alignment = CENTER
 
-    ws.merge_cells("A2:N2")
+    ws.merge_cells("A2:M2")
     ws["A2"] = f"Generated: {datetime.datetime.now().strftime('%d-%b-%Y %H:%M')}"
     ws["A2"].font = NORMAL_FONT
     ws["A2"].alignment = CENTER
 
     headers = ["#", "Student Code", "Full Name", "Father Name", "Gender",
                "Date of Birth", "Class", "Section", "Phone", "Email",
-               "City", "Joining Date", "Medical Details", "Address"]
+               "City", "Joining Date", "Address"]
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=4, column=col, value=h)
         style_header(cell)
@@ -237,7 +237,6 @@ def export_students():
             s.get('email', ''),
             s.get('city', ''),
             str(s.get('joining_date', '') or ''),
-            s.get('medical_details', ''),
             f"{s.get('address_line1','')} {s.get('address_line2','')}".strip(),
         ]
         for col, v in enumerate(vals, 1):
@@ -279,7 +278,6 @@ def export_students():
                 ("City",            s.get('city')),
                 ("State",           s.get('state')),
                 ("Postal Code",     s.get('postal_code')),
-                ("Medical Details", s.get('medical_details')),
             ]
             for idx, (lbl, val) in enumerate(fields):
                 add_row(lbl, val, idx + 2, alt=(idx % 2 == 0))
@@ -349,17 +347,41 @@ def export_teachers():
     school_row  = c.fetchone()
     school_name = school_row[0] if school_row else "School"
 
-    c.execute("""
-        SELECT t.*,
-               (SELECT STRING_AGG(c.class_name || ' ' || c.section, ', ')
-                FROM teacher_classes tc
-                JOIN classes c ON tc.class_id = c.id
-                WHERE tc.teacher_id = t.id) AS assigned_classes
-        FROM teachers t
-        WHERE t.school_id = %s
-        ORDER BY t.full_name
-    """, (school_id,))
-    teachers = fetchall_dict(c)
+    # Try to pull each teacher's latest month's salary payment from
+    # teacher_salary_payments. If that table doesn't exist yet, fall back
+    # to the plain teacher list (salary column will just be blank).
+    try:
+        c.execute("""
+            SELECT t.*,
+                   (SELECT STRING_AGG(c.class_name || ' ' || c.section, ', ')
+                    FROM teacher_classes tc
+                    JOIN classes c ON tc.class_id = c.id
+                    WHERE tc.teacher_id = t.id) AS assigned_classes,
+                   (SELECT tsp.paid_amount
+                    FROM teacher_salary_payments tsp
+                    WHERE tsp.teacher_id = t.id
+                    ORDER BY tsp.year DESC, tsp.month DESC
+                    LIMIT 1) AS latest_salary
+            FROM teachers t
+            WHERE t.school_id = %s
+            ORDER BY t.full_name
+        """, (school_id,))
+        teachers = fetchall_dict(c)
+    except Exception:
+        conn.rollback()
+        c.execute("""
+            SELECT t.*,
+                   (SELECT STRING_AGG(c.class_name || ' ' || c.section, ', ')
+                    FROM teacher_classes tc
+                    JOIN classes c ON tc.class_id = c.id
+                    WHERE tc.teacher_id = t.id) AS assigned_classes
+            FROM teachers t
+            WHERE t.school_id = %s
+            ORDER BY t.full_name
+        """, (school_id,))
+        teachers = fetchall_dict(c)
+        for t in teachers:
+            t['latest_salary'] = None
 
     # Fetch documents per teacher
     all_docs = {}
@@ -393,6 +415,13 @@ def export_teachers():
     for i, t in enumerate(teachers, 1):
         row = i + 4
         alt = (i % 2 == 0)
+
+        # Prefer this month's/latest salary payment; fall back to the
+        # teacher's base salary column if no payment record exists yet.
+        salary_val = t.get('latest_salary')
+        if salary_val is None:
+            salary_val = t.get('salary', '')
+
         vals = [
             i,
             t.get('teacher_code', ''),
@@ -403,12 +432,15 @@ def export_teachers():
             t.get('qualification', ''),
             t.get('subject_specialization', ''),
             str(t.get('joining_date', '') or ''),
-            t.get('salary', ''),
+            salary_val,
             t.get('address', ''),
             t.get('assigned_classes', ''),
         ]
         for col, v in enumerate(vals, 1):
-            style_cell(ws.cell(row=row, column=col, value=v), alt=alt)
+            cell = ws.cell(row=row, column=col, value=v)
+            style_cell(cell, alt=alt)
+            if col == 10 and v not in ('', None):
+                cell.number_format = '#,##0.00'
 
     auto_col_width(ws)
 
