@@ -833,6 +833,8 @@ def add_teacher():
         joining_date = request.form.get('joining_date', '')
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
+        cnic = request.form.get('cnic', '').strip()
+        address = request.form.get('address', '').strip()
 
         if not full_name or not username or not password:
             flash('Name, username, and password are required', 'error')
@@ -860,10 +862,10 @@ def add_teacher():
         c.execute(
             """INSERT INTO teachers
                (user_id, school_id, teacher_code, full_name, email, phone,
-                subject_specialization, qualification, joining_date)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                subject_specialization, qualification, joining_date, cnic, address)
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
             (user_id, school_id, teacher_code, full_name, email, phone,
-             subject_spec, qualification, joining_date or None)
+             subject_spec, qualification, joining_date or None, cnic, address)
         )
         conn.commit()
         conn.close()
@@ -872,7 +874,6 @@ def add_teacher():
 
     conn.close()
     return render_template('teacher_form.html', schools=schools_list)
-
 
 # ========== STUDENTS (Admin + Teacher) ==========
 @app.route('/students')
