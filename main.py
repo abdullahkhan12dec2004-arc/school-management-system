@@ -231,24 +231,29 @@ def hash_password(password):
 
 
 def get_col(row_dict, *keys, default=''):
-    """
-      Tries multiple column name variants.
-       Case-insensitive, strips whitespace, and safely handles NaN values.
-    """
     import pandas as pd
     lower_map = {str(k).lower().strip(): v for k, v in row_dict.items()}
 
+    def clean(val):
+        if val is None:
+            return None
+        if isinstance(val, float):
+            if pd.isna(val):
+                return None
+            if val.is_integer():
+                val = int(val)          # 3001234567.0 -> 3001234567
+        s = str(val).strip()
+        if not s or s.lower() in ('nan', 'none', ''):
+            return None
+        return s
+
     for key in keys:
-        val = row_dict.get(key)
-        if val is not None and not (isinstance(val, float) and pd.isna(val)):
-            s = str(val).strip()
-            if s and s.lower() not in ('nan', 'none', ''):
-                return s
-        val = lower_map.get(str(key).lower().strip())
-        if val is not None and not (isinstance(val, float) and pd.isna(val)):
-            s = str(val).strip()
-            if s and s.lower() not in ('nan', 'none', ''):
-                return s
+        s = clean(row_dict.get(key))
+        if s is not None:
+            return s
+        s = clean(lower_map.get(str(key).lower().strip()))
+        if s is not None:
+            return s
     return default
 
 
@@ -257,7 +262,7 @@ def is_row_empty(row_dict):
     Returns True if the row does not contain any meaningful value.
     """
     import pandas as pd
-    skip_keys = {'school id', 'school_id', 'schoolid'}
+    skip_keys = {'school id', 'school_id', 'schoolid', 'class id', 'class_id', 'classid'}
     for k, val in row_dict.items():
         if str(k).lower().strip() in skip_keys:
             continue
@@ -3163,6 +3168,8 @@ def bulk_upload_teachers():
             password      = get_col(row_dict, 'Password', 'password')
             email         = get_col(row_dict, 'Email', 'email')
             phone         = get_col(row_dict, 'Phone', 'phone')
+            cnic    = get_col(row_dict, 'CNIC', 'cnic')
+            address = get_col(row_dict, 'Address', 'address')
             subject_spec  = get_col(row_dict, 'Subject Specialization', 'subject_specialization')
             qualification = get_col(row_dict, 'Qualification', 'qualification')
             joining_date_raw = (row_dict.get('Joining Date')
@@ -3182,21 +3189,13 @@ def bulk_upload_teachers():
                 INSERT INTO staging_teachers
                 (school_id, full_name, email, phone, subject_specialization,
                  qualification, joining_date, username, password,
+                 cnic, address,
                  validation_status, error_message, uploaded_by)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
-                school_id,
-                full_name,
-                email,
-                phone,
-                subject_spec,
-                qualification,
-                joining_date,
-                username,
-                hashed_pwd,
-                status,
-                error_msg,
-                session['user_id']
+                school_id, full_name, email, phone, subject_spec, qualification,
+                joining_date, username, hashed_pwd, cnic, address,
+                status, error_msg, session['user_id']
             ))
             sys.stderr.write(f"DEBUG: row {idx} inserted\n"); sys.stderr.flush()
             if status == 'VALID':
@@ -3268,6 +3267,10 @@ def bulk_upload_students():
                        or row_dict.get('date_of_birth')
                        or row_dict.get('DOB'))
             dob = parse_flexible_date(dob_raw)
+            joining_date_raw = (row_dict.get('Joining Date')
+                                or row_dict.get('joining_date')
+                                or row_dict.get('JoiningDate'))
+            joining_date = parse_flexible_date(joining_date_raw)
 
             class_id_db = None
             if class_id_str:
@@ -3287,25 +3290,13 @@ def bulk_upload_students():
                 INSERT INTO staging_students
                 (school_id, class_id, full_name, father_name, email, phone,
                  date_of_birth, gender, username, password,
-                 address_line1, city,
+                 address_line1, city, joining_date,
                  validation_status, error_message, uploaded_by)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
-                school_id,
-                class_id_db,
-                full_name,
-                father_name,
-                email,
-                phone,
-                dob,
-                gender,
-                username,
-                hashed_pwd,
-                address_line1,
-                city,
-                status,
-                error_msg,
-                session['user_id']
+                school_id, class_id_db, full_name, father_name, email, phone,
+                dob, gender, username, hashed_pwd, address_line1, city, joining_date,
+                status, error_msg, session['user_id']
             ))
 
             if status == 'VALID':
@@ -3443,17 +3434,18 @@ def confirm_teachers_upload():
     conn = get_db()
     c = conn.cursor()
     school_id = session.get('active_school_id') or session.get('school_id')
-
     c.execute("""
         SELECT id, username, full_name, email, phone, password,
-               subject_specialization, qualification, joining_date
+               subject_specialization, qualification, joining_date,
+               cnic, address
         FROM staging_teachers
         WHERE school_id=%s AND validation_status='VALID' AND uploaded_by=%s
     """, (school_id, session['user_id']))
     staging_records = c.fetchall()
 
     for record in staging_records:
-        staging_id, username, full_name, email, phone, pwd, subj, qual, joining = record
+        (staging_id, username, full_name, email, phone, pwd, subj, qual, joining,
+         cnic, address) = record
 
         c.execute("""
             INSERT INTO users (school_id, username, password, role, full_name, email, phone, is_active)
@@ -3464,9 +3456,11 @@ def confirm_teachers_upload():
         teacher_code = f"TCH-{staging_id}"
         c.execute("""
             INSERT INTO teachers (user_id, school_id, teacher_code, full_name, email, phone,
-                                  subject_specialization, qualification, joining_date)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        """, (user_id, school_id, teacher_code, full_name, email, phone, subj, qual, joining))
+                                  subject_specialization, qualification, joining_date,
+                                  cnic, address)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (user_id, school_id, teacher_code, full_name, email, phone, subj, qual, joining,
+              cnic, address))
 
     c.execute("DELETE FROM staging_teachers WHERE school_id=%s AND uploaded_by=%s",
               (school_id, session['user_id']))
@@ -3505,7 +3499,7 @@ def confirm_students_upload():
     c.execute("""
         SELECT id, username, full_name, email, phone, password,
                class_id, father_name, date_of_birth, gender,
-               address_line1, city
+               address_line1, city, joining_date
         FROM staging_students
         WHERE school_id=%s AND validation_status='VALID' AND uploaded_by=%s
     """, (school_id, session['user_id']))
@@ -3513,7 +3507,7 @@ def confirm_students_upload():
 
     for record in staging_records:
         (staging_id, username, full_name, email, phone, pwd, class_id,
-         father, dob, gender, address_line1, city) = record
+         father, dob, gender, address_line1, city, joining_date) = record
 
         c.execute("""
             INSERT INTO users (school_id, username, password, role, full_name, email, phone, is_active)
@@ -3525,10 +3519,10 @@ def confirm_students_upload():
         c.execute("""
             INSERT INTO students (user_id, school_id, student_code, full_name, father_name,
                                   email, phone, date_of_birth, gender, class_id,
-                                  address_line1, city)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                                  address_line1, city, joining_date)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """, (user_id, school_id, student_code, full_name, father, email, phone,
-              dob, gender, class_id, address_line1, city))
+              dob, gender, class_id, address_line1, city, joining_date))
 
     c.execute("DELETE FROM staging_students WHERE school_id=%s AND uploaded_by=%s",
               (school_id, session['user_id']))
@@ -3741,7 +3735,7 @@ def download_teachers_template():
         cell.alignment = Alignment(horizontal='center' if center else 'left',
                                    vertical='center', wrap_text=wrap)
 
-    num_cols = 9
+    num_cols = 11
     last_col = get_column_letter(num_cols)
 
     ws.merge_cells(f'A1:{last_col}1')
@@ -3758,6 +3752,7 @@ def download_teachers_template():
         ('School ID', True), ('Full Name', True), ('Username', True), ('Password', True),
         ('Email', False), ('Phone', False), ('Subject Specialization', False),
         ('Qualification', False), ('Joining Date', False),
+        ('CNIC', False), ('Address', False),
     ]
     for ci, (lbl, req) in enumerate(hdrs, 1):
         sc(ws.cell(3, ci), lbl, bold=True, fg='FFFFFF',
@@ -3777,7 +3772,7 @@ def download_teachers_template():
             cell.fill = PatternFill('solid', start_color=alt)
             cell.border = bd()
 
-    col_widths = [14, 22, 18, 14, 24, 16, 26, 18, 16]
+    col_widths = [14, 22, 18, 14, 24, 16, 26, 18, 16, 18, 26]
     for i, w in enumerate(col_widths, 1):
         ws.column_dimensions[get_column_letter(i)].width = w
 
@@ -3838,7 +3833,7 @@ def download_students_template():
         cell.alignment = Alignment(horizontal='center' if center else 'left',
                                    vertical='center', wrap_text=wrap)
 
-    num_cols = 12
+    num_cols = 13
     last_col = get_column_letter(num_cols)
 
     ws.merge_cells(f'A1:{last_col}1')
@@ -3857,7 +3852,7 @@ def download_students_template():
     hdrs = [
         ('School ID', True), ('Class ID', True), ('Full Name', True),
         ('Username', True), ('Password', True), ('Father Name', False),
-        ('Email', False), ('Phone', False), ('Date of Birth', False),
+        ('Email', False), ('Phone', False), ('Joining Date', False), ('Date of Birth', False),
         ('Gender', False), ('Address', False), ('City', False),
     ]
     for ci, (lbl, req) in enumerate(hdrs, 1):
@@ -3888,8 +3883,7 @@ def download_students_template():
             cell.font = Font(name='Arial', size=10)
             cell.fill = PatternFill('solid', start_color=alt)
             cell.border = bd()
-
-    col_widths = [13, 12, 22, 18, 14, 20, 24, 16, 16, 10, 24, 16]
+    col_widths = [13, 12, 22, 18, 14, 20, 24, 16, 16, 10, 24, 16, 16]
     for i, w in enumerate(col_widths, 1):
         ws.column_dimensions[get_column_letter(i)].width = w
 
