@@ -734,18 +734,18 @@ def export_salary():
             except Exception:
                 period = f" – {month}/{year}"
 
-        ws.merge_cells("A1:J1")
+        ws.merge_cells("A1:I1")
         ws["A1"] = f"{school_name} – Teacher Salary Payment Report{period}"
         ws["A1"].font  = TITLE_FONT
         ws["A1"].alignment = CENTER
 
-        ws.merge_cells("A2:J2")
+        ws.merge_cells("A2:I2")
         ws["A2"] = f"Generated: {datetime.datetime.now().strftime('%d-%b-%Y %H:%M')}"
         ws["A2"].font  = NORMAL_FONT
         ws["A2"].alignment = CENTER
 
         headers = ["#", "Teacher Code", "Teacher Name", "Specialization",
-                   "Month", "Year", "Base Salary", "Paid Amount",
+                   "Month", "Year", "Paid Amount",
                    "Payment Mode", "Paid By"]
         for col, h in enumerate(headers, 1):
             style_header(ws.cell(row=4, column=col, value=h))
@@ -759,17 +759,17 @@ def export_salary():
             vals = [i, r.get('teacher_code',''), r.get('teacher_name',''),
                     r.get('subject_specialization',''),
                     r.get('month',''), r.get('year',''),
-                    r.get('base_salary',''), paid,
+                    paid,
                     r.get('payment_mode',''), r.get('paid_by_name','')]
             for col, v in enumerate(vals, 1):
                 cell = ws.cell(row=row, column=col, value=v)
                 style_cell(cell, alt=alt)
-                if col in (7, 8):
+                if col == 7:
                     cell.number_format = '#,##0.00'
 
         total_row = len(salary_rows) + 5
-        ws.cell(row=total_row, column=7, value="TOTAL").font = BOLD_FONT
-        tc = ws.cell(row=total_row, column=8, value=total_paid)
+        ws.cell(row=total_row, column=6, value="TOTAL").font = BOLD_FONT
+        tc = ws.cell(row=total_row, column=7, value=total_paid)
         tc.font = BOLD_FONT
         tc.fill = PatternFill("solid", start_color="FFF2CC")
         tc.number_format = '#,##0.00'
