@@ -41,6 +41,17 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
+
+
+def get_effective_school_id(requested_school_id):
+    """
+    Security: sirf super_admin apni marzi se koi bhi school_id pass kar sakta hai.
+    school_admin / teacher hamesha apne hi school tak mehdood rahenge,
+    chahe URL me manually kuch bhi school_id diya jaye.
+    """
+    if session.get('role') == 'super_admin':
+        return requested_school_id or session.get('active_school_id') or session.get('school_id')
+    return session.get('active_school_id') or session.get('school_id')
   
 def teacher_required(f):
     @wraps(f)
@@ -109,10 +120,15 @@ def excel_response(wb, filename):
 def reports_index():
     conn = get_db()
     c    = conn.cursor()
+    role = session.get('role')
     school_id = session.get('active_school_id', session.get('school_id'))
 
-    c.execute("SELECT id, name FROM schools ORDER BY name")
-    schools = fetchall_dict(c)
+    if role == 'super_admin':
+        c.execute("SELECT id, name FROM schools ORDER BY name")
+        schools = fetchall_dict(c)
+    else:
+        c.execute("SELECT id, name FROM schools WHERE id=%s", (school_id,))
+        schools = fetchall_dict(c)
 
     c.execute("SELECT id, class_name, section FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
     classes = fetchall_dict(c)
@@ -126,6 +142,7 @@ def reports_index():
                            classes=classes,
                            teachers=teachers,
                            school_id=school_id,
+                           role=role,
                            now=datetime.datetime.now())
 
 
@@ -137,7 +154,7 @@ def reports_index():
 @login_required
 @teacher_required
 def export_students():
-    school_id = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
+    school_id = get_effective_school_id(request.args.get('school_id'))
     class_id  = request.args.get('class_id')
     student_id_single = request.args.get('student_id')
 
@@ -338,8 +355,7 @@ def export_students():
 @login_required
 @admin_required
 def export_teachers():
-    school_id = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
-
+    school_id = get_effective_school_id(request.args.get('school_id'))
     conn = get_db()
     c    = conn.cursor()
 
@@ -470,7 +486,7 @@ def export_teachers():
 @login_required
 @admin_required
 def export_fees():
-    school_id = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
+    school_id = get_effective_school_id(request.args.get('school_id'))
     class_id  = request.args.get('class_id')
     month     = request.args.get('month')     # e.g. "5"
     year      = request.args.get('year')      # e.g. "2025"
@@ -591,7 +607,7 @@ def export_fees():
 @login_required
 @admin_required
 def export_salary():
-    school_id  = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
+    school_id = get_effective_school_id(request.args.get('school_id'))
     teacher_id = request.args.get('teacher_id')   # optional: specific teacher
     month      = request.args.get('month')         # e.g. "5"
     year       = request.args.get('year')          # e.g. "2025"
