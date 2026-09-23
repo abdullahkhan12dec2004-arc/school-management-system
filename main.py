@@ -199,11 +199,22 @@ School Management System"""
         print(f"OTP email send error: {type(e).__name__}: {e}")
         return False
 
-
-def get_active_school_id():
-    if session.get('role') == 'school_admin':
-        return session.get('school_id')
-    return session.get('active_school_id') or session.get('school_id')
+#################################################
+def all_belong_to_school(c, table, ids, school_id=None):
+    """True agar saari ids current school ki hain."""
+    if table not in ALLOWED_TABLES:
+        return False
+    try:
+        ids = list({int(i) for i in ids})
+    except (TypeError, ValueError):
+        return False
+    if not ids:
+        return True
+    school_id = school_id or get_active_school_id()
+    c.execute(f"SELECT COUNT(*) FROM {table} WHERE id = ANY(%s) AND school_id=%s",
+              (ids, school_id))
+    return c.fetchone()[0] == len(ids)
+###############################################
 
 
 def allowed_file(filename):
@@ -491,6 +502,7 @@ def assign_role(user_id):
 
 # ========== AUTH ROUTES ==========
 
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET' and 'user_id' in session:
@@ -510,36 +522,63 @@ def login():
             c = conn.cursor()
             hashed = hash_password(password)
 
-            c.execute(
-                "SELECT id, role, full_name, school_id FROM users WHERE username=%s AND password=%s AND is_active=TRUE",
-                (username, hashed)
-            )
+            c.execute("""
+                SELECT
+                    u.id,
+                    COALESCE(r.base_role, u.role) AS role,
+                    u.full_name,
+                    u.school_id,
+                    u.role_id,
+                    s.is_active AS school_active
+                FROM users u
+                LEFT JOIN roles r ON r.id = u.role_id
+                LEFT JOIN schools s ON s.id = u.school_id
+                WHERE u.username=%s
+                  AND u.password=%s
+                  AND u.is_active=TRUE
+            """, (username, hashed))
+
             user = fetchone_dict(c)
 
             if user:
+                # Admin ke ilawa har user ka active school hona zaroori hai
+                if user['role'] != 'admin':
+                    if not user['school_id'] or not user['school_active']:
+                        flash('Your school account is not active.', 'error')
+                        return render_template('login.html')
+
                 session.clear()
+
                 session['user_id'] = user['id']
                 session['role'] = user['role']
+                session['role_id'] = user['role_id']
                 session['full_name'] = user['full_name']
                 session['school_id'] = user['school_id']
 
                 if user['role'] == 'student':
                     return redirect(url_for('my_result'))
+
                 if user['role'] == 'parent':
                     return redirect(url_for('select_child'))
+
                 if user['role'] in ('admin', 'school_admin'):
                     return redirect(url_for('select_school'))
+
                 return redirect(url_for('dashboard'))
 
-            flash('The username or password is incorrect.','error')
+            flash('The username or password is incorrect.', 'error')
+
         except Exception as e:
             print(f"Login error: {e}")
             flash('Technical issue. Please try again.', 'error')
+
         finally:
             if conn:
                 conn.close()
 
     return render_template('login.html')
+
+
 
 
 @app.route('/logout')
@@ -584,12 +623,14 @@ def select_school():
             conn.close()
             return redirect(url_for('dashboard'))
 
-    if request.method == 'POST':
+    if request.method == 'POST' and session['role'] == 'admin' :
         chosen = request.form.get('school_id')
         if chosen:
-            session['active_school_id'] = int(chosen)
-            conn.close()
-            return redirect(url_for('dashboard'))
+            c.execute("SELECT 1 FROM schools WHERE id=%s", (chosen,))
+            if c.fetchone():
+                session['active_school_id'] = int(chosen)
+                conn.close()
+                return redirect(url_for('dashboard'))
         flash('Please select a school', 'error')
 
     conn.close()
@@ -1153,11 +1194,15 @@ def add_student():
 @login_required
 @teacher_required
 def classes():
+    school_id = get_active_school_id()
+    if not school_id:
+        flash('Please select a school first', 'error')
+        return redirect(url_for('select_school'))
+
     conn = get_db()
     c = conn.cursor()
 
     if session['role'] in ('admin', 'school_admin'):
-        school_id = get_active_school_id()
         c.execute("""
             SELECT 
                 c.*,
@@ -1169,24 +1214,24 @@ def classes():
             ORDER BY c.class_name
         """, (school_id,))
     else:  # Teacher
-        c.execute("SELECT id FROM teachers WHERE user_id=%s", (session['user_id'],))
+        c.execute("SELECT id FROM teachers WHERE user_id=%s AND school_id=%s",
+                  (session['user_id'], school_id))
         teacher = c.fetchone()
-        if teacher:
-            c.execute("""
-                SELECT 
-                    c.*,
-                    s.name AS school_name,
-                    (SELECT COUNT(*) FROM students st WHERE st.class_id = c.id) AS student_count
-                FROM classes c
-                JOIN schools s ON c.school_id = s.id
-                JOIN teacher_classes tc ON tc.class_id = c.id
-                WHERE tc.teacher_id = %s
-                ORDER BY c.class_name
-            """, (teacher[0],))
-        else:
-            classes_list = []
+        if not teacher:
             conn.close()
             return render_template('classes.html', classes=[])
+
+        c.execute("""
+            SELECT 
+                c.*,
+                s.name AS school_name,
+                (SELECT COUNT(*) FROM students st WHERE st.class_id = c.id) AS student_count
+            FROM classes c
+            JOIN schools s ON c.school_id = s.id
+            JOIN teacher_classes tc ON tc.class_id = c.id
+            WHERE tc.teacher_id = %s AND c.school_id = %s
+            ORDER BY c.class_name
+        """, (teacher[0], school_id))
 
     classes_list = fetchall_dict(c)
     conn.close()
@@ -1288,104 +1333,124 @@ def subjects():
 @login_required
 @teacher_required
 def marks():
-    conn = get_db()
-    c = conn.cursor()
+    conn = get_db(); c = conn.cursor()
     role = session['role']
+    school_id = get_active_school_id()
 
     teacher = None
     classes_list = []
+    teachers_list = []
 
     if role in ('admin', 'school_admin'):
-        school_id = get_active_school_id()
         c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
         classes_list = fetchall_dict(c)
         c.execute("SELECT * FROM teachers WHERE school_id=%s", (school_id,))
         teachers_list = fetchall_dict(c)
-    else:  # Teacher
+    else:
         c.execute("SELECT * FROM teachers WHERE user_id=%s", (session['user_id'],))
         teacher = fetchone_dict(c)
         if teacher:
-            c.execute("""
-                SELECT c.* FROM classes c
-                JOIN teacher_classes tc ON tc.class_id = c.id
-                WHERE tc.teacher_id = %s
-                ORDER BY c.class_name
-            """, (teacher['id'],))
+            c.execute("""SELECT c.* FROM classes c
+                         JOIN teacher_classes tc ON tc.class_id = c.id
+                         WHERE tc.teacher_id = %s ORDER BY c.class_name""", (teacher['id'],))
             classes_list = fetchall_dict(c)
-        teachers_list = []
+
     if request.method == 'POST':
-        class_id = request.form.get('class_id')
-        subject_id = request.form.get('subject_id')
-        exam_type = request.form.get('exam_type', 'Annual')
-        academic_year = request.form.get('academic_year', str(datetime.datetime.now().year))
-
-        if role == 'teacher' and teacher:
-            teacher_id = teacher['id']
-            c.execute("SELECT id FROM teacher_classes WHERE teacher_id=%s AND class_id=%s", (teacher_id, class_id))
-            if not c.fetchone():
-                flash('You do not have permission to enter marks for this class', 'error')
-                conn.close()
-                return redirect(url_for('marks'))
-        else:
-            teacher_id = request.form.get('teacher_id')
-            if not teacher_id or not teacher_id.strip():
-                teacher_id = None   # <-- FIX: empty string ko NULL bana diya
-
-        school_id_val = session.get('school_id') or session.get('active_school_id')
-        if not school_id_val:
-            flash('School not selected. Please select a school first.', 'error')
+        def bail(msg):
             conn.close()
+            flash(msg, 'error')
             return redirect(url_for('marks'))
 
-        student_ids = request.form.getlist('student_id[]')
+        class_id   = request.form.get('class_id', type=int)
+        subject_id = request.form.get('subject_id', type=int)
+        exam_type  = request.form.get('exam_type', 'Annual')
+        academic_year = request.form.get('academic_year', str(datetime.datetime.now().year))
+
+        if not school_id:
+            return bail('School not selected.')
+        if not class_id or not subject_id or \
+           not belongs_to_school(c, 'classes', class_id, school_id) or \
+           not belongs_to_school(c, 'subjects', subject_id, school_id):
+            return bail('Invalid class/subject')
+
+        # subject isi class ka ho
+        c.execute("SELECT total_marks FROM subjects WHERE id=%s AND class_id=%s",
+                  (subject_id, class_id))
+        subj = c.fetchone()
+        if not subj:
+            return bail('This subject does not belong to the selected class')
+        total_marks = subj[0]
+
+        # teacher_id
+        if role == 'teacher':
+            if not teacher or not teacher_has_class(c, class_id):
+                return bail('You do not have permission to enter marks for this class')
+            teacher_id = teacher['id']
+        else:
+            teacher_id = request.form.get('teacher_id', type=int)
+            if teacher_id and not belongs_to_school(c, 'teachers', teacher_id, school_id):
+                return bail('Invalid teacher')
+
+        # sirf isi class + school ke students allowed
+        c.execute("SELECT id FROM students WHERE class_id=%s AND school_id=%s", (class_id, school_id))
+        valid_students = {r[0] for r in c.fetchall()}
+
+        student_ids   = request.form.getlist('student_id[]')
         obtained_list = request.form.getlist('obtained_marks[]')
 
         saved = 0
         for sid, marks_val in zip(student_ids, obtained_list):
             if not marks_val.strip():
                 continue
-            c.execute(
-                "SELECT id FROM marks WHERE student_id=%s AND subject_id=%s AND exam_type=%s AND academic_year=%s",
-                (sid, subject_id, exam_type, academic_year)
-            )
+            try:
+                sid = int(sid)
+                mv = float(marks_val)
+            except ValueError:
+                return bail('Invalid student or marks value')
+            if sid not in valid_students:
+                return bail('A student in the list does not belong to this class')
+            if mv < 0 or mv > total_marks:
+                return bail(f'Marks must be between 0 and {total_marks}')
+
+            c.execute("""SELECT id FROM marks WHERE student_id=%s AND subject_id=%s
+                         AND exam_type=%s AND academic_year=%s""",
+                      (sid, subject_id, exam_type, academic_year))
             existing = c.fetchone()
             if existing:
-                c.execute(
-                    "UPDATE marks SET obtained_marks=%s, entered_at=NOW() WHERE id=%s",
-                    (marks_val, existing[0])
-                )
+                c.execute("UPDATE marks SET obtained_marks=%s, entered_at=NOW() WHERE id=%s",
+                          (mv, existing[0]))
             else:
-                c.execute(
-                    """INSERT INTO marks
-                       (student_id, subject_id, class_id, school_id, teacher_id,
-                        obtained_marks, exam_type, academic_year)
-                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                    (sid, subject_id, class_id, school_id_val,
-                     teacher_id, marks_val, exam_type, academic_year)
-                )
+                c.execute("""INSERT INTO marks (student_id, subject_id, class_id, school_id,
+                                teacher_id, obtained_marks, exam_type, academic_year)
+                             VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                          (sid, subject_id, class_id, school_id,
+                           teacher_id, mv, exam_type, academic_year))
             saved += 1
 
-        conn.commit()
-        conn.close()
-        flash(f'{saved} students\' marks have been saved!', 'success')
+        conn.commit(); conn.close()
+        flash(f"{saved} students' marks have been saved!", 'success')
         return redirect(url_for('marks'))
 
     conn.close()
-    return render_template('marks_entry.html',
-                           classes=classes_list,
-                           teachers=teachers_list,
-                           teacher=teacher,
-                           role=role,
-                           now=datetime.datetime.now())
+    return render_template('marks_entry.html', classes=classes_list, teachers=teachers_list,
+                           teacher=teacher, role=role, now=datetime.datetime.now())
 
 
 # ========== RESULT CARD (All Roles) ==========
 @app.route('/result/<int:student_id>')
 @login_required
 def result_card(student_id):
+    role = session['role']          # <-- PEHLE define karein
     conn = get_db()
     c = conn.cursor()
-    role = session['role']
+
+    # Admin bhi active school ke andar hi dekhe (wo school switch kar sakta hai)
+    if not belongs_to_school(c, 'students', student_id):
+        conn.close()
+        flash('Not allowed', 'error')
+        return redirect(url_for('dashboard'))
+
+
 
     if role == 'student':
         c.execute("SELECT id FROM students WHERE user_id=%s", (session['user_id'],))
@@ -1444,7 +1509,7 @@ def result_card(student_id):
                t.full_name AS teacher_name
         FROM marks m
         JOIN subjects sub ON m.subject_id = sub.id
-        JOIN teachers t ON m.teacher_id = t.id
+        LEFT JOIN teachers t ON m.teacher_id = t.id
         WHERE m.student_id = %s AND m.exam_type = %s AND m.academic_year = %s
         ORDER BY sub.subject_name
     """, (student_id, exam_type, academic_year))
@@ -1577,14 +1642,19 @@ def assignments():
     classes_list = fetchall_dict(c)
 
     if request.method == 'POST':
-        teacher_id = request.form.get('teacher_id')
+        teacher_id = request.form.get('teacher_id', type=int)
         class_ids = request.form.getlist('class_ids')
         is_primary = bool(int(request.form.get('is_primary', 0)))
 
         if not teacher_id or not class_ids:
             flash('Please select both a teacher and a class', 'error')
+        elif not belongs_to_school(c, 'teachers', teacher_id, school_id) or \
+              not all_belong_to_school(c, 'classes', class_ids, school_id):
+            flash('Invalid teacher or class', 'error')
         else:
             for class_id in class_ids:
+
+
                 c.execute(
                     "SELECT id FROM teacher_classes WHERE teacher_id=%s AND class_id=%s",
                     (teacher_id, class_id)
@@ -1619,22 +1689,17 @@ def assignments():
 @login_required
 @teacher_required
 def get_students(class_id):
-    conn = get_db()
-    c = conn.cursor()
+    conn = get_db(); c = conn.cursor()
+    school_id = get_active_school_id()
 
-    if session['role'] == 'teacher':
-        c.execute("""
-            SELECT id FROM teacher_classes 
-            WHERE teacher_id = (SELECT id FROM teachers WHERE user_id=%s) 
-            AND class_id = %s
-        """, (session['user_id'], class_id))
-        if not c.fetchone():
-            return jsonify([])
+    if not belongs_to_school(c, 'classes', class_id, school_id):
+        conn.close(); return jsonify([])
+    if session['role'] == 'teacher' and not teacher_has_class(c, class_id):
+        conn.close(); return jsonify([])
 
-    c.execute(
-        "SELECT id, full_name, student_code FROM students WHERE class_id=%s ORDER BY full_name",
-        (class_id,)
-    )
+    c.execute("""SELECT id, full_name, student_code FROM students
+                 WHERE class_id=%s AND school_id=%s ORDER BY full_name""",
+              (class_id, school_id))
     students = fetchall_dict(c)
     conn.close()
     return jsonify(students)
@@ -1644,26 +1709,16 @@ def get_students(class_id):
 @login_required
 @teacher_required
 def get_subjects(class_id):
-    conn = get_db()
-    c = conn.cursor()
-
+    conn = get_db(); c = conn.cursor()
     school_id = get_active_school_id()
-    if session['role'] == 'teacher':
-        c.execute("""
-            SELECT sub.* FROM subjects sub
-            JOIN classes c ON sub.class_id = c.id
-            JOIN teacher_classes tc ON tc.class_id = c.id
-            WHERE sub.class_id = %s 
-              AND sub.school_id = %s
-              AND tc.teacher_id = (SELECT id FROM teachers WHERE user_id = %s)
-            ORDER BY sub.subject_name
-        """, (class_id, school_id, session['user_id']))
-    else:
-        c.execute(
-            "SELECT * FROM subjects WHERE class_id=%s AND school_id=%s ORDER BY subject_name",
-            (class_id, school_id)
-        )
 
+    if not belongs_to_school(c, 'classes', class_id, school_id):
+        conn.close(); return jsonify([])
+    if session['role'] == 'teacher' and not teacher_has_class(c, class_id):
+        conn.close(); return jsonify([])
+
+    c.execute("SELECT * FROM subjects WHERE class_id=%s AND school_id=%s ORDER BY subject_name",
+              (class_id, school_id))
     subjects_list = fetchall_dict(c)
     conn.close()
     return jsonify(subjects_list)
@@ -1686,6 +1741,10 @@ def teacher_subjects():
 
     if request.method == 'POST':
         teacher_id = request.form.get('teacher_id')
+        if not belongs_to_school(c, 'teachers', teacher_id, school_id):
+            conn.close()
+            flash('Invalid teacher', 'error')
+            return redirect(url_for('teacher_subjects'))
         subject_names   = request.form.getlist('subject_name[]')
         class_ids       = request.form.getlist('class_id[]')
         total_marks_l   = request.form.getlist('total_marks[]')
@@ -1701,7 +1760,10 @@ def teacher_subjects():
             name = subject_names[i].strip() if i < len(subject_names) else ''
             class_id = class_ids[i] if i < len(class_ids) else ''
             if not name or not class_id:
-                continue  # incomplete row, skip karo
+                continue
+                # incomplete row, skip karo
+            if not belongs_to_school(c, 'classes', class_id, school_id):
+                continue
 
             total_marks = total_marks_l[i] if i < len(total_marks_l) and total_marks_l[i] else 100
             passing_marks = passing_marks_l[i] if i < len(passing_marks_l) and passing_marks_l[i] else 40
@@ -2125,7 +2187,13 @@ def edit_teacher(teacher_id):
 def delete_teacher_document(doc_id):
     conn = get_db()
     c = conn.cursor()
-    c.execute("SELECT file_path FROM teacher_documents WHERE id=%s", (doc_id,))
+    school_id = get_active_school_id()
+
+    c.execute("""
+        SELECT d.file_path FROM teacher_documents d
+        JOIN teachers t ON t.id = d.teacher_id
+        WHERE d.id=%s AND t.school_id=%s
+    """, (doc_id, school_id))
     row = c.fetchone()
     if row:
         filepath = os.path.join('static/uploads/teacher_docs', row[0])
@@ -2134,6 +2202,8 @@ def delete_teacher_document(doc_id):
         c.execute("DELETE FROM teacher_documents WHERE id=%s", (doc_id,))
         conn.commit()
         flash('Document deleted successfully!', 'success')
+    else:
+        flash('Not allowed', 'error')    
     conn.close()
     return redirect(request.referrer or url_for('teachers'))
 
@@ -2377,13 +2447,27 @@ def save_student_attendance():
 def fee_collection():
     school_id = get_active_school_id()
     conn = get_db()
+    c.execute("SELECT 1 FROM students WHERE id=%s AND class_id=%s AND school_id=%s",
+          (student_id, class_id, school_id))
+    if not c.fetchone():
+        conn.close()
+        flash('Invalid student/class', 'error')
+         
+        return redirect(url_for('fee_collection'))
+    
     c = conn.cursor()
 
     c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
     classes = fetchall_dict(c)
 
     if request.method == 'POST':
-        class_id = request.form.get('class_id')
+        class_id = request.form.get('class_id', type=int)
+        if not class_id or not belongs_to_school(c, 'classes', class_id, school_id):
+           conn.close(); flash('Invalid class', 'error')
+           return redirect(url_for('fee_collection'))
+
+        c.execute("SELECT * FROM students WHERE class_id=%s AND school_id=%s ORDER BY full_name",
+            (class_id, school_id))
         attendance_date = request.form.get('attendance_date', datetime.date.today())
 
         c.execute("SELECT * FROM students WHERE class_id=%s ORDER BY full_name", (class_id,))
@@ -2500,7 +2584,7 @@ def view_teacher(teacher_id):
 @app.route('/get_classes_by_school')
 @login_required
 def get_classes_by_school():
-    school_id = request.args.get('school_id')
+    school_id = get_active_school_id()   # request.args se nahi
     if not school_id:
         return jsonify([])
     conn = get_db()
@@ -2514,7 +2598,7 @@ def get_classes_by_school():
 @app.route('/get_teachers_by_school')
 @login_required
 def get_teachers_by_school():
-    school_id = request.args.get('school_id')
+    school_id = get_active_school_id()   # request.args se nahi
     if not school_id:
         return jsonify([])
     conn = get_db()
