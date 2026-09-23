@@ -5,6 +5,7 @@ import psycopg2
 import psycopg2.extras
 
 
+
 # ========== DATABASE CONFIG ==========
 # Sab settings environment variables se aati hain (Windows/Linux/hosting sab pe kaam karega).
 # Agar env var set nahi hai to neeche wali default value use hogi - LOCAL DEV ke liye
