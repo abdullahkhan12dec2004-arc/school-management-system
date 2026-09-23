@@ -39,6 +39,46 @@ app.config['MAIL_DEFAULT_SENDER'] = env('MAIL_USERNAME')
 
 mail = Mail(app)
 
+###########################################################################################
+def get_active_school_id():
+    # Sirf Super Admin school switch kar sakta hai
+    if session.get('role') == 'admin':
+        return session.get('active_school_id') or session.get('school_id')
+    # Baaqi sab hamesha sirf apna school
+    return session.get('school_id')
+
+
+@app.before_request
+def enforce_school_scope():
+    if session.get('user_id') and session.get('role') != 'admin':
+        session['active_school_id'] = session.get('school_id')
+
+
+ALLOWED_TABLES = {'classes', 'students', 'teachers', 'subjects', 'users', 'notices', 'roles'}
+
+def belongs_to_school(c, table, row_id, school_id=None):
+    """True agar record current school ka hai."""
+    if table not in ALLOWED_TABLES:
+        return False
+    school_id = school_id or get_active_school_id()
+    c.execute(f"SELECT 1 FROM {table} WHERE id=%s AND school_id=%s", (row_id, school_id))
+    return c.fetchone() is not None
+
+
+def get_my_teacher_id(c):
+    c.execute("SELECT id FROM teachers WHERE user_id=%s", (session['user_id'],))
+    r = c.fetchone()
+    return r[0] if r else None
+
+
+def teacher_has_class(c, class_id):
+    tid = get_my_teacher_id(c)
+    if not tid:
+        return False
+    c.execute("SELECT 1 FROM teacher_classes WHERE teacher_id=%s AND class_id=%s", (tid, class_id))
+    return c.fetchone() is not None
+###########################################################################################
+
 def _read_excel_worker(file_bytes, header_row_index, max_rows):
     import io, pandas as pd
     df = pd.read_excel(
@@ -397,7 +437,57 @@ def generate_excel_report(records, upload_type):
     return buf.getvalue()
 
 
+#########################################################################################
+@app.route('/roles', methods=['GET', 'POST'])
+@login_required
+@school_admin_only_required
+def manage_roles():
+    school_id = get_active_school_id()
+    conn = get_db(); c = conn.cursor()
 
+    if request.method == 'POST':
+        role_name = request.form.get('role_name', '').strip()
+        base_role = request.form.get('base_role')
+        if not role_name or base_role not in ('school_admin', 'teacher', 'student', 'parent'):
+            flash('Valid role name and type required', 'error')
+        else:
+            try:
+                c.execute("""INSERT INTO roles (school_id, role_name, base_role, created_by)
+                             VALUES (%s,%s,%s,%s)""",
+                          (school_id, role_name, base_role, session['user_id']))
+                conn.commit()
+                flash('Role created for your school!', 'success')
+            except psycopg2.IntegrityError:
+                conn.rollback()
+                flash('This role already exists in your school', 'error')
+
+    c.execute("SELECT * FROM roles WHERE school_id=%s ORDER BY role_name", (school_id,))
+    roles_list = fetchall_dict(c)
+    conn.close()
+    return render_template('roles.html', roles=roles_list)
+
+
+@app.route('/users/<int:user_id>/assign_role', methods=['POST'])
+@login_required
+@school_admin_only_required
+def assign_role(user_id):
+    school_id = get_active_school_id()
+    role_id = request.form.get('role_id', type=int)
+    conn = get_db(); c = conn.cursor()
+
+    # User bhi isi school ka ho AUR role bhi isi school ka ho
+    if not belongs_to_school(c, 'users', user_id, school_id) or \
+       not belongs_to_school(c, 'roles', role_id, school_id):
+        conn.close()
+        flash('Not allowed', 'error')
+        return redirect(url_for('users'))
+
+    c.execute("UPDATE users SET role_id=%s WHERE id=%s", (role_id, user_id))
+    conn.commit(); conn.close()
+    flash('Role assigned', 'success')
+    return redirect(url_for('users'))
+
+############################################################################################
 
 # ========== AUTH ROUTES ==========
 
@@ -591,7 +681,7 @@ def dashboard():
     c = conn.cursor()
 
     if role == 'admin':
-        school_id = session.get('active_school_id', session.get('school_id'))
+        school_id = get_active_school_id()
         stats = {}
 
         c.execute("SELECT COUNT(*) FROM schools")
@@ -791,7 +881,7 @@ def teachers():
     c = conn.cursor()
 
     if session['role'] in ('admin', 'school_admin'):
-        school_id = session.get('active_school_id') or session.get('school_id')
+        school_id = get_active_school_id()
         c.execute("""
             SELECT t.*, s.name AS school_name
             FROM teachers t
@@ -818,7 +908,7 @@ def teachers():
 @login_required
 @school_admin_only_required
 def add_teacher():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT id, name FROM schools ORDER BY name")
@@ -884,7 +974,7 @@ def students():
     c = conn.cursor()
 
     if session['role'] in ('admin', 'school_admin'):
-        school_id = session.get('active_school_id') or session.get('school_id')
+        school_id = get_active_school_id()
         c.execute("""
             SELECT st.*, c.class_name, c.section, s.name AS school_name
             FROM students st
@@ -921,7 +1011,7 @@ def students():
 @teacher_required
 @school_admin_only_required
 def add_student():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
 
@@ -1067,7 +1157,7 @@ def classes():
     c = conn.cursor()
 
     if session['role'] in ('admin', 'school_admin'):
-        school_id = session.get('active_school_id') or session.get('school_id')
+        school_id = get_active_school_id()
         c.execute("""
             SELECT 
                 c.*,
@@ -1112,7 +1202,7 @@ def subjects():
     c = conn.cursor()
 
     if session['role'] in ('admin', 'school_admin'):
-        school_id = session.get('active_school_id') or session.get('school_id')
+        school_id = get_active_school_id()
         c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
         classes_list = fetchall_dict(c)
 
@@ -1206,7 +1296,7 @@ def marks():
     classes_list = []
 
     if role in ('admin', 'school_admin'):
-        school_id = session.get('active_school_id') or session.get('school_id')
+        school_id = get_active_school_id()
         c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
         classes_list = fetchall_dict(c)
         c.execute("SELECT * FROM teachers WHERE school_id=%s", (school_id,))
@@ -1432,7 +1522,7 @@ def my_result():
 def users():
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     c.execute("""
         SELECT u.*, s.name AS school_name
         FROM users u
@@ -1451,7 +1541,7 @@ def users():
 def toggle_user(user_id):
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     c.execute("SELECT is_active, school_id FROM users WHERE id=%s", (user_id,))
     row = c.fetchone()
     if not row:
@@ -1476,7 +1566,7 @@ def toggle_user(user_id):
 @login_required
 @school_admin_only_required
 def assignments():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
 
@@ -1557,7 +1647,7 @@ def get_subjects(class_id):
     conn = get_db()
     c = conn.cursor()
 
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     if session['role'] == 'teacher':
         c.execute("""
             SELECT sub.* FROM subjects sub
@@ -1584,7 +1674,7 @@ def get_subjects(class_id):
 @login_required
 @school_admin_only_required
 def teacher_subjects():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
 
@@ -1663,7 +1753,7 @@ def teacher_subjects():
 @login_required
 @school_admin_only_required
 def get_teacher_subjects(teacher_id):
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
     c.execute("""
@@ -1685,7 +1775,7 @@ def get_teacher_subjects(teacher_id):
 @login_required
 @school_admin_only_required
 def remove_teacher_subject(ts_id):
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT id FROM teacher_subjects WHERE id=%s AND school_id=%s", (ts_id, school_id))
@@ -1702,7 +1792,7 @@ def remove_teacher_subject(ts_id):
 @login_required
 @school_admin_only_required
 def add_class():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
 
@@ -1786,7 +1876,7 @@ def edit_student(student_id):
     conn = get_db()
     c = conn.cursor()
 
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     c.execute("SELECT school_id FROM students WHERE id=%s", (student_id,))
     st_row = c.fetchone()
@@ -1934,7 +2024,7 @@ def edit_teacher(teacher_id):
     conn = get_db()
     c = conn.cursor()
 
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     c.execute("SELECT school_id FROM teachers WHERE id=%s", (teacher_id,))
     t_row = c.fetchone()
     if t_row and session.get('role') == 'school_admin' and t_row[0] != school_id:
@@ -2053,7 +2143,7 @@ def delete_teacher_document(doc_id):
 @login_required
 @school_admin_only_required
 def teacher_attendance():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     today = datetime.date.today()
 
     conn = get_db()
@@ -2086,7 +2176,7 @@ def teacher_attendance():
 @login_required
 @school_admin_only_required
 def save_teacher_attendance():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     attendance_date = request.form.get('attendance_date')
     marked_by = session['user_id']
 
@@ -2132,7 +2222,7 @@ def save_teacher_attendance():
 @login_required
 @school_admin_only_required
 def teacher_attendance_report():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     month = request.args.get('month', datetime.date.today().strftime('%Y-%m'))
 
     conn = get_db()
@@ -2177,7 +2267,7 @@ def teacher_attendance_report():
 @login_required
 @teacher_required
 def student_attendance():
-    school_id = session.get('active_school_id', session.get('school_id')) \
+    school_id = get_active_school_id() \
         if session['role'] == 'admin' else session.get('school_id')
     today = datetime.date.today()
 
@@ -2240,7 +2330,7 @@ def student_attendance():
 def save_student_attendance():
     class_id = request.form.get('class_id')
     attendance_date = request.form.get('attendance_date')
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     marked_by = session['user_id']
 
     student_ids = request.form.getlist('student_id[]')
@@ -2285,7 +2375,7 @@ def save_student_attendance():
 @login_required
 @school_admin_only_required
 def fee_collection():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
 
@@ -2326,7 +2416,7 @@ def save_fee():
     payment_mode = request.form.get('payment_mode')
     transaction_reference = request.form.get('transaction_reference', '')
     remarks = request.form.get('remarks', '')
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     collected_by = session['user_id']
     receipt_number = f"FEE-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
     conn = get_db()
@@ -2384,7 +2474,7 @@ def view_teacher(teacher_id):
     conn = get_db()
     c = conn.cursor()
 
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     c.execute("SELECT * FROM teachers WHERE id=%s", (teacher_id,))
     teacher = fetchone_dict(c)
@@ -2442,7 +2532,7 @@ def get_teachers_by_school():
 @login_required
 @school_admin_only_required
 def manage_notices():
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     if not school_id:
         flash('School not found!', 'error')
@@ -2502,7 +2592,7 @@ def manage_notices():
 @app.route('/notices')
 @login_required
 def view_notices():
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     role = session['role']
 
     if not school_id:
@@ -2537,7 +2627,7 @@ def delete_notice(notice_id):
     conn = get_db()
     c = conn.cursor()
 
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     c.execute("SELECT id FROM notices WHERE id=%s AND school_id=%s", (notice_id, school_id))
     if c.fetchone():
         c.execute("UPDATE notices SET is_active=FALSE WHERE id=%s", (notice_id,))
@@ -2819,7 +2909,7 @@ def reject_admin(user_id):
 @login_required
 @school_admin_only_required
 def parents():
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
     c.execute("""
@@ -2840,7 +2930,7 @@ def parents():
 @login_required
 @school_admin_only_required
 def add_parent():
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
 
@@ -3011,7 +3101,7 @@ def switch_child(child_id):
 @login_required
 @school_admin_or_super_admin_required
 def add_school_admin():
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
 
@@ -3078,7 +3168,7 @@ def bulk_upload_classes():
 
         conn = get_db()
         c = conn.cursor()
-        school_id = session.get('active_school_id') or session.get('school_id')
+        school_id = get_active_school_id()
 
         c.execute("DELETE FROM staging_classes WHERE school_id=%s AND uploaded_by=%s",
                   (school_id, session['user_id']))
@@ -3154,7 +3244,7 @@ def bulk_upload_teachers():
 
         conn = get_db()
         c = conn.cursor()
-        school_id = session.get('active_school_id') or session.get('school_id')
+        school_id = get_active_school_id()
         c.execute("DELETE FROM staging_teachers WHERE school_id=%s AND uploaded_by=%s",
                   (school_id, session['user_id']))
         valid_count = 0
@@ -3233,7 +3323,7 @@ def bulk_upload_students():
         conn = get_db()
         c = conn.cursor()
 
-        school_id = session.get('active_school_id') or session.get('school_id')
+        school_id = get_active_school_id()
 
         c.execute("""
             DELETE FROM staging_students
@@ -3314,7 +3404,7 @@ def bulk_upload_students():
     conn = get_db()
     c = conn.cursor()
 
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     c.execute("""
         SELECT id, class_name, section
@@ -3342,7 +3432,7 @@ def download_validation_report(upload_type):
     import io
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     table_map = {
         'classes': 'staging_classes',
@@ -3375,7 +3465,7 @@ def download_validation_report(upload_type):
 def review_classes_upload():
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     c.execute("""
         SELECT * FROM staging_classes 
@@ -3393,7 +3483,7 @@ def review_classes_upload():
 def confirm_classes_upload():
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     c.execute("""
         INSERT INTO classes (school_id, class_name, section, academic_year)
@@ -3416,7 +3506,7 @@ def confirm_classes_upload():
 def review_teachers_upload():
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     c.execute("""
         SELECT * FROM staging_teachers 
@@ -3434,7 +3524,7 @@ def review_teachers_upload():
 def confirm_teachers_upload():
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     c.execute("""
         SELECT id, username, full_name, email, phone, password,
                subject_specialization, qualification, joining_date,
@@ -3476,7 +3566,7 @@ def confirm_teachers_upload():
 def review_students_upload():
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     c.execute("""
         SELECT * FROM staging_students 
@@ -3495,7 +3585,7 @@ def review_students_upload():
 def confirm_students_upload():
     conn = get_db()
     c = conn.cursor()
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     c.execute("""
         SELECT id, username, full_name, email, phone, password,
@@ -3640,7 +3730,7 @@ def download_classes_template():
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
 
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
@@ -3712,7 +3802,7 @@ def download_teachers_template():
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
 
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
@@ -3792,7 +3882,7 @@ def download_students_template():
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
 
-    school_id = session.get('active_school_id') or session.get('school_id')
+    school_id = get_active_school_id()
 
     selected_class_id = request.args.get('class_id', '').strip()
     selected_class_label = None
@@ -3939,7 +4029,7 @@ def download_students_template():
 @login_required
 @school_admin_only_required
 def pay_salary():
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_active_school_id()
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT id, full_name, salary FROM teachers WHERE school_id=%s ORDER BY full_name", (school_id,))
