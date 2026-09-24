@@ -32,31 +32,30 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated
 
+
+
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if session.get('role') not in ['super_admin', 'school_admin']:
-            flash(f"DEBUG role: {session.get('role')}", 'error')
+        if session.get('role') not in ['admin', 'school_admin']:
             flash('Only admins can access this', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
-
-
 def get_effective_school_id(requested_school_id):
     """
     Security: sirf super_admin apni marzi se koi bhi school_id pass kar sakta hai.
     school_admin / teacher hamesha apne hi school tak mehdood rahenge,
     chahe URL me manually kuch bhi school_id diya jaye.
     """
-    if session.get('role') == 'super_admin':
+    if session.get('role') == 'admin':
         return requested_school_id or session.get('active_school_id') or session.get('school_id')
     return session.get('active_school_id') or session.get('school_id')
   
 def teacher_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if session.get('role') not in ['super_admin', 'school_admin', 'teacher']:
+        if session.get('role') not in ['admin', 'school_admin', 'teacher']:
             flash('you cannot access this page', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
@@ -122,8 +121,7 @@ def reports_index():
     c    = conn.cursor()
     role = session.get('role')
     school_id = session.get('active_school_id', session.get('school_id'))
-
-    if role == 'super_admin':
+    if role == 'admin':
         c.execute("SELECT id, name FROM schools ORDER BY name")
         schools = fetchall_dict(c)
     else:
@@ -165,38 +163,39 @@ def export_students():
     c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
     school_row = c.fetchone()
     school_name = school_row[0] if school_row else "School"
+    role = session.get('role')
+    # Teacher sirf apni assigned classes dekh sakta hai
+    allowed_class_ids = None
+    if role == 'teacher':
+        c.execute("""
+           SELECT tc.class_id
+           FROM teacher_classes tc
+           JOIN teachers t ON tc.teacher_id = t.id
+           WHERE t.user_id = %s AND t.school_id = %s
+        """, (session['user_id'], school_id))
+        allowed_class_ids = [r[0] for r in c.fetchall()]
 
+    query = """
+        SELECT st.*, c.class_name, c.section, s.name AS school_name
+        FROM students st
+        LEFT JOIN classes c ON st.class_id = c.id
+        JOIN schools s ON st.school_id = s.id
+        WHERE st.school_id = %s
+    """
+    params = [school_id]
     if student_id_single:
-        # Single student
-        c.execute("""
-            SELECT st.*, c.class_name, c.section, s.name AS school_name
-            FROM students st
-            LEFT JOIN classes c ON st.class_id = c.id
-            JOIN schools s ON st.school_id = s.id
-            WHERE st.id = %s
-        """, (student_id_single,))
-        students = fetchall_dict(c)
-    elif class_id:
-        c.execute("""
-            SELECT st.*, c.class_name, c.section, s.name AS school_name
-            FROM students st
-            LEFT JOIN classes c ON st.class_id = c.id
-            JOIN schools s ON st.school_id = s.id
-            WHERE st.school_id = %s AND st.class_id = %s
-            ORDER BY st.full_name
-        """, (school_id, class_id))
-        students = fetchall_dict(c)
-    else:
-        c.execute("""
-            SELECT st.*, c.class_name, c.section, s.name AS school_name
-            FROM students st
-            LEFT JOIN classes c ON st.class_id = c.id
-            JOIN schools s ON st.school_id = s.id
-            WHERE st.school_id = %s
-            ORDER BY c.class_name, st.full_name
-        """, (school_id,))
-        students = fetchall_dict(c)
+       query += " AND st.id = %s"
+       params.append(student_id_single)
+    if class_id:
+       query += " AND st.class_id = %s"
+       params.append(class_id)
+    if allowed_class_ids is not None:
+       query += " AND st.class_id = ANY(%s)"
+       params.append(allowed_class_ids)
 
+    query += " ORDER BY c.class_name, st.full_name"
+    c.execute(query, params)
+    students = fetchall_dict(c)
     # Fetch parents & siblings for each student
     all_parents  = {}
     all_siblings = {}
