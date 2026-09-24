@@ -761,7 +761,7 @@ def export_salary():
                     paid,
                     r.get('payment_mode',''), r.get('paid_by_name','')]
             for col, v in enumerate(vals, 1):
-                cell = ws.cell(row=row, column=col, value=v)
+                cell = ws.cell(row=row, column=col, value=v) 
                 style_cell(cell, alt=alt)
                 if col == 7:
                     cell.number_format = '#,##0.00'
