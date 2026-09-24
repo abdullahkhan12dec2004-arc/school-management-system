@@ -1599,32 +1599,32 @@ def users():
     conn.close()
     return render_template('users.html', users=users_list)
 
-
-@app.route('/users/toggle/<int:user_id>')
+@app.route('/users/toggle/<int:user_id>', methods=['POST'])
 @login_required
 @school_admin_or_super_admin_required
 def toggle_user(user_id):
+    school_id = get_active_school_id()
+    if user_id == session['user_id']:
+        flash('You cannot deactivate your own account', 'error')
+        return redirect(url_for('users'))
+
     conn = get_db()
     c = conn.cursor()
-    school_id = get_active_school_id()
-    c.execute("SELECT is_active, school_id FROM users WHERE id=%s", (user_id,))
+    # super admin ho ya school admin, dono sirf active school ke users
+    c.execute("SELECT is_active FROM users WHERE id=%s AND school_id=%s AND role <> 'admin'",
+              (user_id, school_id))
     row = c.fetchone()
     if not row:
-        flash('User nahi mila', 'error')
         conn.close()
+        flash('User not found in your school', 'error')
         return redirect(url_for('users'))
 
-    if session.get('role') == 'school_admin' and row[1] != school_id:
-        flash('You can only manage users from your own school', 'error')
-        conn.close()
-        return redirect(url_for('users'))
-
-    new_status = not row[0]
-    c.execute("UPDATE users SET is_active=%s WHERE id=%s", (new_status, user_id))
+    c.execute("UPDATE users SET is_active=%s WHERE id=%s", (not row[0], user_id))
     conn.commit()
     conn.close()
     flash('User status has been updated!', 'success')
     return redirect(url_for('users'))
+
 
 
 @app.route('/assignments', methods=['GET', 'POST'])
@@ -1883,51 +1883,46 @@ def add_class():
     conn.close()
     return render_template('class_form.html', schools=schools_list, now=datetime.datetime.now())
 
-
 @app.route('/classes/<int:class_id>/students')
 @login_required
 @teacher_required
 def class_students(class_id):
     conn = get_db()
     c = conn.cursor()
+    school_id = get_active_school_id()
 
-    c.execute("""
-        SELECT c.*, s.name AS school_name 
-        FROM classes c
-        JOIN schools s ON c.school_id = s.id
-        WHERE c.id = %s
-    """, (class_id,))
-    class_info = fetchone_dict(c)
-
-    if not class_info:
-        flash('Class not found', 'error')
+    if not belongs_to_school(c, 'classes', class_id, school_id):
         conn.close()
+        flash('Class not found', 'error')
         return redirect(url_for('classes'))
 
-    if session['role'] == 'teacher':
-        c.execute("""
-            SELECT id FROM teacher_classes 
-            WHERE teacher_id = (SELECT id FROM teachers WHERE user_id=%s) 
-            AND class_id = %s
-        """, (session['user_id'], class_id))
-        if not c.fetchone():
-            flash('You do not have access to this class', 'error')
-            conn.close()
-            return redirect(url_for('classes'))
+    if session['role'] == 'teacher' and not teacher_has_class(c, class_id):
+        conn.close()
+        flash('You do not have access to this class', 'error')
+        return redirect(url_for('classes'))
+
+    c.execute("""
+        SELECT c.*, s.name AS school_name
+        FROM classes c
+        JOIN schools s ON c.school_id = s.id
+        WHERE c.id = %s AND c.school_id = %s
+    """, (class_id, school_id))
+    class_info = fetchone_dict(c)
 
     c.execute("""
         SELECT st.*, c.class_name, c.section
         FROM students st
         LEFT JOIN classes c ON st.class_id = c.id
-        WHERE st.class_id = %s
+        WHERE st.class_id = %s AND st.school_id = %s
         ORDER BY st.full_name
-    """, (class_id,))
+    """, (class_id, school_id))
     students_list = fetchall_dict(c)
 
     conn.close()
     return render_template('class_students.html',
                            students=students_list,
                            class_info=class_info)
+
 
 
 # ========== STUDENT ENHANCED ROUTES ==========
@@ -2337,8 +2332,7 @@ def teacher_attendance_report():
 @login_required
 @teacher_required
 def student_attendance():
-    school_id = get_active_school_id() \
-        if session['role'] == 'admin' else session.get('school_id')
+    school_id = get_active_school_id()
     today = datetime.date.today()
 
     conn = get_db()
@@ -2346,21 +2340,16 @@ def student_attendance():
     if session['role'] in ('admin', 'school_admin'):
         c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
     else:
-        c.execute("SELECT id FROM teachers WHERE user_id=%s", (session['user_id'],))
-        t = c.fetchone()
-    
-
-        if t:
-            c.execute("""
-                SELECT c.* FROM classes c
-                JOIN teacher_classes tc ON tc.class_id = c.id
-                WHERE tc.teacher_id = %s
-                ORDER BY c.class_name
-            """, (t[0],))
-        else:
+        tid = get_my_teacher_id(c)
+        if not tid:
             conn.close()
             return render_template('student_attendance.html', classes=[], today=today)
-
+        c.execute("""
+            SELECT c.* FROM classes c
+            JOIN teacher_classes tc ON tc.class_id = c.id
+            WHERE tc.teacher_id = %s AND c.school_id = %s
+            ORDER BY c.class_name
+        """, (tid, school_id))
     classes_list = fetchall_dict(c)
 
     selected_class = None
@@ -2369,18 +2358,23 @@ def student_attendance():
     existing = {}
 
     if request.method == 'POST':
-        selected_class = request.form.get('class_id')
+        selected_class = request.form.get('class_id', type=int)
         attendance_date = request.form.get('attendance_date', str(today))
 
+        # sirf wahi class jo upar ki allowed list mein hai
+        if selected_class not in {cl['id'] for cl in classes_list}:
+            selected_class = None
+
         if selected_class:
-            c.execute("SELECT * FROM students WHERE class_id=%s ORDER BY full_name", (selected_class,))
+            c.execute("SELECT * FROM students WHERE class_id=%s AND school_id=%s ORDER BY full_name",
+                      (selected_class, school_id))
             students = fetchall_dict(c)
 
             c.execute("""
                 SELECT student_id, status, remarks
                 FROM student_attendance
-                WHERE class_id=%s AND attendance_date=%s
-            """, (selected_class, attendance_date))
+                WHERE class_id=%s AND school_id=%s AND attendance_date=%s
+            """, (selected_class, school_id, attendance_date))
             for row in c.fetchall():
                 existing[row[0]] = {'status': row[1], 'remarks': row[2] or ''}
 
@@ -2398,7 +2392,7 @@ def student_attendance():
 @login_required
 @teacher_required
 def save_student_attendance():
-    class_id = request.form.get('class_id')
+    class_id = request.form.get('class_id', type=int)
     attendance_date = request.form.get('attendance_date')
     school_id = get_active_school_id()
     marked_by = session['user_id']
@@ -2414,10 +2408,32 @@ def save_student_attendance():
     conn = get_db()
     c = conn.cursor()
 
-    for i, student_id in enumerate(student_ids):
+    if not belongs_to_school(c, 'classes', class_id, school_id):
+        conn.close()
+        flash('Invalid class', 'error')
+        return redirect(url_for('student_attendance'))
+    if session['role'] == 'teacher' and not teacher_has_class(c, class_id):
+        conn.close()
+        flash('You do not have access to this class', 'error')
+        return redirect(url_for('student_attendance'))
+
+    c.execute("SELECT id FROM students WHERE class_id=%s AND school_id=%s", (class_id, school_id))
+    valid_students = {r[0] for r in c.fetchall()}
+
+    saved = 0
+    for i, sid in enumerate(student_ids):
+        try:
+            sid = int(sid)
+        except ValueError:
+            continue
+        if sid not in valid_students:
+            conn.rollback()
+            conn.close()
+            flash('A student in the list does not belong to this class', 'error')
+            return redirect(url_for('student_attendance'))
+
         status = statuses[i] if i < len(statuses) else 'Absent'
         remarks = remarks_list[i] if i < len(remarks_list) else ''
-        # Postgres: INSERT ... ON CONFLICT (upsert) instead of SQL Server IF EXISTS/ELSE
         c.execute("""
             INSERT INTO student_attendance
             (student_id, class_id, school_id, attendance_date,
@@ -2429,15 +2445,17 @@ def save_student_attendance():
                           marked_by = EXCLUDED.marked_by,
                           updated_by = EXCLUDED.marked_by,
                           updated_date = NOW()
-        """, (
-            student_id, class_id, school_id, attendance_date,
-            status, remarks, marked_by, marked_by
-        ))
+        """, (sid, class_id, school_id, attendance_date,
+              status, remarks, marked_by, marked_by))
+        saved += 1
 
     conn.commit()
     conn.close()
-    flash(f'{len(student_ids)} students\' attendance has been saved!', 'success')
+    flash(f"{saved} students' attendance has been saved!", 'success')
     return redirect(url_for('student_attendance'))
+
+
+
 
 
 # ========== FEE COLLECTION ROUTE ==========
@@ -2447,14 +2465,6 @@ def save_student_attendance():
 def fee_collection():
     school_id = get_active_school_id()
     conn = get_db()
-    c.execute("SELECT 1 FROM students WHERE id=%s AND class_id=%s AND school_id=%s",
-          (student_id, class_id, school_id))
-    if not c.fetchone():
-        conn.close()
-        flash('Invalid student/class', 'error')
-         
-        return redirect(url_for('fee_collection'))
-    
     c = conn.cursor()
 
     c.execute("SELECT * FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
@@ -2463,14 +2473,14 @@ def fee_collection():
     if request.method == 'POST':
         class_id = request.form.get('class_id', type=int)
         if not class_id or not belongs_to_school(c, 'classes', class_id, school_id):
-           conn.close(); flash('Invalid class', 'error')
-           return redirect(url_for('fee_collection'))
+            conn.close()
+            flash('Invalid class', 'error')
+            return redirect(url_for('fee_collection'))
 
-        c.execute("SELECT * FROM students WHERE class_id=%s AND school_id=%s ORDER BY full_name",
-            (class_id, school_id))
         attendance_date = request.form.get('attendance_date', datetime.date.today())
 
-        c.execute("SELECT * FROM students WHERE class_id=%s ORDER BY full_name", (class_id,))
+        c.execute("SELECT * FROM students WHERE class_id=%s AND school_id=%s ORDER BY full_name",
+                  (class_id, school_id))
         students = fetchall_dict(c)
         conn.close()
 
@@ -2492,22 +2502,43 @@ def fee_collection():
 @login_required
 @school_admin_only_required
 def save_fee():
-    student_id = request.form.get('student_id')
-    class_id = request.form.get('class_id')
+    school_id = get_active_school_id()
+    student_id = request.form.get('student_id', type=int)
+    class_id = request.form.get('class_id', type=int)
     month = request.form.get('month')
     year = request.form.get('year')
-    amount = request.form.get('amount')
     payment_mode = request.form.get('payment_mode')
     transaction_reference = request.form.get('transaction_reference', '')
     remarks = request.form.get('remarks', '')
-    school_id = get_active_school_id()
-    collected_by = session['user_id']
-    receipt_number = f"FEE-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+    try:
+        amount = float(request.form.get('amount', ''))
+        if amount <= 0:
+            raise ValueError
+    except ValueError:
+        flash('Invalid amount', 'error')
+        return redirect(url_for('fee_collection'))
+
     conn = get_db()
     c = conn.cursor()
+
+    # student isi class + isi school ka hona chahiye
+    if not student_id or not class_id or not belongs_to_school(c, 'classes', class_id, school_id):
+        conn.close()
+        flash('Invalid student/class', 'error')
+        return redirect(url_for('fee_collection'))
+    c.execute("SELECT 1 FROM students WHERE id=%s AND class_id=%s AND school_id=%s",
+              (student_id, class_id, school_id))
+    if not c.fetchone():
+        conn.close()
+        flash('Invalid student/class', 'error')
+        return redirect(url_for('fee_collection'))
+
+    collected_by = session['user_id']
+    receipt_number = f"FEE-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+
     c.execute("""
-        INSERT INTO fee_collections 
-        (student_id, school_id, class_id, month, year, amount, 
+        INSERT INTO fee_collections
+        (student_id, school_id, class_id, month, year, amount,
          payment_mode, transaction_reference, remarks, collected_by,
          receipt_number, created_by)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
@@ -2516,6 +2547,7 @@ def save_fee():
           receipt_number, session['user_id']))
     fee_id = c.fetchone()[0]
     conn.commit()
+
     c.execute("""
         SELECT fc.*, s.full_name as student_name, s.student_code,
                c.class_name, u.full_name as collector_name,
