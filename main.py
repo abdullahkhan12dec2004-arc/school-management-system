@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask import request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
 from functools import wraps
+from flask import abort
 
 import datetime
 import os
@@ -46,12 +47,27 @@ def get_active_school_id():
         return session.get('active_school_id') or session.get('school_id')
     # Baaqi sab hamesha sirf apna school
     return session.get('school_id')
-
-
+    
 @app.before_request
 def enforce_school_scope():
-    if session.get('user_id') and session.get('role') != 'admin':
-        session['active_school_id'] = session.get('school_id')
+    if not session.get('user_id') or request.endpoint in ('static', 'logout', 'logout_force'):
+        return
+    conn = get_db(); c = conn.cursor()
+    c.execute("""SELECT COALESCE(r.base_role, u.role), u.school_id, u.is_active, s.is_active
+                 FROM users u
+                 LEFT JOIN roles r ON r.id=u.role_id AND r.school_id=u.school_id
+                 LEFT JOIN schools s ON s.id=u.school_id
+                 WHERE u.id=%s""", (session['user_id'],))
+    row = c.fetchone(); conn.close()
+    if not row or not row[2] or (row[0] != 'admin' and not row[3]):
+        session.clear()
+        flash('Your account is not active.', 'error')
+        return redirect(url_for('login'))
+    session['role'], session['school_id'] = row[0], row[1]
+    if row[0] != 'admin':
+        session['active_school_id'] = row[1]
+
+
 
 
 ALLOWED_TABLES = {'classes', 'students', 'teachers', 'subjects', 'users', 'notices', 'roles'}
@@ -730,11 +746,13 @@ def edit_school(school_id):
 @login_required
 def dashboard():
     role = session['role']
-
     if role == 'student':
-        return redirect(url_for('my_result'))
+       return redirect(url_for('my_result'))
+    if role == 'parent':
+       return redirect(url_for('parent_dashboard'))
 
     conn = get_db()
+
     c = conn.cursor()
 
     if role == 'admin':
@@ -815,7 +833,7 @@ def dashboard():
         c.execute("SELECT * FROM schools WHERE id=%s", (school_id,))
         school = fetchone_dict(c)
 
-    else:  # Teacher
+    elif role == 'teacher':
         school_id = session.get('school_id')
         session['active_school_id'] = school_id
 
@@ -870,7 +888,9 @@ def dashboard():
         if school_id:
             c.execute("SELECT * FROM schools WHERE id=%s", (school_id,))
             school = fetchone_dict(c)
-
+    else:
+        conn.close()
+        abort(403)
     conn.close()
     return render_template('dashboard.html', stats=stats, results=results, school=school, role=role)
 # ========== SCHOOLS (Only Admin) ==========
@@ -1593,16 +1613,22 @@ def users():
     conn = get_db()
     c = conn.cursor()
     school_id = get_active_school_id()
+
     c.execute("""
-        SELECT u.*, s.name AS school_name
+        SELECT u.id, u.username, u.full_name, u.role, u.school_id,
+               s.name AS school_name
         FROM users u
         LEFT JOIN schools s ON u.school_id = s.id
         WHERE u.school_id = %s
         ORDER BY u.role, u.full_name
     """, (school_id,))
     users_list = fetchall_dict(c)
+
+    c.execute("SELECT * FROM roles WHERE school_id = %s ORDER BY name", (school_id,))
+    roles = fetchall_dict(c)
+
     conn.close()
-    return render_template('users.html', users=users_list)
+    return render_template('users.html', users=users_list, roles=roles)
 
 @app.route('/users/toggle/<int:user_id>', methods=['POST'])
 @login_required
@@ -2608,6 +2634,7 @@ def view_teacher(teacher_id):
 
 @app.route('/get_classes_by_school')
 @login_required
+@teacher_required
 def get_classes_by_school():
     school_id = get_active_school_id()   # request.args se nahi
     if not school_id:
@@ -2619,9 +2646,9 @@ def get_classes_by_school():
     conn.close()
     return jsonify(classes)
 
-
 @app.route('/get_teachers_by_school')
 @login_required
+@teacher_required
 def get_teachers_by_school():
     school_id = get_active_school_id()   # request.args se nahi
     if not school_id:
