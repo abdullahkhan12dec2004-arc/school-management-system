@@ -3875,6 +3875,7 @@ def add_instructions_sheet(wb, fields):
 
 @app.route('/template/classes')
 @login_required
+@school_admin_only_required
 def download_classes_template():
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -3947,6 +3948,7 @@ def download_classes_template():
 
 @app.route('/template/teachers')
 @login_required
+@school_admin_only_required
 def download_teachers_template():
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -4027,6 +4029,7 @@ def download_teachers_template():
 
 @app.route('/template/students')
 @login_required
+@school_admin_only_required
 def download_students_template():
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
