@@ -375,15 +375,12 @@ def validate_teacher_row(row_dict, conn):
 
 
 def validate_student_row(row_dict, conn, school_id):
-    ...
-    c.execute("SELECT id FROM classes WHERE id=%s AND school_id=%s",
-              (int(float(class_id_val)), school_id))
     errors = []
 
-    full_name = get_col(row_dict, 'Full Name', 'full_name', 'FullName', 'FULL NAME')
-    username  = get_col(row_dict, 'Username',  'username',  'USERNAME')
-    password  = get_col(row_dict, 'Password',  'password',  'PASSWORD')
-    phone     = get_col(row_dict, 'Phone',     'phone',     'PHONE',    'Phone No', 'phone_no')
+    full_name    = get_col(row_dict, 'Full Name', 'full_name', 'FullName', 'FULL NAME')
+    username     = get_col(row_dict, 'Username',  'username',  'USERNAME')
+    password     = get_col(row_dict, 'Password',  'password',  'PASSWORD')
+    phone        = get_col(row_dict, 'Phone',     'phone',     'PHONE', 'Phone No', 'phone_no')
     class_id_val = get_col(row_dict, 'Class ID', 'class_id', 'ClassID', 'CLASS ID')
 
     if not full_name:
@@ -394,25 +391,26 @@ def validate_student_row(row_dict, conn, school_id):
         errors.append("Password is required")
     if not phone:
         errors.append("Phone No is required")
+
     if not class_id_val:
         errors.append("Class ID is required")
-    elif class_id_val:
+    else:
         try:
-            c = conn.cursor()
-            c.execute("SELECT id FROM classes WHERE id=%s", (int(float(class_id_val)),))
-            if not c.fetchone():
-                errors.append(f"Class ID '{class_id_val}' does not exist")
-        except Exception:
+            class_id_int = int(float(class_id_val))
+        except (ValueError, TypeError):
             errors.append("Class ID must be a valid number")
+        else:
+            c = conn.cursor()
+            c.execute("SELECT id FROM classes WHERE id=%s AND school_id=%s",
+                      (class_id_int, school_id))
+            if not c.fetchone():
+                errors.append(f"Class ID '{class_id_val}' does not exist in this school")
 
     if username:
-        try:
-            c = conn.cursor()
-            c.execute("SELECT id FROM users WHERE username=%s", (username,))
-            if c.fetchone():
-                errors.append(f"Username '{username}' already exists")
-        except Exception:
-            pass
+        c = conn.cursor()
+        c.execute("SELECT id FROM users WHERE username=%s", (username,))
+        if c.fetchone():
+            errors.append(f"Username '{username}' already exists")
 
     return errors
 
@@ -489,14 +487,30 @@ def assign_role(user_id):
     role_id = request.form.get('role_id', type=int)
     conn = get_db(); c = conn.cursor()
 
-    # User bhi isi school ka ho AUR role bhi isi school ka ho
-    if not belongs_to_school(c, 'users', user_id, school_id) or \
+    # 1) User bhi isi school ka ho AUR role bhi isi school ka ho
+    if not role_id or \
+       not belongs_to_school(c, 'users', user_id, school_id) or \
        not belongs_to_school(c, 'roles', role_id, school_id):
         conn.close()
         flash('Not allowed', 'error')
         return redirect(url_for('users'))
 
-    c.execute("UPDATE users SET role_id=%s WHERE id=%s", (role_id, user_id))
+    # 2) Escalation rokne ke liye: user ka type aur role ka base_role match ho,
+    #    aur 'admin' (super admin) user par koi role assign na ho
+    c.execute("SELECT role FROM users WHERE id=%s AND school_id=%s AND role <> 'admin'",
+              (user_id, school_id))
+    u = c.fetchone()
+    c.execute("SELECT base_role FROM roles WHERE id=%s AND school_id=%s",
+              (role_id, school_id))
+    r = c.fetchone()
+    if not u or not r or u[0] != r[0]:
+        conn.close()
+        flash('Role is user type se match nahi karta', 'error')
+        return redirect(url_for('users'))
+
+    # 3) UPDATE mein bhi school_id, taake koi aur rasta na bache
+    c.execute("UPDATE users SET role_id=%s WHERE id=%s AND school_id=%s",
+              (role_id, user_id, school_id))
     conn.commit(); conn.close()
     flash('Role assigned', 'success')
     return redirect(url_for('users'))
