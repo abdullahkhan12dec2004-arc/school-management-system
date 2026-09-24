@@ -538,21 +538,20 @@ def login():
             conn = get_db()
             c = conn.cursor()
             hashed = hash_password(password)
-
             c.execute("""
                 SELECT
-                    u.id,
-                    COALESCE(r.base_role, u.role) AS role,
-                    u.full_name,
-                    u.school_id,
-                    u.role_id,
-                    s.is_active AS school_active
+                      u.id,
+                      u.full_name,
+                      u.school_id,
+                      u.role_id,
+                      COALESCE(r.base_role, u.role) AS role,
+                      s.is_active AS school_active
                 FROM users u
-                LEFT JOIN roles r ON r.id = u.role_id
+                LEFT JOIN roles r ON r.id = u.role_id AND r.school_id = u.school_id
                 LEFT JOIN schools s ON s.id = u.school_id
                 WHERE u.username=%s
-                  AND u.password=%s
-                  AND u.is_active=TRUE
+                   AND u.password=%s
+                   AND u.is_active=TRUE
             """, (username, hashed))
 
             user = fetchone_dict(c)
