@@ -572,16 +572,20 @@
                             {{ user.created_at[:10] if user.created_at else '-' }}
                         </td>
                         <td>
-                            <a href="{{ url_for('toggle_user', user_id=user.id) }}"
-                               class="btn-sm-modern {% if user.is_active %}btn-deactivate{% else %}btn-activate{% endif %}"
-                               onclick="return confirm('Are you sure you want to {% if user.is_active %}deactivate{% else %}activate{% endif %} {{ user.full_name or user.username }}?')">
-                                {% if user.is_active %}
-                                    <i class="fas fa-lock"></i> Deactivate
-                                {% else %}
-                                    <i class="fas fa-lock-open"></i> Activate
-                                {% endif %}
-                            </a>
-                        </td>
+                            <form method="POST" action="{{ url_for('toggle_user', user_id=user.id) }}"
+                                 onsubmit="return confirm('Are you sure you want to {% if user.is_active %}deactivate{% else %}activate{% endif %} {{ user.full_name or user.username }}?')"
+                                    style="display:inline;">
+                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                 <button type="submit" class="btn-sm-modern {% if user.is_active %}btn-deactivate{% else %}btn-activate{% endif %}">
+                                     {% if user.is_active %}
+                                          <i class="fas fa-lock"></i> Deactivate
+                                     {% else %}
+                                        <i class="fas fa-lock-open"></i> Activate
+                                     {% endif %}
+                                 </button>
+                            </form>
+                         </td>
+
                     </tr>
                     {% endfor %}
                 </tbody>
