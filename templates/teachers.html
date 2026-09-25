@@ -216,12 +216,14 @@
         <i class="fas fa-chalkboard-teacher"></i> Teachers
     </h2>
     <div class="top-actions">
+        {% if session.role in ('admin', 'school_admin') %}
         <a href="{{ url_for('assignments') }}" class="btn">
             <i class="fas fa-book"></i> Subjects Assign Karen
         </a>
         <a href="{{ url_for('add_teacher') }}" class="btn">
             <i class="fas fa-plus"></i> Add Teacher
         </a>
+        {% endif %}
     </div>
 </div>
 
@@ -244,7 +246,9 @@
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Joining Date</th>
+                        {% if session.role in ('admin', 'school_admin') %}
                         <th>Actions</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -258,23 +262,25 @@
                         <td>{{ t.phone or '—' }}</td>
                         <td>{{ t.email or '—' }}</td>
                         <td><small class="text-muted">{{ t.joining_date or '—' }}</small></td>
-
-<td>
-    <a href="{{ url_for('edit_teacher', teacher_id=t.id) }}" class="btn btn-sm "
-       style="background-color:#1a4a6f ; border-color: #1a4a6f; color: white; font-weight: 500;">
-        <i class="fas fa-edit"></i> Edit
-    </a>
-
-</td>
+                        {% if session.role in ('admin', 'school_admin') %}
+                        <td>
+                            <a href="{{ url_for('edit_teacher', teacher_id=t.id) }}" class="btn btn-sm "
+                               style="background-color:#1a4a6f ; border-color: #1a4a6f; color: white; font-weight: 500;">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </td>
+                        {% endif %}
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="9" class="text-center py-4">
+                        <td colspan="{% if session.role in ('admin', 'school_admin') %}9{% else %}8{% endif %}" class="text-center py-4">
                             <i class="fas fa-user-graduate empty-state-icon"></i>
                             <div class="empty-state-title">No teachers found</div>
+                            {% if session.role in ('admin', 'school_admin') %}
                             <a href="{{ url_for('add_teacher') }}" class="btn btn-dark btn-sm">
                                 <i class="fas fa-plus"></i> Add First Teacher
                             </a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
