@@ -1642,15 +1642,17 @@ def users():
     conn = get_db()
     c = conn.cursor()
     school_id = get_active_school_id()
-
     c.execute("""
         SELECT u.id, u.username, u.full_name, u.role, u.school_id,
-               s.name AS school_name
+             u.email, u.is_active, u.created_date,
+             s.name AS school_name
         FROM users u
         LEFT JOIN schools s ON u.school_id = s.id
         WHERE u.school_id = %s
         ORDER BY u.role, u.full_name
     """, (school_id,))
+
+
     users_list = fetchall_dict(c)
 
     c.execute("SELECT * FROM roles WHERE school_id = %s ORDER BY name", (school_id,))
