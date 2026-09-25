@@ -1,4 +1,3 @@
-
 """
 models.py - Business Logic Models for School Management System
 Compatible with database.py (Connection Pooling Version)
@@ -20,16 +19,14 @@ from database import get_db, fetchall_dict, fetchone_dict, hash_password
 # ========== AUDIT MIXIN ==========
 class AuditMixin:
 
-
     @staticmethod
     def get_current_user_id():
-                          
         from flask import session
         return session.get('user_id')
 
     @staticmethod
     def add_create_audit(cursor, table_name, record_id):
-      """Sets the create audit fields."""
+        """Sets the create audit fields."""
         user_id = AuditMixin.get_current_user_id()
         if user_id:
             cursor.execute(f"""
@@ -40,7 +37,7 @@ class AuditMixin:
 
     @staticmethod
     def add_update_audit(cursor, table_name, record_id):
-      """Sets the create audit fields."""
+        """Sets the update audit fields."""
         user_id = AuditMixin.get_current_user_id()
         if user_id:
             cursor.execute(f"""
@@ -66,7 +63,7 @@ class School:
 
     @staticmethod
     def get_by_id(school_id):
-       """Fetches the school by ID."""
+        """Fetches the school by ID."""
         conn = get_db()
         c = conn.cursor()
         c.execute("SELECT * FROM schools WHERE id=%s", (school_id,))
@@ -76,7 +73,7 @@ class School:
 
     @staticmethod
     def create(data, logo_file=None):
-     """Create a new school with location details."""
+        """Create a new school with location details."""
         conn = get_db()
         c = conn.cursor()
 
@@ -189,11 +186,14 @@ class Student:
         return students
 
     @staticmethod
-    def get_by_id(student_id):
-        """ID se student fetch karo with all details"""
+    def get_by_id(student_id, school_id=None):
+        """ID se student fetch karo with all details.
+        school_id diya gaya to us school ke bahar ka student kabhi nahi milega
+        (cross-school data leak rokne ke liye)."""
         conn = get_db()
         c = conn.cursor()
-        c.execute("""
+
+        query = """
             SELECT st.*, c.class_name, c.section, s.name AS school_name,
                    u.username, u.email AS user_email,
                    cr.full_name AS created_by_name,
@@ -205,7 +205,14 @@ class Student:
             LEFT JOIN users cr ON st.created_by = cr.id
             LEFT JOIN users up ON st.updated_by = up.id
             WHERE st.id = %s
-        """, (student_id,))
+        """
+        params = [student_id]
+
+        if school_id:
+            query += " AND st.school_id = %s"
+            params.append(school_id)
+
+        c.execute(query, params)
         student = fetchone_dict(c)
         conn.close()
         return student
@@ -301,10 +308,19 @@ class Student:
         return student_id
 
     @staticmethod
-    def update(student_id, data, profile_pic=None):
-        """Student update karo with all fields"""
+    def update(student_id, data, profile_pic=None, school_id=None):
+        """Student update karo with all fields.
+        school_id diya gaya to sirf apni school ke student ko hi update karega."""
         conn = get_db()
         c = conn.cursor()
+
+        # School scoping: agar caller ne school_id diya hai to pehle verify karo
+        # ke ye student usi school ka hai, warna update silently skip karo.
+        if school_id:
+            c.execute("SELECT id FROM students WHERE id=%s AND school_id=%s", (student_id, school_id))
+            if not c.fetchone():
+                conn.close()
+                return False
 
         # Profile picture handle karo
         if profile_pic and profile_pic.filename:
@@ -631,11 +647,13 @@ class Teacher:
         return teachers
 
     @staticmethod
-    def get_by_id(teacher_id):
-        """ID se teacher fetch karo"""
+    def get_by_id(teacher_id, school_id=None):
+        """ID se teacher fetch karo.
+        school_id diya gaya to sirf apni school ka teacher hi milega."""
         conn = get_db()
         c = conn.cursor()
-        c.execute("""
+
+        query = """
             SELECT t.*, s.name AS school_name,
                    cr.full_name AS created_by_name,
                    up.full_name AS updated_by_name
@@ -644,7 +662,14 @@ class Teacher:
             LEFT JOIN users cr ON t.created_by = cr.id
             LEFT JOIN users up ON t.updated_by = up.id
             WHERE t.id = %s
-        """, (teacher_id,))
+        """
+        params = [teacher_id]
+
+        if school_id:
+            query += " AND t.school_id = %s"
+            params.append(school_id)
+
+        c.execute(query, params)
         teacher = fetchone_dict(c)
         conn.close()
         return teacher
@@ -725,10 +750,17 @@ class Teacher:
         return teacher_id
 
     @staticmethod
-    def update(teacher_id, data, profile_pic=None):
-        """Teacher update karo"""
+    def update(teacher_id, data, profile_pic=None, school_id=None):
+        """Teacher update karo.
+        school_id diya gaya to sirf apni school ke teacher ko hi update karega."""
         conn = get_db()
         c = conn.cursor()
+
+        if school_id:
+            c.execute("SELECT id FROM teachers WHERE id=%s AND school_id=%s", (teacher_id, school_id))
+            if not c.fetchone():
+                conn.close()
+                return False
 
         if profile_pic and profile_pic.filename:
             pic_filename = secure_filename(f"teacher_{teacher_id}_{profile_pic.filename}")
@@ -867,11 +899,13 @@ class FeeCollection:
         return fee_id
 
     @staticmethod
-    def get_by_id(fee_id):
-        """Fee receipt details fetch karo"""
+    def get_by_id(fee_id, school_id=None):
+        """Fee receipt details fetch karo.
+        school_id diya gaya to sirf apni school ki receipt hi milegi."""
         conn = get_db()
         c = conn.cursor()
-        c.execute("""
+
+        query = """
             SELECT fc.*, s.full_name AS student_name, s.student_code,
                    c.class_name, c.section, sch.name AS school_name,
                    u.full_name AS collector_name
@@ -881,7 +915,14 @@ class FeeCollection:
             JOIN schools sch ON fc.school_id = sch.id
             JOIN users u ON fc.collected_by = u.id
             WHERE fc.id = %s
-        """, (fee_id,))
+        """
+        params = [fee_id]
+
+        if school_id:
+            query += " AND fc.school_id = %s"
+            params.append(school_id)
+
+        c.execute(query, params)
         receipt = fetchone_dict(c)
         conn.close()
         return receipt
@@ -922,8 +963,9 @@ class FeeCollection:
         return fees
 
     @staticmethod
-    def get_by_student(student_id, month=None, year=None):
-        """Student-wise fee history"""
+    def get_by_student(student_id, month=None, year=None, school_id=None):
+        """Student-wise fee history.
+        school_id diya gaya to sirf apni school ki fee history hi milegi."""
         conn = get_db()
         c = conn.cursor()
 
@@ -935,6 +977,9 @@ class FeeCollection:
         """
         params = [student_id]
 
+        if school_id:
+            query += " AND fc.school_id = %s"
+            params.append(school_id)
         if month:
             query += " AND fc.month = %s"
             params.append(month)
@@ -1004,24 +1049,35 @@ class StudentAttendance:
         return True
 
     @staticmethod
-    def get_by_class(class_id, attendance_date):
-        """Class-wise attendance fetch karo"""
+    def get_by_class(class_id, attendance_date, school_id=None):
+        """Class-wise attendance fetch karo.
+        school_id diya gaya to sirf apni school ki class ka data milega."""
         conn = get_db()
         c = conn.cursor()
-        c.execute("""
+
+        query = """
             SELECT sa.*, s.full_name AS student_name, s.student_code
             FROM student_attendance sa
             JOIN students s ON sa.student_id = s.id
             WHERE sa.class_id=%s AND sa.attendance_date=%s
-            ORDER BY s.full_name
-        """, (class_id, attendance_date))
+        """
+        params = [class_id, attendance_date]
+
+        if school_id:
+            query += " AND sa.school_id = %s"
+            params.append(school_id)
+
+        query += " ORDER BY s.full_name"
+
+        c.execute(query, params)
         attendance = fetchall_dict(c)
         conn.close()
         return attendance
 
     @staticmethod
-    def get_student_report(student_id, month=None, year=None):
-        """Student ka attendance report"""
+    def get_student_report(student_id, month=None, year=None, school_id=None):
+        """Student ka attendance report.
+        school_id diya gaya to sirf apni school ka record hi milega."""
         conn = get_db()
         c = conn.cursor()
 
@@ -1030,6 +1086,10 @@ class StudentAttendance:
             WHERE student_id = %s
         """
         params = [student_id]
+
+        if school_id:
+            query += " AND school_id = %s"
+            params.append(school_id)
 
         if month and year:
             query += " AND EXTRACT(MONTH FROM attendance_date)=%s AND EXTRACT(YEAR FROM attendance_date)=%s"
@@ -1124,8 +1184,9 @@ class TeacherAttendance:
         return attendance
 
     @staticmethod
-    def get_teacher_report(teacher_id, month=None, year=None):
-        """Teacher ka attendance report"""
+    def get_teacher_report(teacher_id, month=None, year=None, school_id=None):
+        """Teacher ka attendance report.
+        school_id diya gaya to sirf apni school ka record hi milega."""
         conn = get_db()
         c = conn.cursor()
 
@@ -1134,6 +1195,10 @@ class TeacherAttendance:
             WHERE teacher_id = %s
         """
         params = [teacher_id]
+
+        if school_id:
+            query += " AND school_id = %s"
+            params.append(school_id)
 
         if month and year:
             query += " AND EXTRACT(MONTH FROM attendance_date)=%s AND EXTRACT(YEAR FROM attendance_date)=%s"
@@ -1149,7 +1214,8 @@ class TeacherAttendance:
         conn.close()
         return attendance
 
-################################################################
+
+# ========== NOTICE MODELS ==========
 class Notice:
     def __init__(self):
         self.id = None
@@ -1161,11 +1227,14 @@ class Notice:
         self.created_by = None
         self.created_date = None
 
+
 class NoticeRecipient:
     def __init__(self):
         self.id = None
         self.notice_id = None
         self.role = None  # 'all', 'student', 'teacher'
+
+
 # ========== CLASS MODEL ==========
 class Class:
     """Class related operations"""
@@ -1197,16 +1266,25 @@ class Class:
         return classes
 
     @staticmethod
-    def get_by_id(class_id):
-        """ID se class fetch karo"""
+    def get_by_id(class_id, school_id=None):
+        """ID se class fetch karo.
+        school_id diya gaya to sirf apni school ki class hi milegi."""
         conn = get_db()
         c = conn.cursor()
-        c.execute("""
+
+        query = """
             SELECT c.*, s.name AS school_name
             FROM classes c
             JOIN schools s ON c.school_id = s.id
             WHERE c.id = %s
-        """, (class_id,))
+        """
+        params = [class_id]
+
+        if school_id:
+            query += " AND c.school_id = %s"
+            params.append(school_id)
+
+        c.execute(query, params)
         class_info = fetchone_dict(c)
         conn.close()
         return class_info
@@ -1247,7 +1325,6 @@ def get_audit_info(table_name, record_id):
         c.execute(f"""
             SELECT 
                 cr.full_name AS created_by_name,
-                crd.full_name AS created_by_name,
                 record.created_date,
                 up.full_name AS updated_by_name,
                 record.updated_date
@@ -1258,7 +1335,7 @@ def get_audit_info(table_name, record_id):
         """, (record_id,))
 
         return fetchone_dict(c)
-    except:
+    except Exception:
         return None
     finally:
         conn.close()
