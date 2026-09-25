@@ -27,27 +27,36 @@ def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'user_id' not in session:
-            flash('Pehle login karein', 'error')
-            return redirect(url_for('login'))
+             flash('Please log in first', 'error')
+             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
+
+
 
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if session.get('role') not in ['super_admin', 'school_admin']:
-            flash(f"DEBUG role: {session.get('role')}", 'error')
-            flash('Sirf Admin access kar sakta hai', 'error')
+        if session.get('role') not in ['admin', 'school_admin']:
+            flash('Only admins can access this', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
-
+def get_effective_school_id(requested_school_id):
+    """
+    Security: sirf super_admin apni marzi se koi bhi school_id pass kar sakta hai.
+    school_admin / teacher hamesha apne hi school tak mehdood rahenge,
+    chahe URL me manually kuch bhi school_id diya jaye.
+    """
+    if session.get('role') == 'admin':
+        return requested_school_id or session.get('active_school_id') or session.get('school_id')
+    return session.get('active_school_id') or session.get('school_id')
   
 def teacher_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if session.get('role') not in ['super_admin', 'school_admin', 'teacher']:
-            flash('Aapko is page ka access nahi hai', 'error')
+        if session.get('role') not in ['admin', 'school_admin', 'teacher']:
+            flash('you cannot access this page', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
@@ -110,10 +119,14 @@ def excel_response(wb, filename):
 def reports_index():
     conn = get_db()
     c    = conn.cursor()
+    role = session.get('role')
     school_id = session.get('active_school_id', session.get('school_id'))
-
-    c.execute("SELECT id, name FROM schools ORDER BY name")
-    schools = fetchall_dict(c)
+    if role == 'admin':
+        c.execute("SELECT id, name FROM schools ORDER BY name")
+        schools = fetchall_dict(c)
+    else:
+        c.execute("SELECT id, name FROM schools WHERE id=%s", (school_id,))
+        schools = fetchall_dict(c)
 
     c.execute("SELECT id, class_name, section FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
     classes = fetchall_dict(c)
@@ -127,6 +140,7 @@ def reports_index():
                            classes=classes,
                            teachers=teachers,
                            school_id=school_id,
+                           role=role,
                            now=datetime.datetime.now())
 
 
@@ -138,7 +152,7 @@ def reports_index():
 @login_required
 @teacher_required
 def export_students():
-    school_id = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
+    school_id = get_effective_school_id(request.args.get('school_id'))
     class_id  = request.args.get('class_id')
     student_id_single = request.args.get('student_id')
 
@@ -149,38 +163,39 @@ def export_students():
     c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
     school_row = c.fetchone()
     school_name = school_row[0] if school_row else "School"
+    role = session.get('role')
+    # Teacher sirf apni assigned classes dekh sakta hai
+    allowed_class_ids = None
+    if role == 'teacher':
+        c.execute("""
+           SELECT tc.class_id
+           FROM teacher_classes tc
+           JOIN teachers t ON tc.teacher_id = t.id
+           WHERE t.user_id = %s AND t.school_id = %s
+        """, (session['user_id'], school_id))
+        allowed_class_ids = [r[0] for r in c.fetchall()]
 
+    query = """
+        SELECT st.*, c.class_name, c.section, s.name AS school_name
+        FROM students st
+        LEFT JOIN classes c ON st.class_id = c.id
+        JOIN schools s ON st.school_id = s.id
+        WHERE st.school_id = %s
+    """
+    params = [school_id]
     if student_id_single:
-        # Single student
-        c.execute("""
-            SELECT st.*, c.class_name, c.section, s.name AS school_name
-            FROM students st
-            LEFT JOIN classes c ON st.class_id = c.id
-            JOIN schools s ON st.school_id = s.id
-            WHERE st.id = %s
-        """, (student_id_single,))
-        students = fetchall_dict(c)
-    elif class_id:
-        c.execute("""
-            SELECT st.*, c.class_name, c.section, s.name AS school_name
-            FROM students st
-            LEFT JOIN classes c ON st.class_id = c.id
-            JOIN schools s ON st.school_id = s.id
-            WHERE st.school_id = %s AND st.class_id = %s
-            ORDER BY st.full_name
-        """, (school_id, class_id))
-        students = fetchall_dict(c)
-    else:
-        c.execute("""
-            SELECT st.*, c.class_name, c.section, s.name AS school_name
-            FROM students st
-            LEFT JOIN classes c ON st.class_id = c.id
-            JOIN schools s ON st.school_id = s.id
-            WHERE st.school_id = %s
-            ORDER BY c.class_name, st.full_name
-        """, (school_id,))
-        students = fetchall_dict(c)
+       query += " AND st.id = %s"
+       params.append(student_id_single)
+    if class_id:
+       query += " AND st.class_id = %s"
+       params.append(class_id)
+    if allowed_class_ids is not None:
+       query += " AND st.class_id = ANY(%s)"
+       params.append(allowed_class_ids)
 
+    query += " ORDER BY c.class_name, st.full_name"
+    c.execute(query, params)
+    students = fetchall_dict(c)
     # Fetch parents & siblings for each student
     all_parents  = {}
     all_siblings = {}
@@ -205,19 +220,19 @@ def export_students():
     ws.title = "Students Summary"
     ws.row_dimensions[1].height = 30
 
-    ws.merge_cells("A1:N1")
+    ws.merge_cells("A1:M1")
     ws["A1"] = f"{school_name} – Student Report"
     ws["A1"].font = TITLE_FONT
     ws["A1"].alignment = CENTER
 
-    ws.merge_cells("A2:N2")
+    ws.merge_cells("A2:M2")
     ws["A2"] = f"Generated: {datetime.datetime.now().strftime('%d-%b-%Y %H:%M')}"
     ws["A2"].font = NORMAL_FONT
     ws["A2"].alignment = CENTER
 
     headers = ["#", "Student Code", "Full Name", "Father Name", "Gender",
                "Date of Birth", "Class", "Section", "Phone", "Email",
-               "City", "Joining Date", "Medical Details", "Address"]
+               "City", "Joining Date", "Address"]
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=4, column=col, value=h)
         style_header(cell)
@@ -238,7 +253,6 @@ def export_students():
             s.get('email', ''),
             s.get('city', ''),
             str(s.get('joining_date', '') or ''),
-            s.get('medical_details', ''),
             f"{s.get('address_line1','')} {s.get('address_line2','')}".strip(),
         ]
         for col, v in enumerate(vals, 1):
@@ -280,7 +294,6 @@ def export_students():
                 ("City",            s.get('city')),
                 ("State",           s.get('state')),
                 ("Postal Code",     s.get('postal_code')),
-                ("Medical Details", s.get('medical_details')),
             ]
             for idx, (lbl, val) in enumerate(fields):
                 add_row(lbl, val, idx + 2, alt=(idx % 2 == 0))
@@ -341,8 +354,7 @@ def export_students():
 @login_required
 @admin_required
 def export_teachers():
-    school_id = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
-
+    school_id = get_effective_school_id(request.args.get('school_id'))
     conn = get_db()
     c    = conn.cursor()
 
@@ -350,17 +362,41 @@ def export_teachers():
     school_row  = c.fetchone()
     school_name = school_row[0] if school_row else "School"
 
-    c.execute("""
-        SELECT t.*,
-               (SELECT STRING_AGG(c.class_name || ' ' || c.section, ', ')
-                FROM teacher_classes tc
-                JOIN classes c ON tc.class_id = c.id
-                WHERE tc.teacher_id = t.id) AS assigned_classes
-        FROM teachers t
-        WHERE t.school_id = %s
-        ORDER BY t.full_name
-    """, (school_id,))
-    teachers = fetchall_dict(c)
+    # Try to pull each teacher's latest month's salary payment from
+    # teacher_salary_payments. If that table doesn't exist yet, fall back
+    # to the plain teacher list (salary column will just be blank).
+    try:
+        c.execute("""
+            SELECT t.*,
+                   (SELECT STRING_AGG(c.class_name || ' ' || c.section, ', ')
+                    FROM teacher_classes tc
+                    JOIN classes c ON tc.class_id = c.id
+                    WHERE tc.teacher_id = t.id) AS assigned_classes,
+                   (SELECT tsp.paid_amount
+                    FROM teacher_salary_payments tsp
+                    WHERE tsp.teacher_id = t.id
+                    ORDER BY tsp.year DESC, tsp.month DESC
+                    LIMIT 1) AS latest_salary
+            FROM teachers t
+            WHERE t.school_id = %s
+            ORDER BY t.full_name
+        """, (school_id,))
+        teachers = fetchall_dict(c)
+    except Exception:
+        conn.rollback()
+        c.execute("""
+            SELECT t.*,
+                   (SELECT STRING_AGG(c.class_name || ' ' || c.section, ', ')
+                    FROM teacher_classes tc
+                    JOIN classes c ON tc.class_id = c.id
+                    WHERE tc.teacher_id = t.id) AS assigned_classes
+            FROM teachers t
+            WHERE t.school_id = %s
+            ORDER BY t.full_name
+        """, (school_id,))
+        teachers = fetchall_dict(c)
+        for t in teachers:
+            t['latest_salary'] = None
 
     # Fetch documents per teacher
     all_docs = {}
@@ -394,6 +430,13 @@ def export_teachers():
     for i, t in enumerate(teachers, 1):
         row = i + 4
         alt = (i % 2 == 0)
+
+        # Prefer this month's/latest salary payment; fall back to the
+        # teacher's base salary column if no payment record exists yet.
+        salary_val = t.get('latest_salary')
+        if salary_val is None:
+            salary_val = t.get('salary', '')
+
         vals = [
             i,
             t.get('teacher_code', ''),
@@ -404,12 +447,15 @@ def export_teachers():
             t.get('qualification', ''),
             t.get('subject_specialization', ''),
             str(t.get('joining_date', '') or ''),
-            t.get('salary', ''),
+            salary_val,
             t.get('address', ''),
             t.get('assigned_classes', ''),
         ]
         for col, v in enumerate(vals, 1):
-            style_cell(ws.cell(row=row, column=col, value=v), alt=alt)
+            cell = ws.cell(row=row, column=col, value=v)
+            style_cell(cell, alt=alt)
+            if col == 10 and v not in ('', None):
+                cell.number_format = '#,##0.00'
 
     auto_col_width(ws)
 
@@ -439,7 +485,7 @@ def export_teachers():
 @login_required
 @admin_required
 def export_fees():
-    school_id = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
+    school_id = get_effective_school_id(request.args.get('school_id'))
     class_id  = request.args.get('class_id')
     month     = request.args.get('month')     # e.g. "5"
     year      = request.args.get('year')      # e.g. "2025"
@@ -560,7 +606,7 @@ def export_fees():
 @login_required
 @admin_required
 def export_salary():
-    school_id  = request.args.get('school_id') or session.get('active_school_id') or session.get('school_id')
+    school_id = get_effective_school_id(request.args.get('school_id'))
     teacher_id = request.args.get('teacher_id')   # optional: specific teacher
     month      = request.args.get('month')         # e.g. "5"
     year       = request.args.get('year')          # e.g. "2025"
@@ -600,6 +646,7 @@ def export_salary():
         mode = "payments"
     except Exception:
         # Fallback: use teachers.salary directly
+        conn.rollback()      # <-- ye add karo
         salary_rows = []
         mode = "base"
 
@@ -686,18 +733,18 @@ def export_salary():
             except Exception:
                 period = f" – {month}/{year}"
 
-        ws.merge_cells("A1:J1")
+        ws.merge_cells("A1:I1")
         ws["A1"] = f"{school_name} – Teacher Salary Payment Report{period}"
         ws["A1"].font  = TITLE_FONT
         ws["A1"].alignment = CENTER
 
-        ws.merge_cells("A2:J2")
+        ws.merge_cells("A2:I2")
         ws["A2"] = f"Generated: {datetime.datetime.now().strftime('%d-%b-%Y %H:%M')}"
         ws["A2"].font  = NORMAL_FONT
         ws["A2"].alignment = CENTER
 
         headers = ["#", "Teacher Code", "Teacher Name", "Specialization",
-                   "Month", "Year", "Base Salary", "Paid Amount",
+                   "Month", "Year", "Paid Amount",
                    "Payment Mode", "Paid By"]
         for col, h in enumerate(headers, 1):
             style_header(ws.cell(row=4, column=col, value=h))
@@ -711,17 +758,17 @@ def export_salary():
             vals = [i, r.get('teacher_code',''), r.get('teacher_name',''),
                     r.get('subject_specialization',''),
                     r.get('month',''), r.get('year',''),
-                    r.get('base_salary',''), paid,
+                    paid,
                     r.get('payment_mode',''), r.get('paid_by_name','')]
             for col, v in enumerate(vals, 1):
-                cell = ws.cell(row=row, column=col, value=v)
+                cell = ws.cell(row=row, column=col, value=v) 
                 style_cell(cell, alt=alt)
-                if col in (7, 8):
+                if col == 7:
                     cell.number_format = '#,##0.00'
 
         total_row = len(salary_rows) + 5
-        ws.cell(row=total_row, column=7, value="TOTAL").font = BOLD_FONT
-        tc = ws.cell(row=total_row, column=8, value=total_paid)
+        ws.cell(row=total_row, column=6, value="TOTAL").font = BOLD_FONT
+        tc = ws.cell(row=total_row, column=7, value=total_paid)
         tc.font = BOLD_FONT
         tc.fill = PatternFill("solid", start_color="FFF2CC")
         tc.number_format = '#,##0.00'

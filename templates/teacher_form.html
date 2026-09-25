@@ -192,8 +192,14 @@ body {
     pointer-events: none;
 }
 
+.input-wrapper textarea ~ i.input-icon {
+    top: 14px;
+    transform: none;
+}
+
 .input-wrapper input,
-.input-wrapper select {
+.input-wrapper select,
+.input-wrapper textarea {
     width: 100%;
     padding: 0.42rem 0.75rem 0.42rem 2rem;
     border: 1.5px solid #e5eaf0;
@@ -204,14 +210,21 @@ body {
     transition: all 0.2s;
 }
 
+.input-wrapper textarea {
+    resize: vertical;
+    min-height: 56px;
+}
+
 .input-wrapper input:focus,
-.input-wrapper select:focus {
+.input-wrapper select:focus,
+.input-wrapper textarea:focus {
     outline: none;
     border-color: #1ca3e0;
     box-shadow: 0 0 0 3px rgba(28, 163, 224, 0.12);
 }
 
-.input-wrapper input::placeholder {
+.input-wrapper input::placeholder,
+.input-wrapper textarea::placeholder {
     color: #b9c2d0;
     font-size: 0.74rem;
 }
@@ -502,6 +515,14 @@ body, .main-content, .container-fluid {
                             </div>
                         </div>
                         <div class="form-group">
+                            <label class="form-label"><i class="fas fa-id-badge"></i> CNIC</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-address-card input-icon"></i>
+                                <input type="text" name="cnic" id="cnic" placeholder="XXXXX-XXXXXXX-X" maxlength="15" oninput="formatCNIC(this)">
+                            </div>
+                            <div class="help-text"><i class="fas fa-info-circle"></i> Format: 35202-1234567-1</div>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label"><i class="fas fa-calendar"></i> Joining Date</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-calendar-alt input-icon"></i>
@@ -520,6 +541,13 @@ body, .main-content, .container-fluid {
                             <div class="input-wrapper">
                                 <i class="fas fa-certificate input-icon"></i>
                                 <input type="text" name="qualification" id="qualification" placeholder="e.g. M.Sc, B.Ed, PhD">
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label"><i class="fas fa-map-marker-alt"></i> Address</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-home input-icon"></i>
+                                <textarea name="address" id="address" rows="2" placeholder="House #, Street, City"></textarea>
                             </div>
                         </div>
                     </div>
@@ -604,6 +632,18 @@ body, .main-content, .container-fluid {
         } else {
             previewCard.style.display = 'none';
         }
+    }
+
+    function formatCNIC(input) {
+        // Digits only, auto-insert dashes as 5-7-1
+        let digits = input.value.replace(/\D/g, '').slice(0, 13);
+        let formatted = digits;
+        if (digits.length > 5 && digits.length <= 12) {
+            formatted = digits.slice(0, 5) + '-' + digits.slice(5);
+        } else if (digits.length > 12) {
+            formatted = digits.slice(0, 5) + '-' + digits.slice(5, 12) + '-' + digits.slice(12);
+        }
+        input.value = formatted;
     }
 
     function checkStrength() {

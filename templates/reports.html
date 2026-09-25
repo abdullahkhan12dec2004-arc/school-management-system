@@ -310,15 +310,20 @@
         <div class="card-body">
           <p class="text-muted small">Complete profile of school students – a single student, entire class, or all students of the school.</p>
 
-          <div class="mb-3">
-            <label class="form-label">School</label>
-            <select class="form-select" id="st_school" onchange="loadClassesForStudents()">
-              <option value="">– Select School –</option>
-              {% for s in schools %}
-              <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+            <div class="mb-3">
+               <label class="form-label">School</label>
+               {% if role == 'super_admin' %}
+               <select class="form-select" id="st_school" onchange="loadClassesForStudents()">
+                  <option value="">– Select School –</option>
+                  {% for s in schools %}
+                  <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+                  {% endfor %}
+               </select>
+               {% else %}
+               <input type="text" class="form-select" value="{{ schools[0].name if schools else '' }}" disabled>
+               <input type="hidden" id="st_school" value="{{ schools[0].id if schools else school_id }}">
+               {% endif %}
+            </div>
 
           <div class="mb-3">
             <label class="form-label">Class (Optional)</label>
@@ -354,15 +359,20 @@
         <div class="card-body">
           <p class="text-muted small">Complete details of all teachers in the school – qualifications, assigned classes, and documents.</p>
 
-          <div class="mb-3">
-            <label class="form-label">School</label>
-            <select class="form-select" id="tc_school">
-              <option value="">– Select School –</option>
-              {% for s in schools %}
-              <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+           <div class="mb-3">
+             <label class="form-label">School</label>
+             {% if role == 'super_admin' %}
+             <select class="form-select" id="tc_school">
+                <option value="">– Select School –</option>
+                {% for s in schools %}
+                <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+             </select>
+             {% else %}
+             <input type="text" class="form-select" value="{{ schools[0].name if schools else '' }}" disabled>
+             <input type="hidden" id="tc_school" value="{{ schools[0].id if schools else school_id }}">
+             {% endif %}
+           </div>  
         </div>
         <div class="card-footer text-end">
           <button class="btn-navy" onclick="downloadReport('teachers')">
@@ -380,16 +390,20 @@
         </div>
         <div class="card-body">
           <p class="text-muted small">Record of collected fees for any month – by school or class.</p>
-
-          <div class="mb-3">
-            <label class="form-label">School</label>
-            <select class="form-select" id="fee_school" onchange="loadClassesForFees()">
-              <option value="">– Select School –</option>
-              {% for s in schools %}
-              <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+            <div class="mb-3">
+                <label class="form-label">School</label>
+                {% if role == 'super_admin' %}
+                <select class="form-select" id="fee_school" onchange="loadClassesForFees()">
+                   <option value="">– Select School –</option>
+                   {% for s in schools %}
+                   <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+                   {% endfor %}
+                </select>
+                {% else %}
+                <input type="text" class="form-select" value="{{ schools[0].name if schools else '' }}" disabled>
+                <input type="hidden" id="fee_school" value="{{ schools[0].id if schools else school_id }}">
+                {% endif %}
+            </div>
 
           <div class="mb-3">
             <label class="form-label">Class (Optional)</label>
@@ -440,15 +454,20 @@
         <div class="card-body">
           <p class="text-muted small">Salary details of school teachers – entire school or a specific teacher, with month/year filter.</p>
 
-          <div class="mb-3">
-            <label class="form-label">School</label>
-            <select class="form-select" id="sal_school" onchange="loadTeachersForSalary()">
-              <option value="">– Select School –</option>
-              {% for s in schools %}
-              <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+            <div class="mb-3">
+                <label class="form-label">School</label>
+                {% if role == 'super_admin' %}
+                <select class="form-select" id="sal_school" onchange="loadTeachersForSalary()">
+                    <option value="">– Select School –</option>
+                    {% for s in schools %}
+                    <option value="{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <input type="text" class="form-select" value="{{ schools[0].name if schools else '' }}" disabled>
+                <input type="hidden" id="sal_school" value="{{ schools[0].id if schools else school_id }}">
+                {% endif %}
+            </div>
 
           <div class="mb-3">
             <label class="form-label">Teacher (Optional)</label>
