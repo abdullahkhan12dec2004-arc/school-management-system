@@ -312,7 +312,7 @@
 
             <div class="mb-3">
                <label class="form-label">School</label>
-               {% if role == 'super_admin' %}
+               {% if role == 'admin' %}
                <select class="form-select" id="st_school" onchange="loadClassesForStudents()">
                   <option value="">– Select School –</option>
                   {% for s in schools %}
@@ -361,7 +361,7 @@
 
            <div class="mb-3">
              <label class="form-label">School</label>
-             {% if role == 'super_admin' %}
+             {% if role == 'admin' %}
              <select class="form-select" id="tc_school">
                 <option value="">– Select School –</option>
                 {% for s in schools %}
@@ -392,7 +392,7 @@
           <p class="text-muted small">Record of collected fees for any month – by school or class.</p>
             <div class="mb-3">
                 <label class="form-label">School</label>
-                {% if role == 'super_admin' %}
+                {% if role == 'admin' %}
                 <select class="form-select" id="fee_school" onchange="loadClassesForFees()">
                    <option value="">– Select School –</option>
                    {% for s in schools %}
@@ -456,11 +456,11 @@
 
             <div class="mb-3">
                 <label class="form-label">School</label>
-                {% if role == 'super_admin' %}
+                {% if role == 'admin' %}
                 <select class="form-select" id="sal_school" onchange="loadTeachersForSalary()">
                     <option value="">– Select School –</option>
                     {% for s in schools %}
-                    <option value="{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+                    <option value="{( s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
                     {% endfor %}
                 </select>
                 {% else %}
