@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 
 from flask import request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from flask import abort
 
@@ -22,11 +23,20 @@ import string
 import requests
 
 
+
+
+def env(key, default=''):
+    return (os.environ.get(key) or default).strip()
+
 app = Flask(__name__)
-app.secret_key = 'school_mgmt_secret_2024'
+app.secret_key = env('SECRET_KEY')
+if not app.secret_key:
+    raise RuntimeError("SECRET_KEY environment variable is not set")
+from flask_wtf import CSRFProtect
+csrf = CSRFProtect(app)    
 app.register_blueprint(reports_bp)
 UPLOAD_FOLDER = 'static/uploads/logos'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def env(key, default=''):
@@ -39,7 +49,9 @@ app.config['MAIL_PASSWORD'] = env('MAIL_PASSWORD').replace(' ', '')
 app.config['MAIL_DEFAULT_SENDER'] = env('MAIL_USERNAME')
 
 mail = Mail(app)
-
+#############################################################################
+PRIVATE_UPLOAD_FOLDER = os.path.join(os.getcwd(), 'private_uploads')
+TEACHER_DOCS_FOLDER = os.path.join(PRIVATE_UPLOAD_FOLDER, 'teacher_docs')
 ###########################################################################################
 def get_active_school_id():
     # Sirf Super Admin school switch kar sakta hai
@@ -170,7 +182,13 @@ def parse_flexible_date(raw_val):
         return None
 
 
+import hmac
 
+def hash_otp(otp: str) -> str:
+    return hmac.new(app.secret_key.encode(), otp.encode(), hashlib.sha256).hexdigest()
+
+def verify_otp_value(entered: str, stored_hash: str) -> bool:
+    return hmac.compare_digest(hash_otp(entered), stored_hash)
 
 
 
@@ -233,8 +251,9 @@ def all_belong_to_school(c, table, ids, school_id=None):
 ###############################################
 
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def allowed_file(filename, extensions=None):
+    extensions = extensions or IMAGE_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in extensions
 
 
 # ========== DECORATORS ==========
@@ -290,11 +309,18 @@ def teacher_required(f):
     return decorated
 
 
-ALLOWED_EXTENSIONS = {'xlsx', 'xls'}
+EXCEL_EXTENSIONS = {'xlsx', 'xls'}
 
 
 def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+    return generate_password_hash(password)
+
+def verify_password(password, stored_hash):
+    if stored_hash and (stored_hash.startswith('pbkdf2:') or stored_hash.startswith('scrypt:')):
+        return check_password_hash(stored_hash, password)
+    # legacy unsalted sha256 fallback
+    legacy = hashlib.sha256(password.encode()).hexdigest()
+    return hmac.compare_digest(legacy, stored_hash or '')    
 
 
 def get_col(row_dict, *keys, default=''):
@@ -555,29 +581,29 @@ def login():
             c = conn.cursor()
             hashed = hash_password(password)
             c.execute("""
-                SELECT
-                      u.id,
-                      u.full_name,
-                      u.school_id,
-                      u.role_id,
-                      COALESCE(r.base_role, u.role) AS role,
-                      s.is_active AS school_active
-                FROM users u
-                LEFT JOIN roles r ON r.id = u.role_id AND r.school_id = u.school_id
-                LEFT JOIN schools s ON s.id = u.school_id
-                WHERE u.username=%s
-                   AND u.password=%s
-                   AND u.is_active=TRUE
-            """, (username, hashed))
-
+                 SELECT
+                     u.id, u.full_name, u.school_id, u.role_id, u.password,
+                     COALESCE(r.base_role, u.role) AS role,
+                     s.is_active AS school_active
+                 FROM users u
+                 LEFT JOIN roles r ON r.id = u.role_id AND r.school_id = u.school_id
+                 LEFT JOIN schools s ON s.id = u.school_id
+                 WHERE u.username=%s AND u.is_active=TRUE
+            """, (username,))
             user = fetchone_dict(c)
 
-            if user:
-                # Admin ke ilawa har user ka active school hona zaroori hai
+            if user and verify_password(password, user['password']):
+                  # legacy hash hai to naye format mein upgrade kar dein
+                if not user['password'].startswith(('pbkdf2:', 'scrypt:')):
+                    c.execute("UPDATE users SET password=%s WHERE id=%s",
+                         (generate_password_hash(password), user['id']))
+                    conn.commit()
+
                 if user['role'] != 'admin':
-                    if not user['school_id'] or not user['school_active']:
-                        flash('Your school account is not active.', 'error')
-                        return render_template('login.html')
+                   if not user['school_id'] or not user['school_active']:
+                       flash('Your school account is not active.', 'error')
+                       return render_template('login.html')
+      
 
                 session.clear()
 
@@ -2182,8 +2208,8 @@ def edit_teacher(teacher_id):
                         cert_filename = secure_filename(
                             f"doc_{teacher_id}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{idx}_{file.filename}"
                         )
-                        os.makedirs('static/uploads/teacher_docs', exist_ok=True)
-                        file.save(os.path.join('static/uploads/teacher_docs', cert_filename))
+                        os.makedirs(TEACHER_DOCS_FOLDER, exist_ok=True)
+                        file.save(os.path.join(TEACHER_DOCS_FOLDER, cert_filename))
                         doc_type = doc_types[idx] if idx < len(doc_types) else 'Document'
                         doc_name = doc_names[idx] if idx < len(doc_names) else file.filename
                         c.execute("""
@@ -2211,8 +2237,38 @@ def edit_teacher(teacher_id):
     conn.close()
     return render_template('teacher_edit.html', teacher=teacher, documents=documents)
 
+#########################################################################################
+@app.route('/teachers/document/<int:doc_id>/view')
+@login_required
+@teacher_required
+def download_teacher_document(doc_id):
+    conn = get_db(); c = conn.cursor()
+    school_id = get_active_school_id()
 
-@app.route('/teachers/document/delete/<int:doc_id>')
+    c.execute("""
+        SELECT d.file_path, d.document_name, t.school_id, t.id as teacher_id, t.user_id
+        FROM teacher_documents d
+        JOIN teachers t ON t.id = d.teacher_id
+        WHERE d.id=%s
+    """, (doc_id,))
+    row = fetchone_dict(c)
+    conn.close()
+
+    if not row or row['school_id'] != school_id:
+        abort(404)
+
+    # Teacher sirf apni khud ki document dekh sake
+    if session['role'] == 'teacher' and row['user_id'] != session['user_id']:
+        abort(403)
+
+    filepath = os.path.join(TEACHER_DOCS_FOLDER, row['file_path'])
+    if not os.path.exists(filepath):
+        abort(404)
+    return send_file(filepath, as_attachment=False, download_name=row['document_name'])
+
+############################################################################################
+
+@app.route('/teachers/document/delete/<int:doc_id>', methods=['POST'])
 @login_required
 @school_admin_only_required
 def delete_teacher_document(doc_id):
@@ -2227,7 +2283,7 @@ def delete_teacher_document(doc_id):
     """, (doc_id, school_id))
     row = c.fetchone()
     if row:
-        filepath = os.path.join('static/uploads/teacher_docs', row[0])
+        filepath = os.path.join(TEACHER_DOCS_FOLDER, row[0])
         if os.path.exists(filepath):
             os.remove(filepath)
         c.execute("DELETE FROM teacher_documents WHERE id=%s", (doc_id,))
@@ -2756,7 +2812,7 @@ def view_notices():
     return render_template('view_notices.html', notices=notices)
 
 
-@app.route('/notices/delete/<int:notice_id>')
+@app.route('/notices/delete/<int:notice_id>', methods=['POST'])
 @login_required
 @school_admin_only_required
 def delete_notice(notice_id):
@@ -2836,7 +2892,7 @@ def school_admin_signup():
                 'admin_phone': admin_phone,
                 'username': username,
                 'password_hash': hash_password(password),
-                'otp': otp,
+                'otp_hash': hash_otp(otp),
                 'otp_expiry': otp_expiry.isoformat(),
                 'otp_attempts': 0,
             }
@@ -2870,6 +2926,10 @@ def verify_otp():
 
     if request.method == 'POST':
         entered_otp = request.form.get('otp', '').strip()
+        if verify_otp_value(entered_otp, pending['otp_hash']):
+            # success block
+        else:
+            pending['otp_attempts'] = pending.get('otp_attempts', 0) + 1
 
         if pending.get('otp_attempts', 0) >= 5:
             flash('Too many incorrect attempts. Please request a new OTP.', 'error')
@@ -2936,7 +2996,7 @@ def resend_otp():
     otp = generate_otp()
     otp_expiry = datetime.datetime.now() + datetime.timedelta(minutes=10)
 
-    pending['otp'] = otp
+    pending['otp_hash'] = hash_otp(otp)
     pending['otp_expiry'] = otp_expiry.isoformat()
     pending['otp_attempts'] = 0
     session['pending_signup'] = pending
@@ -2974,7 +3034,7 @@ def pending_admins():
     return render_template('pending_admins.html', pending_list=pending_list)
 
 
-@app.route('/super/approve_admin/<int:user_id>')
+@app.route('/super/approve_admin/<int:user_id>', methods=['POST'])
 @login_required
 def approve_admin(user_id):
     if session.get('role') != 'admin':
@@ -3008,7 +3068,7 @@ def approve_admin(user_id):
     return redirect(url_for('pending_admins'))
 
 
-@app.route('/super/reject_admin/<int:user_id>')
+@app.route('/super/reject_admin/<int:user_id>', methods=['POST'])
 @login_required
 def reject_admin(user_id):
     if session.get('role') != 'admin':
@@ -3627,7 +3687,7 @@ def review_classes_upload():
 
     return render_template('review_upload.html', records=records, upload_type='classes')
 
-@app.route('/bulk/classes/confirm')
+@app.route('/bulk/classes/confirm', methods=['POST'])
 @login_required
 @school_admin_only_required
 def confirm_classes_upload():
@@ -3668,7 +3728,7 @@ def review_teachers_upload():
 
     return render_template('review_upload.html', records=records, upload_type='teachers')
 
-@app.route('/bulk/teachers/confirm')
+@app.route('/bulk/teachers/confirm', methods=['POST'])
 @login_required
 @school_admin_only_required
 def confirm_teachers_upload():
@@ -3729,7 +3789,7 @@ def review_students_upload():
     return render_template('review_upload.html', records=records, upload_type='students')
 
 
-@app.route('/bulk/students/confirm')
+@app.route('/bulk/students/confirm', methods=['POST'])
 @login_required
 @school_admin_only_required
 def confirm_students_upload():
@@ -4237,4 +4297,5 @@ def pay_salary():
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    debug_mode = env('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(debug=debug_mode, host='0.0.0.0', port=int(env('PORT', '5000')))
