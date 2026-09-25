@@ -4,7 +4,6 @@ School Management System with Role-Based Access
 """
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
-
 from flask import request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
