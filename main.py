@@ -147,7 +147,7 @@ def safe_read_excel(file_storage, header_row_index=2, max_rows=5000, timeout=30)
     finally:
         signal.alarm(0)
         signal.signal(signal.SIGALRM, old_handler)
->>>>>>> e46e676b32b8deccccc7dad38493921ad9d6c2df
+
 
     df = df.dropna(how="all").reset_index(drop=True)
     df = df.dropna(axis=1, how="all")
