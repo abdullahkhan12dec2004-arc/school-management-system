@@ -897,6 +897,18 @@
                                 <div class="help-text"><i class="fas fa-shield-alt"></i> Use at least 6 characters</div>
                                 <div id="strengthContainer"></div>
                             </div>
+                           <div class="form-group full-width">
+                                <label class="form-label"><i class="fas fa-user-shield"></i> Role</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-user-tag input-icon"></i>
+                                    <select name="role_id" style="padding-left: 2.3rem;">
+                                        <option value="">-- Select Role (optional) --</option>
+                                        {% for r in roles %}
+                                        <option value="{{ r.id }}">{{ r.role_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="btn-group">
