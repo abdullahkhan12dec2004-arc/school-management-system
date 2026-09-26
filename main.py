@@ -1675,7 +1675,7 @@ def users():
 
     users_list = fetchall_dict(c)
 
-    c.execute("SELECT * FROM roles WHERE school_id = %s ORDER BY name", (school_id,))
+    c.execute("SELECT * FROM roles WHERE school_id = %s ORDER BY role_name", (school_id,))
     roles = fetchall_dict(c)
 
     conn.close()
