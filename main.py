@@ -497,7 +497,7 @@ def generate_excel_report(records, upload_type):
 #########################################################################################
 @app.route('/roles', methods=['GET', 'POST'])
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def manage_roles():
     school_id = get_active_school_id()
     conn = get_db(); c = conn.cursor()
@@ -1019,6 +1019,8 @@ def add_teacher():
     c = conn.cursor()
     c.execute("SELECT id, name FROM schools WHERE id=%s", (school_id,))
     schools_list = fetchall_dict(c)
+    c.execute("SELECT id, role_name FROM roles WHERE school_id=%s AND base_role='teacher' ORDER BY role_name", (school_id,))
+    teacher_roles = fetchall_dict(c)
 
     if request.method == 'POST':
         full_name = request.form.get('full_name', '').strip()
@@ -1031,6 +1033,11 @@ def add_teacher():
         password = request.form.get('password', '')
         cnic = request.form.get('cnic', '').strip()
         address = request.form.get('address', '').strip()
+        role_id = request.form.get('role_id', type=int)
+        if role_id and not belongs_to_school(c, 'roles', role_id, school_id):
+            flash('Invalid role selected', 'error')
+            conn.close()
+            return render_template('teacher_form.html', schools=schools_list, roles=teacher_roles)
 
         if not full_name or not username or not password:
             flash('Name, username, and password are required', 'error')
@@ -1040,9 +1047,9 @@ def add_teacher():
         try:
             c.execute(
                 """INSERT INTO users
-                   (school_id, username, password, role, full_name, email, phone)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id""",
-                (school_id, username, hash_password(password), 'teacher',
+                   (school_id, username, password, role, role_id, full_name, email, phone)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id""",
+                (school_id, username, hash_password(password), 'teacher', role_id,
                  full_name, email, phone)
             )
             row = c.fetchone()
@@ -1052,7 +1059,7 @@ def add_teacher():
             conn.rollback()
             flash('This username already exists!', 'error')
             conn.close()
-            return render_template('teacher_form.html', schools=schools_list)
+            return render_template('teacher_form.html', schools=schools_list, roles=teacher_roles)
 
         teacher_code = f"TCH-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
         c.execute(
@@ -1069,7 +1076,7 @@ def add_teacher():
         return redirect(url_for('teachers'))
 
     conn.close()
-    return render_template('teacher_form.html', schools=schools_list)
+    return render_template('teacher_form.html', schools=schools_list, roles=teacher_roles)
 
 # ========== STUDENTS (Admin + Teacher) ==========
 @app.route('/students')
@@ -1089,8 +1096,11 @@ def students():
             WHERE st.school_id = %s
             ORDER BY st.full_name
         """, (school_id,))
+    
     else:  # Teacher
-        c.execute("SELECT id FROM teachers WHERE user_id=%s", (session['user_id'],))
+        school_id = get_active_school_id()
+        c.execute("SELECT id FROM teachers WHERE user_id=%s AND school_id=%s",
+                  (session['user_id'], school_id))
         teacher = c.fetchone()
         if teacher:
             c.execute("""
@@ -1099,9 +1109,11 @@ def students():
                 LEFT JOIN classes c ON st.class_id = c.id
                 JOIN schools s ON st.school_id = s.id
                 JOIN teacher_classes tc ON tc.class_id = c.id
-                WHERE tc.teacher_id = %s
+                WHERE tc.teacher_id = %s AND st.school_id = %s
                 ORDER BY st.full_name
-            """, (teacher[0],))
+            """, (teacher[0], school_id))       
+
+
         else:
             students_list = []
             conn.close()
@@ -1126,6 +1138,8 @@ def add_student():
 
     c.execute("SELECT id, full_name, student_code FROM students WHERE school_id=%s ORDER BY full_name", (school_id,))
     all_students = fetchall_dict(c)
+    c.execute("SELECT id, role_name FROM roles WHERE school_id=%s AND base_role='student' ORDER BY role_name", (school_id,))
+    student_roles = fetchall_dict(c)
     conn.close()
 
     if request.method == 'POST':
@@ -1139,7 +1153,7 @@ def add_student():
         joining_date = request.form.get('joining_date', '') or None
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
-
+        role_id = request.form.get('role_id', type=int)
         address_line1 = request.form.get('address_line1', '')
         address_line2 = request.form.get('address_line2', '')
         city = request.form.get('city', '')
@@ -1152,18 +1166,23 @@ def add_student():
             return render_template('student_form.html',
                                    classes=classes_list,
                                    all_students=all_students,
+                                   roles=student_roles,
                                    now=datetime.datetime.now())
 
         conn = get_db()
         c = conn.cursor()
-
+        if role_id and not belongs_to_school(c, 'roles', role_id, school_id):
+            flash('Invalid role selected', 'error')
+            conn.close()
+            return render_template('student_form.html', classes=classes_list, all_students=all_students, roles=student_roles, now=datetime.datetime.now())
         try:
             c.execute("""
                 INSERT INTO users 
-                (school_id, username, password, role, full_name, email, phone)
-                VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id
-            """, (school_id, username, hash_password(password), 'student',
+                (school_id, username, password, role, role_id, full_name, email, phone)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
+            """, (school_id, username, hash_password(password), 'student', role_id,
                   full_name, email, phone))
+
 
             row = c.fetchone()
             user_id = int(row[0])
@@ -1252,6 +1271,7 @@ def add_student():
     return render_template('student_form.html',
                            classes=classes_list,
                            all_students=all_students,
+                           roles=student_roles,
                            now=datetime.datetime.now())
 
 # ========== CLASSES (Admin + Teacher) ==========
@@ -1990,7 +2010,7 @@ def class_students(class_id):
 # ========== STUDENT ENHANCED ROUTES ==========
 @app.route('/students/<int:student_id>/edit', methods=['GET', 'POST'])
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def edit_student(student_id):
     conn = get_db()
     c = conn.cursor()
@@ -2143,7 +2163,7 @@ def edit_student(student_id):
 # ========== TEACHER ENHANCED ROUTES ==========
 @app.route('/teachers/<int:teacher_id>/edit', methods=['GET', 'POST'])
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def edit_teacher(teacher_id):
     conn = get_db()
     c = conn.cursor()
@@ -2303,7 +2323,7 @@ def delete_teacher_document(doc_id):
 # ========== TEACHER ATTENDANCE (Admin only, all schools) ==========
 @app.route('/attendance/teacher', methods=['GET', 'POST'])
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def teacher_attendance():
     school_id = get_active_school_id()
     today = datetime.date.today()
@@ -2336,7 +2356,7 @@ def teacher_attendance():
 
 @app.route('/attendance/teacher/save', methods=['POST'])
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def save_teacher_attendance():
     school_id = get_active_school_id()
     attendance_date = request.form.get('attendance_date')
@@ -2382,7 +2402,7 @@ def save_teacher_attendance():
 # Teacher attendance history / report
 @app.route('/attendance/teacher/report')
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def teacher_attendance_report():
     school_id = get_active_school_id()
     month = request.args.get('month', datetime.date.today().strftime('%Y-%m'))
@@ -2558,7 +2578,7 @@ def save_student_attendance():
 # ========== FEE COLLECTION ROUTE ==========
 @app.route('/fee_collection', methods=['GET', 'POST'])
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def fee_collection():
     school_id = get_active_school_id()
     conn = get_db()
@@ -2597,7 +2617,7 @@ def fee_collection():
 
 @app.route('/fee_collection/save', methods=['POST'])
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def save_fee():
     school_id = get_active_school_id()
     student_id = request.form.get('student_id', type=int)
@@ -3149,6 +3169,8 @@ def add_parent():
         ORDER BY s.full_name
     """, (school_id,))
     students_list = fetchall_dict(c)
+    c.execute("SELECT id, role_name FROM roles WHERE school_id=%s AND base_role='parent' ORDER BY role_name", (school_id,))
+    parent_roles = fetchall_dict(c)
 
     if request.method == 'POST':
         full_name = request.form.get('full_name', '').strip()
@@ -3157,30 +3179,32 @@ def add_parent():
         email = request.form.get('email', '')
         phone = request.form.get('phone', '')
         child_ids = request.form.getlist('child_ids')
-
+        role_id = request.form.get('role_id', type=int)
         if not full_name or not username or not password:
             flash('Naam, username aur password zaruri hain', 'error')
             conn.close()
-            return render_template('parent_form.html', students=students_list)
+            return render_template('parent_form.html', students=students_list, roles=parent_roles)
 
         if not child_ids:
             flash('Please select at least one child', 'error')
             conn.close()
-            return render_template('parent_form.html', students=students_list)
+            return render_template('parent_form.html', students=students_list, roles=parent_roles)
 
         # ⬇️ NAYA: saare bachay isi school ke hone chahiye
         if not all_belong_to_school(c, 'students', child_ids, school_id):
             conn.close()
             flash('Invalid student selection', 'error')
-            return render_template('parent_form.html', students=students_list)
-
-        
+            return render_template('parent_form.html', students=students_list, roles=parent_roles)
+        if role_id and not belongs_to_school(c, 'roles', role_id, school_id):
+            conn.close()
+            flash('Invalid role selected', 'error')
+            return render_template('parent_form.html', students=students_list, roles=parent_roles)          
 
         try:
             c.execute("""
-                INSERT INTO users (school_id, username, password, role, full_name, email, phone, is_active)
-                VALUES (%s, %s, %s, 'parent', %s, %s, %s, TRUE) RETURNING id
-            """, (school_id, username, hash_password(password), full_name, email, phone))
+                INSERT INTO users (school_id, username, password, role, role_id, full_name, email, phone, is_active)
+                VALUES (%s, %s, %s, 'parent', %s, %s, %s, %s, TRUE) RETURNING id
+            """, (school_id, username, hash_password(password), role_id, full_name, email, phone))
             parent_user_id = c.fetchone()[0]
 
             for child_id in child_ids:
@@ -3200,7 +3224,7 @@ def add_parent():
             conn.close()
 
     conn.close()
-    return render_template('parent_form.html', students=students_list)
+    return render_template('parent_form.html', students=students_list, roles=parent_roles)
 
 
 @app.route('/select_child', methods=['GET', 'POST'])
@@ -3322,6 +3346,8 @@ def add_school_admin():
 
     c.execute("SELECT id, name FROM schools WHERE id=%s", (school_id,))
     school = fetchone_dict(c)
+    c.execute("SELECT id, role_name FROM roles WHERE school_id=%s AND base_role='school_admin' ORDER BY role_name", (school_id,))
+    admin_roles = fetchall_dict(c)
 
     if request.method == 'POST':
         full_name = request.form.get('full_name', '').strip()
@@ -3329,7 +3355,7 @@ def add_school_admin():
         password = request.form.get('password', '')
         email = request.form.get('email', '')
         phone = request.form.get('phone', '')
-
+        role_id = request.form.get('role_id', type=int)
         if session.get('role') == 'admin':
             chosen_school_id = request.form.get('school_id', type=int) or school_id
             # ⬇️ NAYA: school sach mein maujood ho
@@ -3337,21 +3363,21 @@ def add_school_admin():
             if not c.fetchone():
                 conn.close()
                 flash('Invalid school', 'error')
-                return render_template('add_school_admin.html', school=school)
+                return render_template('add_school_admin.html', school=school,roles=admin_roles)
         else:
             chosen_school_id = school_id
 
         if not full_name or not username or not password:
             flash('Naam, username or password must be required', 'error')
             conn.close()
-            return render_template('add_school_admin.html', school=school)
+            return render_template('add_school_admin.html', school=school, roles=admin_roles)
 
         try:
             c.execute("""
                 INSERT INTO users
-                  (school_id, username, password, role, full_name, email, phone, is_active)
-                VALUES (%s, %s, %s, 'school_admin', %s, %s, %s, TRUE)
-            """, (chosen_school_id, username, hash_password(password), full_name, email, phone))
+                  (school_id, username, password, role, role_id, full_name, email, phone, is_active)
+                VALUES (%s, %s, %s, 'school_admin', %s, %s, %s, %s, TRUE)
+            """, (chosen_school_id, username, hash_password(password), role_id, full_name, email, phone))
             conn.commit()
             flash(f'School Admin "{full_name}" created successfully! Username: {username}', 'success')
             return redirect(url_for('users'))
@@ -3365,7 +3391,7 @@ def add_school_admin():
             conn.close()
 
     conn.close()
-    return render_template('add_school_admin.html', school=school)
+    return render_template('add_school_admin.html', school=school, roles=admin_roles)
 
 # CLASSES BULK UPLOAD
 @app.route('/bulk/classes', methods=['GET', 'POST'])
@@ -4251,7 +4277,7 @@ def download_students_template():
 
 @app.route('/salary/pay', methods=['GET', 'POST'])
 @login_required
-@school_admin_only_required
+@school_admin_or_super_admin_required
 def pay_salary():
     school_id = get_active_school_id()
     conn = get_db()
