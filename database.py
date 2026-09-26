@@ -433,6 +433,17 @@ def init_db():
             uploaded_by INT,
             uploaded_date TIMESTAMP DEFAULT NOW()
         )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS roles (
+            id SERIAL PRIMARY KEY,
+            school_id INT NOT NULL REFERENCES schools(id),
+            role_name VARCHAR(50) NOT NULL,
+            base_role VARCHAR(50) NOT NULL,
+            created_by INT,
+            created_date TIMESTAMP DEFAULT NOW(),
+            UNIQUE (school_id, role_name)
+        )
         """
     ]
 
