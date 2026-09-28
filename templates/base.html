@@ -364,9 +364,9 @@
 
 
 
-    
 
-        
+
+
         /* ===== MAIN CONTENT ===== */
         .main {
             margin-left: var(--sidebar-w);
@@ -959,6 +959,10 @@
     <a href="{{ url_for('pending_admins') }}" class="nav-item {% if request.endpoint == 'pending_admins' %}active{% endif %}">
         <i class="fas fa-clock"></i> Pending Admins
     </a>
+    <!-- Roles -->
+    <a href="{{ url_for('manage_roles') }}" class="nav-item {% if request.endpoint == 'manage_roles' %}active{% endif %}">
+        <i class="fas fa-user-tag"></i> Roles
+    </a>
 {% endif %}
 
     <!-- ===== SCHOOL ADMIN ===== -->
@@ -972,6 +976,10 @@
         </a>
         <a href=" {{ url_for('edit_school', school_id=session.school_id) }} " class="nav-item {% if request.endpoint == 'edit_school' %}active{% endif %}">
             <i class="fas fa-pen"></i> Edit School
+        </a>
+        <!-- Roles -->
+        <a href="{{ url_for('manage_roles') }}" class="nav-item {% if request.endpoint == 'manage_roles' %}active{% endif %}">
+            <i class="fas fa-user-tag"></i> Roles
         </a>
 
         <div class="nav-section">ACADEMICS</div>
@@ -1029,11 +1037,6 @@
         <a href="{{ url_for('view_notices') }}" class="nav-item {% if request.endpoint == 'view_notices' %}active{% endif %}">
             <i class="fas fa-bell"></i> Notice Board
         </a>
-    {% endif %}
-    {% if session.get('role') in ('admin', 'school_admin') %}
-      <a class="nav-link" href="{{ url_for('manage_roles') }}">
-        <i class="fa fa-user-shield"></i> Roles
-      </a>
     {% endif %}
 
     <!-- ===== TEACHER ===== -->
