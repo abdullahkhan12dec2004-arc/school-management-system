@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Manage Roles{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- Create Role Form -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-header fw-bold">
+          <i class="fa fa-user-shield me-1"></i> Create New Role
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('manage_roles') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-3">
+              <label class="form-label">Role Name <span class="text-danger">*</span></label>
+              <input type="text" name="role_name" class="form-control"
+                     placeholder="e.g. Class Teacher, Guardian" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Role Type <span class="text-danger">*</span></label>
+              <select name="base_role" class="form-select" required>
+                <option value="">-- Select Type --</option>
+                <option value="school_admin">School Admin</option>
+                <option value="teacher">Teacher</option>
+                <option value="student">Student</option>
+                <option value="parent">Parent</option>
+              </select>
+              <div class="form-text">
+                Ye role sirf aapke school ke liye banega, kisi aur school mein use nahi hoga.
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fa fa-save me-1"></i> Create Role
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Existing Roles -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-header fw-bold">
+          <i class="fa fa-list me-1"></i> Roles in This School
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Role Name</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in roles %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>{{ r.role_name }}</td>
+                  <td>
+                    <span class="badge bg-info text-dark">
+                      {{ r.base_role|replace('_', ' ')|title }}
+                    </span>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-4">
+                    Abhi tak koi role nahi bana. Left side se pehla role banayein.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
