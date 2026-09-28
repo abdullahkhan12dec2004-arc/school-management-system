@@ -555,7 +555,8 @@
       {% endif %}
     </div>
 
-    <form method="POST">
+    <form method="POST" action="{{ url_for('select_school') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="schools-grid-modern">
         {% for school in schools %}
         <label class="school-card-modern">
