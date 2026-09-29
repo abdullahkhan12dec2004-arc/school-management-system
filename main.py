@@ -97,7 +97,13 @@ def get_my_teacher_id(c):
     c.execute("SELECT id FROM teachers WHERE user_id=%s", (session['user_id'],))
     r = c.fetchone()
     return r[0] if r else None
-
+def valid_role_for(c, role_id, school_id, base_role):
+    """Role maujood ho, isi school ka ho, aur sahi type ka ho."""
+    if not role_id:
+        return False
+    c.execute("SELECT 1 FROM roles WHERE id=%s AND school_id=%s AND base_role=%s",
+              (role_id, school_id, base_role))
+    return c.fetchone() is not None
 
 def teacher_has_class(c, class_id):
     tid = get_my_teacher_id(c)
@@ -1034,15 +1040,15 @@ def add_teacher():
         cnic = request.form.get('cnic', '').strip()
         address = request.form.get('address', '').strip()
         role_id = request.form.get('role_id', type=int)
-        if role_id and not belongs_to_school(c, 'roles', role_id, school_id):
-            flash('Invalid role selected', 'error')
-            conn.close()
-            return render_template('teacher_form.html', schools=schools_list, roles=teacher_roles)
-
         if not full_name or not username or not password:
-            flash('Name, username, and password are required', 'error')
-            conn.close()
-            return render_template('teacher_form.html', schools=schools_list)
+           flash('Name, username, and password are required', 'error')
+           conn.close()
+           return render_template('teacher_form.html', schools=schools_list, roles=teacher_roles)
+
+        if not valid_role_for(c, role_id, school_id, 'teacher'):
+           flash('Please select a valid Role', 'error')
+           conn.close()
+           return render_template('teacher_form.html', schools=schools_list, roles=teacher_roles)
 
         try:
             c.execute(
@@ -1171,10 +1177,13 @@ def add_student():
 
         conn = get_db()
         c = conn.cursor()
-        if role_id and not belongs_to_school(c, 'roles', role_id, school_id):
-            flash('Invalid role selected', 'error')
-            conn.close()
-            return render_template('student_form.html', classes=classes_list, all_students=all_students, roles=student_roles, now=datetime.datetime.now())
+
+        if not valid_role_for(c, role_id, school_id, 'student'):
+           flash('Please select a valid Role', 'error')
+           conn.close()
+           return render_template('student_form.html', classes=classes_list,
+                           all_students=all_students, roles=student_roles,
+                           now=datetime.datetime.now())
         try:
             c.execute("""
                 INSERT INTO users 
@@ -3201,10 +3210,10 @@ def add_parent():
             conn.close()
             flash('Invalid student selection', 'error')
             return render_template('parent_form.html', students=students_list, roles=parent_roles)
-        if role_id and not belongs_to_school(c, 'roles', role_id, school_id):
-            conn.close()
-            flash('Invalid role selected', 'error')
-            return render_template('parent_form.html', students=students_list, roles=parent_roles)          
+        if not valid_role_for(c, role_id, school_id, 'parent'):
+           conn.close()
+           flash('Please select a valid Role', 'error')
+           return render_template('parent_form.html', students=students_list, roles=parent_roles)        
 
         try:
             c.execute("""
@@ -3377,6 +3386,10 @@ def add_school_admin():
             flash('Naam, username or password must be required', 'error')
             conn.close()
             return render_template('add_school_admin.html', school=school, roles=admin_roles)
+        if not valid_role_for(c, role_id, chosen_school_id, 'school_admin'):
+            conn.close()
+            flash('Please select a valid Role', 'error')
+            return render_template('add_school_admin.html', school=school, roles=admin_roles)    
 
         try:
             c.execute("""
