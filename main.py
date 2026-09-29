@@ -3065,9 +3065,10 @@ def pending_admins():
     return render_template('pending_admins.html', pending_list=pending_list)
 
 
-@app.route('/super/approve_admin/<int:user_id>', methods=['POST'])
+@app.route('/super/approve_admin/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def approve_admin(user_id):
+    ...baaki code same...
     if session.get('role') != 'admin':
         flash('You cannot approve this', 'error')
         return redirect(url_for('dashboard'))
@@ -3077,10 +3078,15 @@ def approve_admin(user_id):
 
     try:
         c.execute("""
-            UPDATE users 
-            SET role = 'school_admin', is_active = TRUE, updated_date = NOW()
-            WHERE id = %s AND role = 'school_admin_pending'
+           UPDATE users 
+           SET role = 'school_admin', is_active = TRUE, updated_date = NOW()
+           WHERE id = %s AND role = 'school_admin_pending'
         """, (user_id,))
+
+        if c.rowcount == 0:
+           conn.rollback()
+           flash('Admin not found or already approved.', 'error')
+           return redirect(url_for('pending_admins'))
 
         c.execute("""
             UPDATE schools 
