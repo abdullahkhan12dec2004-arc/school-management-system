@@ -143,18 +143,23 @@
                                 <td>{{ pending.email or '-' }}</td>
                                 <td>{{ pending.phone or '-' }}</td>
                                 <td class="date-cell">{{ pending.created_date.strftime('%Y-%m-%d') if pending.created_date else '-' }}</td>
-                                <td class="actions-cell">
-                                    <a href="{{ url_for('approve_admin', user_id=pending.user_id) }}"
-                                       class="btn btn-approve"
-                                       onclick="return confirm('Approve this school admin?')">
-                                        Approve
-                                    </a>
-                                    <a href="{{ url_for('reject_admin', user_id=pending.user_id) }}"
-                                       class="btn btn-reject"
-                                       onclick="return confirm('Reject and delete this request?')">
-                                        Reject
-                                    </a>
-                                </td>
+                                  <td class="actions-cell">
+                                    <form method="POST"
+                                         action="{{ url_for('approve_admin', user_id=pending.user_id) }}"
+                                            style="display:inline;"
+                                         onsubmit="return confirm('Approve this school admin?')">
+                                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                         <button type="submit" class="btn btn-approve">Approve</button>
+                                    </form>
+
+                                    <form method="POST"
+                                      action="{{ url_for('reject_admin', user_id=pending.user_id) }}"
+                                       style="display:inline;"
+                                        onsubmit="return confirm('Reject and delete this request?')">
+                                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                           <button type="submit" class="btn btn-reject">Reject</button>
+                                    </form>
+                                   </td>
                             </tr>
                             {% endfor %}
                         </tbody>
