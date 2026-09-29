@@ -3068,7 +3068,7 @@ def pending_admins():
 @app.route('/super/approve_admin/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def approve_admin(user_id):
-    ...baaki code same...
+
     if session.get('role') != 'admin':
         flash('You cannot approve this', 'error')
         return redirect(url_for('dashboard'))
