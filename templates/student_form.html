@@ -897,18 +897,24 @@
                                 <div class="help-text"><i class="fas fa-shield-alt"></i> Use at least 6 characters</div>
                                 <div id="strengthContainer"></div>
                             </div>
-                           <div class="form-group full-width">
-                           <label>Role <span style="color:red">*</span></label>
-                           <select name="role_id" required>
-                            <option value="">-- Select Role --</option>
-                          {% for r in roles %}
-                            <option value="{{ r.id }}">{{ r.role_name }}</option>
-                         {% endfor %}
-                       </select>
-                      {% if not roles %}
-                          <small style="color:red">Pehle <a href="{{ url_for('manage_roles') }}">Roles</a> page se role banayein.</small>
-                      {% endif %}
-                            </div>
+<div class="form-group full-width">
+    <label class="form-label"><i class="fas fa-user-shield"></i> Role <span class="required">*</span></label>
+    <div class="input-wrapper">
+        <i class="fas fa-id-badge input-icon"></i>
+        <select name="role_id" id="roleSelect" required>
+            <option value="">-- Select Role --</option>
+            {% for r in roles %}
+            <option value="{{ r.id }}">{{ r.role_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if not roles %}
+    <div class="help-text" style="color:#e05a5a;">
+        <i class="fas fa-exclamation-circle"></i>
+        Pehle <a href="{{ url_for('manage_roles') }}" style="color:#0ea5e9; font-weight:600;">Roles</a> page se role banayein.
+    </div>
+    {% endif %}
+</div>
                         </div>
 
                         <div class="btn-group">
