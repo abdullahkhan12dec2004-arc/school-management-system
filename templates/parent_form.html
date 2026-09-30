@@ -194,7 +194,30 @@
         border-color: var(--sky);
         box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
     }
+.input-wrapper select {
+    width: 100%;
+    padding: 0.65rem 2.4rem 0.65rem 2.4rem;
+    border: 1.5px solid #e5eaf0;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-family: 'Inter', sans-serif;
+    background: #ffffff;
+    color: #1a2c3e;
+    transition: all 0.2s;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230ea5e9' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+}
 
+.input-wrapper select:focus {
+    outline: none;
+    border-color: var(--sky);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+}
     .input-wrapper input::placeholder {
         color: #b9c2d0;
         font-size: 0.82rem;
@@ -491,18 +514,23 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                           <label>Role <span style="color:red">*</span></label>
-                            <select name="role_id" required>
-                           <option value="">-- Select Role --</option>
-                          {% for r in roles %}
-                            <option value="{{ r.id }}">{{ r.role_name }}</option>
-                          {% endfor %}
-                          </select>
-                        {% if not roles %}
-                             <small style="color:red">Pehle <a href="{{ url_for('manage_roles') }}">Roles</a> page se role banayein.</small>
-                        {% endif %}
-                        </div>
+<div class="form-group" style="margin-top: 1rem; margin-bottom: 0;">
+    <label class="form-label">Role <span class="required">*</span></label>
+    <div class="input-wrapper">
+        <i class="fas fa-user-shield input-icon"></i>
+        <select name="role_id" required>
+            <option value="">-- Select Role --</option>
+            {% for r in roles %}
+                <option value="{{ r.id }}">{{ r.role_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if not roles %}
+        <div class="help-text" style="color:#e05a5a;">
+            Pehle <a href="{{ url_for('manage_roles') }}">Roles</a> page se role banayein.
+        </div>
+    {% endif %}
+</div>
                     </div>
                 </div>
             </div>
