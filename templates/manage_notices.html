@@ -3,11 +3,11 @@
 
 {% block content %}
 <style>
-    :root {
-        --sky-blue: #3b82f6;
-        --sky-blue-dark: #2563eb;
-        --sky-blue-light: #dbeafe;
-    }
+  :root {
+    --sky-blue: #38bdf8;
+    --sky-blue-dark: #0ea5e9;
+    --sky-blue-light: #dbeafe;
+   }
 
     body {
         background-color: #ffffff !important;
@@ -25,10 +25,11 @@
         column-gap: 14px;
         row-gap: 2px;
         align-items: center;
-        background: linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark));
+    
         padding: 1.15rem 1.5rem;
         border-radius: 14px;
-        box-shadow: 0 6px 14px rgba(59, 130, 246, 0.25);
+        background: linear-gradient(135deg, #1d9bf0 0%, #38bdf8 100%);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         margin-bottom: 2rem;
         text-align: left;
     }
@@ -81,9 +82,9 @@
     }
 
     .notice-card .card-header {
-        background: linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark));
-        border: none;
-        padding: 0.9rem 1.1rem;
+      background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+      border: none;
+      padding: 0.9rem 1.1rem;
     }
 
     .notice-card .card-header h5 {
@@ -129,8 +130,8 @@
     .compact-form .form-control:focus,
     .compact-form .form-select:focus {
         border-color: var(--sky-blue);
-        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2);
-    }
+        box-shadow: 0 0 0 0.2rem rgba(56, 189, 248, 0.25);
+   }
 
     .compact-form textarea.form-control {
         font-size: 0.9rem;
