@@ -222,7 +222,15 @@ body {
     border-color: #1ca3e0;
     box-shadow: 0 0 0 3px rgba(28, 163, 224, 0.12);
 }
-
+.input-wrapper select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239aa9bf' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 2rem;
+}
 .input-wrapper input::placeholder,
 .input-wrapper textarea::placeholder {
     color: #b9c2d0;
@@ -581,18 +589,26 @@ body, .main-content, .container-fluid {
                             <div class="help-text"><i class="fas fa-shield-alt"></i> Keep it secure</div>
                             <div id="strengthContainer"></div>
                         </div>
-                         <div class="form-group">
-                            <label>Role <span style="color:red">*</span></label>
-                           <select name="role_id" required>
-                            <option value="">-- Select Role --</option>
-                            {% for r in roles %}
-                               <option value="{{ r.id }}">{{ r.role_name }}</option>
-                           {% endfor %}
-                            </select>
-                       {% if not roles %}
-                               <small style="color:red">Pehle <a href="{{ url_for('manage_roles') }}">Roles</a> page se role banayein.</small>
-                      {% endif %}
-                        </div> 
+<div class="form-group">
+    <label class="form-label"><i class="fas fa-user-shield"></i> Role <span class="required">*</span></label>
+    <div class="input-wrapper">
+        <i class="fas fa-users-cog input-icon"></i>
+        <select name="role_id" id="role" required>
+            <option value="">-- Select Role --</option>
+            {% for r in roles %}
+                <option value="{{ r.id }}">{{ r.role_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if not roles %}
+        <div class="help-text" style="color:#e05a5a;">
+            <i class="fas fa-exclamation-circle"></i>
+            Pehle <a href="{{ url_for('manage_roles') }}" style="color:#1ca3e0;">Roles</a> page se role banayein.
+        </div>
+    {% else %}
+        <div class="help-text"><i class="fas fa-info-circle"></i> Teacher ka access level</div>
+    {% endif %}
+</div>
                     </div>
 
                     <!-- Preview Card -->
