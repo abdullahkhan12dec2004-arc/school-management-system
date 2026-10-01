@@ -104,6 +104,12 @@ def valid_role_for(c, role_id, school_id, base_role):
     c.execute("SELECT 1 FROM roles WHERE id=%s AND school_id=%s AND base_role=%s",
               (role_id, school_id, base_role))
     return c.fetchone() is not None
+    
+def get_roles_for(c, school_id, base_role):
+    c.execute("SELECT id, role_name FROM roles WHERE school_id=%s AND base_role=%s ORDER BY role_name",
+              (school_id, base_role))
+    return fetchall_dict(c)
+    
 
 def teacher_has_class(c, class_id):
     tid = get_my_teacher_id(c)
@@ -123,37 +129,19 @@ def _read_excel_worker(file_bytes, header_row_index, max_rows):
     )
     return df 
 
-def safe_read_excel(file_storage, header_row_index=2, max_rows=5000, timeout=30):
+def safe_read_excel(file_storage, header_row_index=2, max_rows=5000):
     import io
     file_storage.stream.seek(0)
     file_bytes = file_storage.stream.read()
-
-    if len(file_bytes) > 10 * 1024 * 1024:
-        raise ValueError("The Excel file is too large. The maximum allowed file size is 10 MB.")
     if not file_bytes:
         raise ValueError("Uploaded Excel file is empty.")
+    if len(file_bytes) > 10 * 1024 * 1024:
+        raise ValueError("The Excel file is too large. The maximum allowed file size is 10 MB.")
     try:
         df = pd.read_excel(io.BytesIO(file_bytes), engine="openpyxl",
-                            header=header_row_index, nrows=max_rows)
+                           header=header_row_index, nrows=max_rows)
     except Exception as e:
-        raise ValueError(f"Excel file corrupt hai ya read nahi ho saka: {e}")
-    def _handler(signum, frame):
-        raise TimeoutError("The Excel processing timed out.")
-
-    old_handler = signal.signal(signal.SIGALRM, _handler)
-    signal.alarm(timeout)
-    try:
-        df = pd.read_excel(io.BytesIO(file_bytes), engine="openpyxl",
-                            header=header_row_index, nrows=max_rows)
-    except TimeoutError:
-        raise ValueError("Excel processing timed out. The file is too large or complex.")
-    except Exception as e:
-        raise ValueError(f"The Excel file is corrupted or has crashed: {e}")
-    finally:
-        signal.alarm(0)
-        signal.signal(signal.SIGALRM, old_handler)
-
-
+        raise ValueError(f"The Excel file is corrupted or could not be read: {e}")
     df = df.dropna(how="all").reset_index(drop=True)
     df = df.dropna(axis=1, how="all")
     return df
@@ -3477,46 +3465,45 @@ def bulk_upload_classes():
     return render_template('bulk_upload_updated.html', upload_type='classes')
 
 #######################################################################################################
-
-
 @app.route('/bulk/teachers', methods=['GET', 'POST'])
 @login_required
 @school_admin_only_required
 def bulk_upload_teachers():
+    school_id = get_active_school_id()
+
     if request.method == 'POST':
-        import sys
         file = request.files.get('file')
         if not file or not file.filename:
-          flash('Please select an Excel file.', 'error')
-          return redirect(request.url)
-
+            flash('Please select an Excel file.', 'error')
+            return redirect(request.url)
         if not file.filename.lower().endswith(('.xlsx', '.xls')):
-          flash('Please upload an Excel file (.xlsx or .xls).', 'error')
-          return redirect(request.url)
-
-        try:
-           print("DEBUG: before read_excel (isolated)", flush=True)
-           df = safe_read_excel(file, header_row_index=2, max_rows=5000)
-           sys.stderr.write(f"DEBUG: read_excel done, shape={df.shape}\n")
-           sys.stderr.flush()
-        except Exception as e:
-           sys.stderr.write(f"DEBUG: Excel ERROR: {repr(e)}\n")
-           sys.stderr.flush()
-           flash(f'Error reading file: {str(e)}', 'error')
-           return redirect(request.url)
-
-        df.columns = [str(col).strip().rstrip('*').strip() for col in df.columns]
-        sys.stderr.write(f"DEBUG: columns={list(df.columns)}\n"); sys.stderr.flush()
+            flash('Please upload an Excel file (.xlsx or .xls).', 'error')
+            return redirect(request.url)
 
         conn = get_db()
         c = conn.cursor()
-        school_id = get_active_school_id()
+
+        # NEW: role check
+        role_id = request.form.get('role_id', type=int)
+        if not valid_role_for(c, role_id, school_id, 'teacher'):
+            conn.close()
+            flash('Please select a valid Teacher Role', 'error')
+            return redirect(request.url)
+
+        try:
+            df = safe_read_excel(file, header_row_index=2, max_rows=5000)
+        except Exception as e:
+            conn.close()
+            flash(f'Error reading file: {str(e)}', 'error')
+            return redirect(request.url)
+
+        df.columns = [str(col).strip().rstrip('*').strip() for col in df.columns]
+
         c.execute("DELETE FROM staging_teachers WHERE school_id=%s AND uploaded_by=%s",
                   (school_id, session['user_id']))
         valid_count = 0
         invalid_count = 0
         for idx, row in df.iterrows():
-            sys.stderr.write(f"DEBUG: start row {idx}\n"); sys.stderr.flush()
             row_dict = {str(k).strip().rstrip('*').strip(): v for k, v in row.items()}
             if is_row_empty(row_dict):
                 continue
@@ -3525,36 +3512,32 @@ def bulk_upload_teachers():
             password      = get_col(row_dict, 'Password', 'password')
             email         = get_col(row_dict, 'Email', 'email')
             phone         = get_col(row_dict, 'Phone', 'phone')
-            cnic    = get_col(row_dict, 'CNIC', 'cnic')
-            address = get_col(row_dict, 'Address', 'address')
+            cnic          = get_col(row_dict, 'CNIC', 'cnic')
+            address       = get_col(row_dict, 'Address', 'address')
             subject_spec  = get_col(row_dict, 'Subject Specialization', 'subject_specialization')
             qualification = get_col(row_dict, 'Qualification', 'qualification')
             joining_date_raw = (row_dict.get('Joining Date')
-                     or row_dict.get('joining_date')
-                     or row_dict.get('JoiningDate'))
-            sys.stderr.write(f"DEBUG: row {idx} raw joining_date={joining_date_raw!r} type={type(joining_date_raw)}\n"); sys.stderr.flush()
+                                or row_dict.get('joining_date')
+                                or row_dict.get('JoiningDate'))
             joining_date = parse_flexible_date(joining_date_raw)
-            sys.stderr.write(f"DEBUG: row {idx} parsed joining_date={joining_date}\n"); sys.stderr.flush()
 
             errors    = validate_teacher_row(row_dict, conn)
-            sys.stderr.write(f"DEBUG: row {idx} validated, errors={errors}\n"); sys.stderr.flush()
             status    = 'VALID' if not errors else 'INVALID'
             error_msg = '; '.join(errors) if errors else None
             hashed_pwd = hash_password(password) if password else ''
-            sys.stderr.write(f"DEBUG: row {idx} before insert\n"); sys.stderr.flush()
+
             c.execute("""
                 INSERT INTO staging_teachers
                 (school_id, full_name, email, phone, subject_specialization,
                  qualification, joining_date, username, password,
-                 cnic, address,
+                 cnic, address, role_id,
                  validation_status, error_message, uploaded_by)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
                 school_id, full_name, email, phone, subject_spec, qualification,
-                joining_date, username, hashed_pwd, cnic, address,
+                joining_date, username, hashed_pwd, cnic, address, role_id,
                 status, error_msg, session['user_id']
             ))
-            sys.stderr.write(f"DEBUG: row {idx} inserted\n"); sys.stderr.flush()
             if status == 'VALID':
                 valid_count += 1
             else:
@@ -3563,46 +3546,53 @@ def bulk_upload_teachers():
         conn.close()
         flash(f'✅ {valid_count} valid | ❌ {invalid_count} invalid rows found', 'info')
         return redirect(url_for('review_teachers_upload'))
-    return render_template('bulk_upload_updated.html', upload_type='teachers')
+
+    # GET
+    conn = get_db()
+    c = conn.cursor()
+    roles = get_roles_for(c, school_id, 'teacher')
+    conn.close()
+    return render_template('bulk_upload_updated.html', upload_type='teachers', roles=roles)
 
 @app.route('/bulk/students', methods=['GET', 'POST'])
 @login_required
 @school_admin_only_required
 def bulk_upload_students():
+    school_id = get_active_school_id()
 
     if request.method == 'POST':
-
         file = request.files.get('file')
-
         if not file or not file.filename or not file.filename.lower().endswith(('.xlsx', '.xls')):
             flash('Please upload a valid Excel file (.xlsx or .xls)', 'error')
+            return redirect(request.url)
+
+        conn = get_db()
+        c = conn.cursor()
+
+        # NEW: role check
+        role_id = request.form.get('role_id', type=int)
+        if not valid_role_for(c, role_id, school_id, 'student'):
+            conn.close()
+            flash('Please select a valid Student Role', 'error')
             return redirect(request.url)
 
         try:
             df = safe_read_excel(file, header_row_index=2)
         except Exception as e:
+            conn.close()
             flash(f'Error reading file: {str(e)}', 'error')
             return redirect(request.url)
 
         df.columns = [str(col).strip().rstrip('*').strip() for col in df.columns]
 
-        conn = get_db()
-        c = conn.cursor()
-
-        school_id = get_active_school_id()
-
-        c.execute("""
-            DELETE FROM staging_students
-            WHERE school_id=%s AND uploaded_by=%s
-        """, (school_id, session['user_id']))
+        c.execute("DELETE FROM staging_students WHERE school_id=%s AND uploaded_by=%s",
+                  (school_id, session['user_id']))
 
         valid_count = 0
         invalid_count = 0
 
         for idx, row in df.iterrows():
-
             row_dict = {str(k).strip().rstrip('*').strip(): v for k, v in row.items()}
-
             if is_row_empty(row_dict):
                 continue
 
@@ -3614,12 +3604,9 @@ def bulk_upload_students():
             gender       = get_col(row_dict, 'Gender', 'gender')
             username     = get_col(row_dict, 'Username', 'username')
             password     = get_col(row_dict, 'Password', 'password')
-
-            # NEW: Address & City — template ke exact column names
             address_line1 = get_col(row_dict, 'Address', 'address_line1', 'Address Line 1')
             city          = get_col(row_dict, 'City', 'city')
 
-            # DOB — raw value use karo, get_col (jo string bana deta hai) NAHI
             dob_raw = (row_dict.get('Date of Birth')
                        or row_dict.get('date_of_birth')
                        or row_dict.get('DOB'))
@@ -3633,27 +3620,25 @@ def bulk_upload_students():
             if class_id_str:
                 try:
                     class_id_db = int(float(class_id_str))
-                except:
+                except Exception:
                     class_id_db = None
 
             errors = validate_student_row(row_dict, conn, school_id)
-
             status = 'VALID' if not errors else 'INVALID'
             error_msg = '; '.join(errors) if errors else None
-
             hashed_pwd = hash_password(password) if password else ''
 
             c.execute("""
                 INSERT INTO staging_students
                 (school_id, class_id, full_name, father_name, email, phone,
                  date_of_birth, gender, username, password,
-                 address_line1, city, joining_date,
+                 address_line1, city, joining_date, role_id,
                  validation_status, error_message, uploaded_by)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
                 school_id, class_id_db, full_name, father_name, email, phone,
                 dob, gender, username, hashed_pwd, address_line1, city, joining_date,
-                status, error_msg, session['user_id']
+                role_id, status, error_msg, session['user_id']
             ))
 
             if status == 'VALID':
@@ -3663,30 +3648,26 @@ def bulk_upload_students():
 
         conn.commit()
         conn.close()
-
         flash(f'✅ {valid_count} valid | ❌ {invalid_count} invalid rows found', 'info')
         return redirect(url_for('review_students_upload'))
 
+    # GET
     conn = get_db()
     c = conn.cursor()
-
-    school_id = get_active_school_id()
-
-    c.execute("""
-        SELECT id, class_name, section
-        FROM classes
-        WHERE school_id=%s
-        ORDER BY class_name
-    """, (school_id,))
-
+    c.execute("SELECT id, class_name, section FROM classes WHERE school_id=%s ORDER BY class_name",
+              (school_id,))
     classes_list = fetchall_dict(c)
+    roles = get_roles_for(c, school_id, 'student')
     conn.close()
 
-    return render_template(
-        'bulk_upload_updated.html',
-        upload_type='students',
-        classes=classes_list
-    )
+    return render_template('bulk_upload_updated.html',
+                           upload_type='students',
+                           classes=classes_list,
+                           roles=roles)
+
+
+
+
 
 
 @app.route('/bulk/<upload_type>/download_report')
@@ -3784,47 +3765,7 @@ def review_teachers_upload():
 
     return render_template('review_upload.html', records=records, upload_type='teachers')
 
-@app.route('/bulk/teachers/confirm', methods=['POST'])
-@login_required
-@school_admin_only_required
-def confirm_teachers_upload():
-    conn = get_db()
-    c = conn.cursor()
-    school_id = get_active_school_id()
-    c.execute("""
-        SELECT id, username, full_name, email, phone, password,
-               subject_specialization, qualification, joining_date,
-               cnic, address
-        FROM staging_teachers
-        WHERE school_id=%s AND validation_status='VALID' AND uploaded_by=%s
-    """, (school_id, session['user_id']))
-    staging_records = c.fetchall()
 
-    for record in staging_records:
-        (staging_id, username, full_name, email, phone, pwd, subj, qual, joining,
-         cnic, address) = record
-
-        c.execute("""
-            INSERT INTO users (school_id, username, password, role, full_name, email, phone, is_active)
-            VALUES (%s,%s,%s,'teacher',%s,%s,%s,TRUE) RETURNING id
-        """, (school_id, username, pwd, full_name, email, phone))
-        user_id = c.fetchone()[0]
-
-        teacher_code = f"TCH-{staging_id}"
-        c.execute("""
-            INSERT INTO teachers (user_id, school_id, teacher_code, full_name, email, phone,
-                                  subject_specialization, qualification, joining_date,
-                                  cnic, address)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        """, (user_id, school_id, teacher_code, full_name, email, phone, subj, qual, joining,
-              cnic, address))
-
-    c.execute("DELETE FROM staging_teachers WHERE school_id=%s AND uploaded_by=%s",
-              (school_id, session['user_id']))
-    conn.commit()
-    conn.close()
-    flash('Teachers uploaded successfully!', 'success')
-    return redirect(url_for('teachers'))
 
 @app.route('/bulk/students/review')
 @login_required
@@ -3843,8 +3784,58 @@ def review_students_upload():
     conn.close()
 
     return render_template('review_upload.html', records=records, upload_type='students')
+##################################################################################################
+@app.route('/bulk/teachers/confirm', methods=['POST'])
+@login_required
+@school_admin_only_required
+def confirm_teachers_upload():
+    conn = get_db()
+    c = conn.cursor()
+    school_id = get_active_school_id()
+    c.execute("""
+        SELECT id, username, full_name, email, phone, password,
+               subject_specialization, qualification, joining_date,
+               cnic, address, role_id
+        FROM staging_teachers
+        WHERE school_id=%s AND validation_status='VALID' AND uploaded_by=%s
+    """, (school_id, session['user_id']))
+    staging_records = c.fetchall()
 
+    for record in staging_records:
+        (staging_id, username, full_name, email, phone, pwd, subj, qual, joining,
+         cnic, address, role_id) = record
 
+        # NEW: role dobara verify
+        if not valid_role_for(c, role_id, school_id, 'teacher'):
+            conn.rollback()
+            conn.close()
+            flash('Role is invalid. Please upload the file again.', 'error')
+            return redirect(url_for('bulk_upload_teachers'))
+
+        c.execute("""
+            INSERT INTO users (school_id, username, password, role, role_id,
+                               full_name, email, phone, is_active)
+            VALUES (%s,%s,%s,'teacher',%s,%s,%s,%s,TRUE) RETURNING id
+        """, (school_id, username, pwd, role_id, full_name, email, phone))
+        user_id = c.fetchone()[0]
+
+        teacher_code = f"TCH-{staging_id}"
+        c.execute("""
+            INSERT INTO teachers (user_id, school_id, teacher_code, full_name, email, phone,
+                                  subject_specialization, qualification, joining_date,
+                                  cnic, address)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (user_id, school_id, teacher_code, full_name, email, phone, subj, qual, joining,
+              cnic, address))
+
+    c.execute("DELETE FROM staging_teachers WHERE school_id=%s AND uploaded_by=%s",
+              (school_id, session['user_id']))
+    conn.commit()
+    conn.close()
+    flash('Teachers uploaded successfully!', 'success')
+    return redirect(url_for('teachers'))
+
+#####################################################################################################
 @app.route('/bulk/students/confirm', methods=['POST'])
 @login_required
 @school_admin_only_required
@@ -3856,7 +3847,7 @@ def confirm_students_upload():
     c.execute("""
         SELECT id, username, full_name, email, phone, password,
                class_id, father_name, date_of_birth, gender,
-               address_line1, city, joining_date
+               address_line1, city, joining_date, role_id
         FROM staging_students
         WHERE school_id=%s AND validation_status='VALID' AND uploaded_by=%s
     """, (school_id, session['user_id']))
@@ -3864,12 +3855,20 @@ def confirm_students_upload():
 
     for record in staging_records:
         (staging_id, username, full_name, email, phone, pwd, class_id,
-         father, dob, gender, address_line1, city, joining_date) = record
+         father, dob, gender, address_line1, city, joining_date, role_id) = record
+
+        # NEW: role dobara verify
+        if not valid_role_for(c, role_id, school_id, 'student'):
+            conn.rollback()
+            conn.close()
+            flash('Role is invalid. Please upload the file again.', 'error')
+            return redirect(url_for('bulk_upload_students'))
 
         c.execute("""
-            INSERT INTO users (school_id, username, password, role, full_name, email, phone, is_active)
-            VALUES (%s,%s,%s,'student',%s,%s,%s,TRUE) RETURNING id
-        """, (school_id, username, pwd, full_name, email, phone))
+            INSERT INTO users (school_id, username, password, role, role_id,
+                               full_name, email, phone, is_active)
+            VALUES (%s,%s,%s,'student',%s,%s,%s,%s,TRUE) RETURNING id
+        """, (school_id, username, pwd, role_id, full_name, email, phone))
         user_id = c.fetchone()[0]
 
         student_code = f"STD-{staging_id}"
@@ -3887,6 +3886,8 @@ def confirm_students_upload():
     conn.close()
     flash('Students uploaded successfully!', 'success')
     return redirect(url_for('students'))
+
+
 
 
 # ════════════════════════════════════════════════════════════════
