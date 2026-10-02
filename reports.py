@@ -18,7 +18,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 from database import get_db, fetchall_dict, fetchone_dict
-
+import re
 reports_bp = Blueprint('reports', __name__)
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -31,10 +31,8 @@ def login_required(f):
              return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
-
-
-
-def admin_required(f):
+####################################################
+def school_admin_or_super_admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if session.get('role') not in ['admin', 'school_admin']:
@@ -42,16 +40,78 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
-def get_effective_school_id(requested_school_id):
-    """
-    Security: sirf super_admin apni marzi se koi bhi school_id pass kar sakta hai.
-    school_admin / teacher hamesha apne hi school tak mehdood rahenge,
-    chahe URL me manually kuch bhi school_id diya jaye.
-    """
+
+
+def get_effective_school_id(requested_school_id=None):
+    """Sirf super admin school badal sakta hai. Baaqi sab apne school tak."""
     if session.get('role') == 'admin':
-        return requested_school_id or session.get('active_school_id') or session.get('school_id')
-    return session.get('active_school_id') or session.get('school_id')
-  
+        sid = requested_school_id or session.get('active_school_id') or session.get('school_id')
+        try:
+            return int(sid) if sid else None
+        except (TypeError, ValueError):
+            return None
+    return session.get('school_id')
+
+
+def resolve_school(c, requested=None):
+    """(school_id, school_name) lautata hai, ya (None, None) agar school invalid ho."""
+    school_id = get_effective_school_id(requested)
+    if not school_id:
+        return None, None
+    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
+    row = c.fetchone()
+    return (school_id, row[0]) if row else (None, None)
+
+
+REPORT_TABLES = {'classes', 'students', 'teachers'}
+
+def belongs_to_school(c, table, row_id, school_id):
+    if table not in REPORT_TABLES or not row_id:
+        return False
+    c.execute(f"SELECT 1 FROM {table} WHERE id=%s AND school_id=%s", (row_id, school_id))
+    return c.fetchone() is not None
+
+
+def get_teacher_class_ids(c, school_id):
+    c.execute("""
+        SELECT tc.class_id
+        FROM teacher_classes tc
+        JOIN teachers t ON tc.teacher_id = t.id
+        WHERE t.user_id = %s AND t.school_id = %s
+    """, (session['user_id'], school_id))
+    return [r[0] for r in c.fetchall()]
+####################################################
+def make_sheet_title(name, code, used):
+    """
+    Excel-safe aur unique sheet title banata hai.
+    - Excel mein na allowed hain: \\ / * ? : [ ]
+    - Max length 31 characters
+    - Same naam (case-insensitive) dobara nahi chal sakta
+    `used` ek set hai jisme pehle se bane titles (lowercase) hote hain.
+    """
+    # 1) ghalat characters hatao
+    base = re.sub(r"[\\/*?:\[\]]", "", str(name or "")).strip().strip("'")
+    if not base:
+        base = "Student"
+    base = base[:25]
+
+    candidate = base
+
+    # 2) agar already use ho chuka hai, to student code ke aakhri 4 chars lagao
+    if candidate.lower() in used and code:
+        candidate = f"{base} {str(code)[-4:]}"
+
+    # 3) phir bhi same ho to number lagao (2, 3, 4 ...)
+    n = 2
+    while candidate.lower() in used:
+        candidate = f"{base} {n}"
+        n += 1
+
+    used.add(candidate.lower())
+    return candidate[:31]
+
+
+
 def teacher_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -113,35 +173,49 @@ def excel_response(wb, filename):
     )
 
 # ── REPORT PAGES (GET: form, POST: download) ─────────────────────────────────
-
 @reports_bp.route('/reports')
 @login_required
+@teacher_required          # NEW: student/parent ab nahi khol sakte
 def reports_index():
     conn = get_db()
     c    = conn.cursor()
     role = session.get('role')
-    school_id = session.get('active_school_id', session.get('school_id'))
+    school_id = get_effective_school_id()
+
+    if not school_id:
+        conn.close()
+        flash('Please select a school first', 'error')
+        return redirect(url_for('select_school'))
+
     if role == 'admin':
         c.execute("SELECT id, name FROM schools ORDER BY name")
-        schools = fetchall_dict(c)
     else:
         c.execute("SELECT id, name FROM schools WHERE id=%s", (school_id,))
-        schools = fetchall_dict(c)
+    schools = fetchall_dict(c)
 
-    c.execute("SELECT id, class_name, section FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
-    classes = fetchall_dict(c)
-
-    c.execute("SELECT id, full_name FROM teachers WHERE school_id=%s ORDER BY full_name", (school_id,))
-    teachers = fetchall_dict(c)
+    if role == 'teacher':
+        # Teacher sirf apni assigned classes dekhe, aur teachers ki list bilkul nahi
+        c.execute("""
+            SELECT DISTINCT c.id, c.class_name, c.section
+            FROM classes c
+            JOIN teacher_classes tc ON tc.class_id = c.id
+            JOIN teachers t ON t.id = tc.teacher_id
+            WHERE t.user_id=%s AND c.school_id=%s
+            ORDER BY c.class_name
+        """, (session['user_id'], school_id))
+        classes  = fetchall_dict(c)
+        teachers = []
+    else:
+        c.execute("SELECT id, class_name, section FROM classes WHERE school_id=%s ORDER BY class_name", (school_id,))
+        classes = fetchall_dict(c)
+        c.execute("SELECT id, full_name FROM teachers WHERE school_id=%s ORDER BY full_name", (school_id,))
+        teachers = fetchall_dict(c)
 
     conn.close()
-    return render_template('reports.html',
-                           schools=schools,
-                           classes=classes,
-                           teachers=teachers,
-                           school_id=school_id,
-                           role=role,
-                           now=datetime.datetime.now())
+    return render_template('reports.html', schools=schools, classes=classes,
+                           teachers=teachers, school_id=school_id,
+                           role=role, now=datetime.datetime.now())
+
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -152,28 +226,38 @@ def reports_index():
 @login_required
 @teacher_required
 def export_students():
-    school_id = get_effective_school_id(request.args.get('school_id'))
-    class_id  = request.args.get('class_id')
-    student_id_single = request.args.get('student_id')
+    class_id          = request.args.get('class_id', type=int)
+    student_id_single = request.args.get('student_id', type=int)
 
     conn = get_db()
     c    = conn.cursor()
 
-    # School info
-    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
-    school_row = c.fetchone()
-    school_name = school_row[0] if school_row else "School"
+    school_id, school_name = resolve_school(c, request.args.get('school_id'))
+    if not school_id:
+        conn.close()
+        flash('Invalid school', 'error')
+        return redirect(url_for('reports_index'))
+
     role = session.get('role')
-    # Teacher sirf apni assigned classes dekh sakta hai
+
+    if class_id and not belongs_to_school(c, 'classes', class_id, school_id):
+        conn.close()
+        flash('Invalid class', 'error')
+        return redirect(url_for('reports_index'))
+
+    if student_id_single and not belongs_to_school(c, 'students', student_id_single, school_id):
+        conn.close()
+        flash('Invalid student', 'error')
+        return redirect(url_for('reports_index'))
+
     allowed_class_ids = None
     if role == 'teacher':
-        c.execute("""
-           SELECT tc.class_id
-           FROM teacher_classes tc
-           JOIN teachers t ON tc.teacher_id = t.id
-           WHERE t.user_id = %s AND t.school_id = %s
-        """, (session['user_id'], school_id))
-        allowed_class_ids = [r[0] for r in c.fetchall()]
+        allowed_class_ids = get_teacher_class_ids(c, school_id)
+        if class_id and class_id not in allowed_class_ids:
+            conn.close()
+            flash('You can only export your own classes', 'error')
+            return redirect(url_for('reports_index'))
+
 
     query = """
         SELECT st.*, c.class_name, c.section, s.name AS school_name
@@ -263,8 +347,9 @@ def export_students():
 
     # ── Individual Detail Sheets (one per student if single or ≤30) ──────────
     if len(students) <= 30:
+        used_titles = {"students summary"}      # pehli sheet ka naam bhi reserved
         for s in students:
-            title = f"{s.get('full_name','Student')[:25]}"
+            title = make_sheet_title(s.get('full_name'), s.get('student_code'), used_titles)
             ws2 = wb.create_sheet(title=title)
 
             # Title
@@ -352,15 +437,16 @@ def export_students():
 
 @reports_bp.route('/reports/teachers/export')
 @login_required
-@admin_required
+@school_admin_or_super_admin_required
 def export_teachers():
-    school_id = get_effective_school_id(request.args.get('school_id'))
     conn = get_db()
     c    = conn.cursor()
 
-    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
-    school_row  = c.fetchone()
-    school_name = school_row[0] if school_row else "School"
+    school_id, school_name = resolve_school(c, request.args.get('school_id'))
+    if not school_id:
+        conn.close()
+        flash('Invalid school', 'error')
+        return redirect(url_for('reports_index'))
 
     # Try to pull each teacher's latest month's salary payment from
     # teacher_salary_payments. If that table doesn't exist yet, fall back
@@ -483,19 +569,25 @@ def export_teachers():
 
 @reports_bp.route('/reports/fees/export')
 @login_required
-@admin_required
+@school_admin_or_super_admin_required
 def export_fees():
-    school_id = get_effective_school_id(request.args.get('school_id'))
-    class_id  = request.args.get('class_id')
-    month     = request.args.get('month')     # e.g. "5"
-    year      = request.args.get('year')      # e.g. "2025"
+    class_id = request.args.get('class_id', type=int)
+    month    = request.args.get('month', type=int)
+    year     = request.args.get('year', type=int)
 
     conn = get_db()
     c    = conn.cursor()
 
-    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
-    school_row  = c.fetchone()
-    school_name = school_row[0] if school_row else "School"
+    school_id, school_name = resolve_school(c, request.args.get('school_id'))
+    if not school_id:
+        conn.close()
+        flash('Invalid school', 'error')
+        return redirect(url_for('reports_index'))
+
+    if class_id and not belongs_to_school(c, 'classes', class_id, school_id):
+        conn.close()
+        flash('Invalid class', 'error')
+        return redirect(url_for('reports_index'))
 
     query = """
         SELECT fc.*,
@@ -522,11 +614,11 @@ def export_fees():
 
     query += " ORDER BY cl.class_name, s.full_name, fc.year, fc.month"
 
-    print(f"DEBUG school_id={school_id} class_id={class_id} month={month} year={year}")
-    print(f"DEBUG params={params}")
+
+
     c.execute(query, params)
     fees = fetchall_dict(c)
-    print(f"DEBUG fees found={len(fees)}")
+  
     conn.close()
 
     wb = openpyxl.Workbook()
@@ -604,19 +696,25 @@ def export_fees():
 
 @reports_bp.route('/reports/salary/export')
 @login_required
-@admin_required
+@school_admin_or_super_admin_required
 def export_salary():
-    school_id = get_effective_school_id(request.args.get('school_id'))
-    teacher_id = request.args.get('teacher_id')   # optional: specific teacher
-    month      = request.args.get('month')         # e.g. "5"
-    year       = request.args.get('year')          # e.g. "2025"
+    teacher_id = request.args.get('teacher_id', type=int)
+    month      = request.args.get('month', type=int)
+    year       = request.args.get('year', type=int)
 
     conn = get_db()
     c    = conn.cursor()
 
-    c.execute("SELECT name FROM schools WHERE id=%s", (school_id,))
-    school_row  = c.fetchone()
-    school_name = school_row[0] if school_row else "School"
+    school_id, school_name = resolve_school(c, request.args.get('school_id'))
+    if not school_id:
+        conn.close()
+        flash('Invalid school', 'error')
+        return redirect(url_for('reports_index'))
+
+    if teacher_id and not belongs_to_school(c, 'teachers', teacher_id, school_id):
+        conn.close()
+        flash('Invalid teacher', 'error')
+        return redirect(url_for('reports_index'))
 
     # Check if teacher_salary_payments table exists; fall back to teachers.salary
     try:
