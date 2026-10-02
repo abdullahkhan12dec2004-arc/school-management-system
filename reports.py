@@ -187,10 +187,7 @@ def reports_index():
         flash('Please select a school first', 'error')
         return redirect(url_for('select_school'))
 
-    if role == 'admin':
-        c.execute("SELECT id, name FROM schools ORDER BY name")
-    else:
-        c.execute("SELECT id, name FROM schools WHERE id=%s", (school_id,))
+    c.execute("SELECT id, name FROM schools WHERE id=%s", (school_id,))
     schools = fetchall_dict(c)
 
     if role == 'teacher':
@@ -572,7 +569,7 @@ def export_teachers():
 @school_admin_or_super_admin_required
 def export_fees():
     class_id = request.args.get('class_id', type=int)
-    month    = request.args.get('month', type=int)
+    month    = request.args.get('month') or None
     year     = request.args.get('year', type=int)
 
     conn = get_db()
