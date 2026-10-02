@@ -349,7 +349,7 @@
         </div>
       </div>
     </div>
-
+{% if role in ('admin', 'school_admin') %}
     <!-- REPORT 2: Teachers -->
     <div class="col-md-6">
       <div class="card h-100">
@@ -460,7 +460,7 @@
                 <select class="form-select" id="sal_school" onchange="loadTeachersForSalary()">
                     <option value="">– Select School –</option>
                     {% for s in schools %}
-                    <option value="{( s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
+                    <option value="{{ s.id }}" {% if s.id == school_id %}selected{% endif %}>{{ s.name }}</option>
                     {% endfor %}
                 </select>
                 {% else %}
@@ -507,6 +507,7 @@
         </div>
       </div>
     </div>
+{% endif %}            
   </div>
 </div>
 
@@ -595,6 +596,8 @@ function loadTeachersForSalary() {
 document.getElementById('st_class').addEventListener('change', function() {
   const classId = this.value;
   const schoolId = document.getElementById('st_school').value;
+  const stSel = document.getElementById('st_student');
+  stSel.innerHTML = '<option value="">– All Students –</option>';
   if (!classId || !schoolId) return;
   fetch(`/get_students/${classId}`)
     .then(r => r.json())
