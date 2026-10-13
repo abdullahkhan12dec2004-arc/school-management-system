@@ -3,51 +3,162 @@
 
 {% block extra_css %}
 <style>
-    /* Custom table styles with borders */
-    .table-bordered-custom {
-        width: 100%;
-        border-collapse: collapse;
+    /* ===== Custom Table Card (no Bootstrap) ===== */
+.tbl-card {
+    margin-top: 28px;
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;              /* corners clip ho jayen */
+    box-shadow: 0 6px 18px rgba(14, 165, 233, 0.15);
+}
+.tbl-card-header {
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.tbl-card-header h5 {
+    margin: 0;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.total-badge {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 12.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tbl-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    color: #475569;
+}
+
+/* Header: blue cells + white separators */
+.tbl thead th {
+    background: #0ea5e9;
+    color: #ffffff;
+    padding: 14px 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-top: none;
+    white-space: nowrap;
+}
+
+/* Body: light blue-grey grid border (same as picture) */
+.tbl tbody td {
+    padding: 14px 12px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+.tbl tbody tr:hover td {
+    background: #f0f9ff;
+}
+
+/* First column (#) grey like the ID column in picture */
+.tbl tbody td:first-child {
+    background: #f1f5f9;
+    color: #64748b;
+    font-weight: 600;
+    text-align: center;
+    width: 50px;
+}
+.tbl tbody tr:hover td:first-child {
+    background: #e0f2fe;
+}
+
+.tbl .t-code {
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0ea5e9;
+}
+.tbl .t-name {
+    font-weight: 600;
+    color: #1e293b;
+}
+.tbl .t-muted {
+    font-size: 12.5px;
+    color: #94a3b8;
+}
+
+/* Buttons */
+.btn-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #1a4a6f;
+    color: #ffffff;
+    border: 1px solid #1a4a6f;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+.btn-edit:hover {
+    background: #12354f;
+    color: #ffffff;
+}
+.btn-add-first {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #212529;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+/* Empty state */
+.tbl-empty {
+    text-align: center;
+    padding: 32px 12px !important;
+}
+.empty-state-icon {
+    color: #c9a227;
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+.empty-state-title {
+    font-weight: 700;
+    color: #334155;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+    .tbl-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
-    .table-bordered-custom th,
-    .table-bordered-custom td {
-        border: 1px solid #dee2e6 !important;
-        padding: 12px;
-        vertical-align: middle;
-    }
-    .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #7dd3fc, #38bdf8);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.35) !important;
-        border-top: none !important;
-        font-weight: 600;
-        font-size: 12.5px;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-    }
-    .table-bordered-custom thead tr:first-child th {
-        border-top: none !important;
-    }
-    .table-bordered-custom tbody tr:nth-child(even) {
-        background-color: #f8fafc;
-    }
-    .table-bordered-custom tbody tr:hover {
-        background-color: #e0f2fe;
-    }
-    .table-bordered-custom td:first-child {
-        font-weight: 600;
-        color: #0ea5e9;
-        text-align: center;
-        width: 50px;
-    }
-    .badge-code {
-        background: transparent;
-        color: #0ea5e9;
-        font-family: monospace;
-        font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-weight: 700;
-    }
+}
+
     .dashboard-container {
         background-color: #ffffff !important;
     }
@@ -115,39 +226,7 @@
         color: #ffffff;
     }
 
-    /* ===== NEW: rounded table card, no white border showing at corners ===== */
-    .table-card.card {
-        margin-top: 28px;
-        border-radius: 14px !important;
-        overflow: hidden;
-        border: none;
-        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.15);
-    }
-    .table-card .card-body,
-    .table-card .table-responsive {
-        border-radius: 0 !important;
-    }
 
-    /* Blue header bar inside the card, like the reference image */
-    .table-card-header {
-        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-        padding: 16px 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .table-card-header h5 {
-        margin: 0;
-        color: #ffffff;
-        font-weight: 700;
-        font-size: 1.05rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .table-card-header h5 i {
-        font-size: 1rem;
-    }
     .total-badge {
         background: rgba(255, 255, 255, 0.22);
         color: #ffffff;
@@ -226,67 +305,65 @@
         {% endif %}
     </div>
 </div>
-
-
-<div class="card border-0 shadow-sm table-card">
-    <div class="table-card-header">
+<div class="tbl-card">
+    <div class="tbl-card-header">
         <h5><i class="fas fa-list-ul"></i> Teachers List</h5>
         <span class="total-badge"><i class="fas fa-chalkboard-teacher"></i> Total: {{ teachers|length }}</span>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table-bordered-custom">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Code</th>
-                        <th>Full Name</th>
-                        <th>Specialization</th>
-                        <th>Qualification</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Joining Date</th>
+
+    <div class="tbl-scroll">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Code</th>
+                    <th>Full Name</th>
+                    <th>Specialization</th>
+                    <th>Qualification</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Joining Date</th>
+                    {% if session.role in ('admin', 'school_admin') %}
+                    <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in teachers %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><span class="t-code">{{ t.teacher_code }}</span></td>
+                    <td class="t-name">{{ t.full_name }}</td>
+                    <td>{{ t.subject_specialization or '—' }}</td>
+                    <td>{{ t.qualification or '—' }}</td>
+                    <td>{{ t.phone or '—' }}</td>
+                    <td>{{ t.email or '—' }}</td>
+                    <td><span class="t-muted">{{ t.joining_date or '—' }}</span></td>
+                    {% if session.role in ('admin', 'school_admin') %}
+                    <td>
+                        <a href="{{ url_for('edit_teacher', teacher_id=t.id) }}" class="btn-edit">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="{% if session.role in ('admin', 'school_admin') %}9{% else %}8{% endif %}" class="tbl-empty">
+                        <i class="fas fa-user-graduate empty-state-icon"></i>
+                        <div class="empty-state-title">No teachers found</div>
                         {% if session.role in ('admin', 'school_admin') %}
-                        <th>Actions</th>
+                        <a href="{{ url_for('add_teacher') }}" class="btn-add-first">
+                            <i class="fas fa-plus"></i> Add First Teacher
+                        </a>
                         {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for t in teachers %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td><span class="badge-code">{{ t.teacher_code }}</span></td>
-                        <td class="fw-semibold">{{ t.full_name }}</td>
-                        <td>{{ t.subject_specialization or '—' }}</td>
-                        <td>{{ t.qualification or '—' }}</td>
-                        <td>{{ t.phone or '—' }}</td>
-                        <td>{{ t.email or '—' }}</td>
-                        <td><small class="text-muted">{{ t.joining_date or '—' }}</small></td>
-                        {% if session.role in ('admin', 'school_admin') %}
-                        <td>
-                            <a href="{{ url_for('edit_teacher', teacher_id=t.id) }}" class="btn btn-sm "
-                               style="background-color:#1a4a6f ; border-color: #1a4a6f; color: white; font-weight: 500;">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                        </td>
-                        {% endif %}
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="{% if session.role in ('admin', 'school_admin') %}9{% else %}8{% endif %}" class="text-center py-4">
-                            <i class="fas fa-user-graduate empty-state-icon"></i>
-                            <div class="empty-state-title">No teachers found</div>
-                            {% if session.role in ('admin', 'school_admin') %}
-                            <a href="{{ url_for('add_teacher') }}" class="btn btn-dark btn-sm">
-                                <i class="fas fa-plus"></i> Add First Teacher
-                            </a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
+
+
 {% endblock %}
