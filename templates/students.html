@@ -182,56 +182,199 @@
             gap: 8px;
         }
     }
+/* ===== TABLE CARD (Users page jaisa) ===== */
+.data-card {
+    background: #ffffff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
 
-    /* ===== TABLE CARD (user.html jaisa rounded card) ===== */
-    .students-table-card {
-        margin-top: 0;
-        border-radius: var(--radius-2xl);
-        border: 1px solid var(--gray-200);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-    }
+/* Card ka blue top bar */
+.data-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    color: #ffffff;
+}
 
-    .table-bordered-custom {
-        width: 100%;
-        border-collapse: collapse;
-    }
+.data-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+}
 
-    .table-bordered-custom th,
-    .table-bordered-custom td {
-        border: 1px solid var(--gray-200) !important;
-        padding: 12px;
-        vertical-align: middle;
-    }
+.total-pill {
+    background: #ffffff;
+    color: var(--gray-800);
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
 
-    .table-bordered-custom thead th {
-        background: linear-gradient(135deg, var(--sky-blue) 0%, var(--sky-blue-dark) 100%);
-        color: #ffffff;
-        border: 1px solid var(--sky-blue-dark) !important;
-        font-weight: 700;
+.total-pill i {
+    color: var(--gray-500);
+    margin-right: 4px;
+}
+
+/* Table */
+.data-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+
+.data-table thead th {
+    background: #0ea5e9;
+    color: #ffffff;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 14px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    white-space: nowrap;
+}
+
+.data-table tbody td {
+    padding: 14px 12px;
+    vertical-align: middle;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-800);
+    font-size: 14px;
+    background: #ffffff;
+}
+
+.data-table tbody tr:hover td {
+    background: var(--gray-50);
+}
+
+.data-table td.col-index {
+    width: 60px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--gray-500);
+}
+
+.data-table td.col-actions {
+    width: 180px;
+    text-align: center;
+}
+
+.cell-muted {
+    color: var(--gray-400);
+}
+
+.name-cell {
+    font-weight: 600;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 48px 12px !important;
+}
+
+.empty-state i.big {
+    font-size: 3rem;
+    color: var(--gray-400);
+    display: block;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    margin: 0 0 14px;
+    color: var(--gray-500);
+}
+
+/* Action buttons (custom, bootstrap nahi) */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.action-btn.edit {
+    background: #f59e0b;
+}
+
+.action-btn.edit:hover {
+    background: #d97706;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.action-btn.result {
+    background: var(--primary-dark);
+}
+
+.action-btn.result:hover {
+    background: var(--primary);
+    box-shadow: 0 2px 8px rgba(26, 74, 111, 0.3);
+}
+
+.action-btn.primary {
+    background: var(--sky-blue-dark);
+}
+
+@media (max-width: 768px) {
+    .data-table thead th,
+    .data-table tbody td {
+        padding: 8px;
         font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
     }
 
-    .table-bordered-custom tbody tr {
-        transition: background 0.2s ease;
+    .action-buttons {
+        flex-direction: column;
+        gap: 5px;
     }
 
-    .table-bordered-custom tbody tr:nth-child(even) {
-        background-color: var(--gray-50);
+    .action-btn {
+        padding: 3px 8px;
+        font-size: 10px;
     }
 
-    .table-bordered-custom tbody tr:hover {
-        background-color: var(--gray-50);
+    .data-card-header {
+        padding: 12px 16px;
     }
+}
 
-    .table-bordered-custom td:first-child {
-        font-weight: 700;
-        color: var(--secondary);
-        text-align: center;
-        width: 50px;
-    }
 
     /* Student Code Badge */
     .student-code-badge {
@@ -277,25 +420,7 @@
     }
 
     /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .btn-sm {
-        padding: 5px 12px;
-        font-size: 12px;
-        border-radius: 6px;
-        transition: all 0.2s ease;
-    }
-
-    .btn-edit {
-        background: #f59e0b;
-        color: white;
-        border: none;
-    }
+ 
 
     .btn-edit:hover {
         background: #d97706;
@@ -303,11 +428,7 @@
         box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
     }
 
-    .btn-result {
-        background: var(--primary-dark);
-        color: white;
-        border: none;
-    }
+
 
     .btn-result:hover {
         background: var(--primary);
@@ -396,91 +517,92 @@
 {% endif %}
 
 <!-- Students Table Card -->
-<div class="card shadow-sm students-table-card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table-bordered-custom">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">#</th>
-                        <th>Student Code</th>
-                        <th>Full Name</th>
-                        <th>Father Name</th>
-                        <th>Class</th>
-                        <th>Gender</th>
-                        <th>Phone</th>
-                        <th style="width: 180px;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for s in students %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td><span class="student-code-badge">{{ s.student_code }}</span></td>
-                        <td class="fw-semibold">
-                            <i class="fas fa-user" style="color: #c6a43b; font-size: 12px;"></i>
-                            {{ s.full_name }}
-                        </td>
-                        <td>
-                            <i class="fas fa-user-friends" style="color: #64748b; font-size: 11px;"></i>
-                            {{ s.father_name or '—' }}
-                        </td>
-                        <td>
-                            {% if s.class_name %}
-                            <span class="class-badge">
-                                <i class="fas fa-door-open"></i>
-                                {{ s.class_name }}{% if s.section %} - {{ s.section }}{% endif %}
-                            </span>
-                            {% else %}
-                            <span class="text-muted">—</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if s.gender == 'Male' %}
-                            <span class="gender-male">
-                                <i class="fas fa-mars"></i> Male
-                            </span>
-                            {% elif s.gender == 'Female' %}
-                            <span class="gender-female">
-                                <i class="fas fa-venus"></i> Female
-                            </span>
-                            {% else %}
-                            <span class="text-muted">{{ s.gender or '—' }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <i class="fas fa-phone" style="color: #64748b; font-size: 11px;"></i>
-                            {{ s.phone or '—' }}
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="{{ url_for('edit_student', student_id=s.id) }}"
-                                   class="btn btn-sm btn-edit"
-                                   title="Edit Student">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <a href="{{ url_for('result_card', student_id=s.id) }}"
-                                   class="btn btn-sm btn-result"
-                                   title="View Result Card">
-                                    <i class="fas fa-file-alt"></i> Result
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <i class="fas fa-user-graduate fa-3x text-muted mb-3 d-block"></i>
-                            <p class="text-muted mb-0">No students found</p>
-                            <a href="{{ url_for('add_student') }}" class="btn btn-sm btn-primary mt-3">
-                                <i class="fas fa-plus"></i> Add First Student
+<div class="data-card">
+    <div class="data-card-header">
+        <h3 class="data-card-title">
+            <i class="fas fa-list-ul"></i> Students List
+        </h3>
+        <span class="total-pill">
+            <i class="fas fa-users"></i> Total: {{ students|length }}
+        </span>
+    </div>
+
+    <div class="data-table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student Code</th>
+                    <th>Full Name</th>
+                    <th>Father Name</th>
+                    <th>Class</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td class="col-index">{{ loop.index }}</td>
+                    <td><span class="student-code-badge">{{ s.student_code }}</span></td>
+                    <td class="name-cell">
+                        <i class="fas fa-user" style="color: #c6a43b; font-size: 12px;"></i>
+                        {{ s.full_name }}
+                    </td>
+                    <td>
+                        <i class="fas fa-user-friends" style="color: #64748b; font-size: 11px;"></i>
+                        {{ s.father_name or '—' }}
+                    </td>
+                    <td>
+                        {% if s.class_name %}
+                        <span class="class-badge">
+                            <i class="fas fa-door-open"></i>
+                            {{ s.class_name }}{% if s.section %} - {{ s.section }}{% endif %}
+                        </span>
+                        {% else %}
+                        <span class="cell-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if s.gender == 'Male' %}
+                        <span class="gender-male"><i class="fas fa-mars"></i> Male</span>
+                        {% elif s.gender == 'Female' %}
+                        <span class="gender-female"><i class="fas fa-venus"></i> Female</span>
+                        {% else %}
+                        <span class="cell-muted">{{ s.gender or '—' }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <i class="fas fa-phone" style="color: #64748b; font-size: 11px;"></i>
+                        {{ s.phone or '—' }}
+                    </td>
+                    <td class="col-actions">
+                        <div class="action-buttons">
+                            <a href="{{ url_for('edit_student', student_id=s.id) }}"
+                               class="action-btn edit" title="Edit Student">
+                                <i class="fas fa-edit"></i> Edit
                             </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                            <a href="{{ url_for('result_card', student_id=s.id) }}"
+                               class="action-btn result" title="View Result Card">
+                                <i class="fas fa-file-alt"></i> Result
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        <i class="fas fa-user-graduate big"></i>
+                        <p>No students found</p>
+                        <a href="{{ url_for('add_student') }}" class="action-btn primary">
+                            <i class="fas fa-plus"></i> Add First Student
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
