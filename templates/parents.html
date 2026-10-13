@@ -9,45 +9,235 @@
         background-color: #ffffff !important;
     }
 
-    /* Custom table styles with borders */
-    .table-bordered-custom {
+    /* ================= CUSTOM TABLE CARD (no bootstrap) ================= */
+    .pl-card {
+        background: #ffffff;
+        border: 1px solid #e3e9f0;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 14px rgba(15, 43, 61, 0.06);
+    }
+
+    /* Blue top bar (like "System Users List") */
+    .pl-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+        color: #ffffff;
+    }
+
+    .pl-card-header .pl-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pl-total-pill {
+        background: #ffffff;
+        color: #1a4a6f;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .pl-total-pill i {
+        color: #0ea5e9;
+    }
+
+    .pl-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Table with borders on every cell */
+    .pl-table {
         width: 100%;
         border-collapse: collapse;
+        background: #ffffff;
+        font-size: 13.5px;
     }
 
-    .table-bordered-custom th,
-    .table-bordered-custom td {
-        border: 1px solid #dee2e6 !important;
-        padding: 12px 16px;
+    .pl-table th,
+    .pl-table td {
+        border: 1px solid #e3e9f0;
+        padding: 14px 16px;
         vertical-align: middle;
-    }
-
-    .table-bordered-custom thead th {
-        background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
-        color: white;
-        border: 1px solid #38bdf8 !important;
-        font-weight: 600;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .table-bordered-custom tbody tr:nth-child(even) {
-        background-color: #f8fafc;
-    }
-
-    .table-bordered-custom tbody tr:hover {
-        background-color: #e8f1f8;
-    }
-
-    .table-bordered-custom td:first-child {
-        font-weight: 700;
-        color: #c6a43b;
         text-align: center;
-        width: 50px;
     }
 
-    /* Search bar styles */
+    /* Header row */
+    .pl-table thead th {
+        background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        white-space: nowrap;
+    }
+
+    /* Rows */
+    .pl-table tbody tr {
+        background: #ffffff;
+        transition: background 0.15s;
+    }
+
+    .pl-table tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+
+    .pl-table tbody tr:hover {
+        background: #eef6fc;
+    }
+
+    /* # column */
+    .pl-table td.pl-id {
+        width: 60px;
+        font-weight: 700;
+        color: #5b6b7f;
+        font-family: 'Courier New', monospace;
+    }
+
+    /* Name cell with avatar */
+    .pl-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-align: left;
+    }
+
+    .pl-avatar {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 50%;
+        background: #245a8a;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pl-user-name {
+        font-weight: 700;
+        font-size: 14.5px;
+        color: #1a2c3e;
+        line-height: 1.2;
+    }
+
+    /* Username (monospace like the picture) */
+    .pl-username {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        font-weight: 600;
+        color: #1a2c3e;
+    }
+
+    .pl-muted {
+        color: #9aa9bf;
+    }
+
+    .pl-contact i {
+        font-size: 0.75rem;
+        color: #9aa9bf;
+        margin-right: 4px;
+    }
+
+    /* Children count pill */
+    .pl-child-pill {
+        background: #e8f1f8;
+        color: #1a4a6f;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    /* Status pills */
+    .pl-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 600;
+    }
+
+    .pl-status::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .pl-status.active {
+        background: #d9f7e8;
+        color: #12a15c;
+    }
+
+    .pl-status.inactive {
+        background: #fde4e4;
+        color: #d93535;
+    }
+
+    /* Action buttons */
+    .pl-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 6px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #ffffff;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .pl-btn.danger { background: #ef4444; }
+    .pl-btn.danger:hover { background: #dc2626; color: #fff; }
+    .pl-btn.success { background: #0ea5e9; }
+    .pl-btn.success:hover { background: #0284c7; color: #fff; }
+
+    /* Empty state */
+    .pl-empty {
+        text-align: center;
+        padding: 48px 16px;
+    }
+
+    .pl-empty i {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 14px;
+    }
+
+    .pl-empty h5 {
+        color: #6b7a8d;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .pl-empty p {
+        color: #8a97a8;
+        margin-bottom: 20px;
+    }
+
+    /* ================= SEARCH BAR ================= */
     .search-wrapper {
         position: relative;
         max-width: 380px;
@@ -77,27 +267,7 @@
         box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.08);
     }
 
-    .username-badge {
-        background: #0f2b3d;
-        color: #e0c87c;
-        font-family: monospace;
-        font-size: 11.5px;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-weight: 600;
-    }
-
-    .child-count-badge {
-        background: #e8f1f8;
-        color: #1a4a6f;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    /* Header row: blue gradient card, icon box left, button right */
+    /* ================= PAGE HEADER ================= */
     .page-header-row {
         display: flex;
         justify-content: space-between;
@@ -199,92 +369,90 @@
     <input type="text" id="searchInput" placeholder="Search parent by name or username..." onkeyup="filterTable()">
 </div>
 
-<!-- Table -->
-<div class="card border-0 shadow-sm" style="border-radius: 20px; overflow: hidden;">
-    <div class="card-body p-0">
-        {% if parents %}
-        <div class="table-responsive">
-            <table class="table-bordered-custom" id="parentsTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Username</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th class="text-center">Children</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for parent in parents %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>
-                            <span class="fw-semibold" style="color: #1a2c3e;">{{ parent.full_name }}</span>
-                        </td>
-                        <td>
-                            <span class="username-badge">{{ parent.username }}</span>
-                        </td>
-                        <td>
-                            {% if parent.phone %}
-                                <i class="fas fa-phone me-1 text-muted" style="font-size: 0.75rem;"></i>{{ parent.phone }}
-                            {% else %}
-                                <span class="text-muted">—</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if parent.email %}
-                                <i class="fas fa-envelope me-1 text-muted" style="font-size: 0.75rem;"></i>{{ parent.email }}
-                            {% else %}
-                                <span class="text-muted">—</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center">
-                            <span class="child-count-badge">
-                                {{ parent.child_count }}
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            {% if parent.is_active %}
-                                <span class="badge badge-success">
-                                    <i class="fas fa-check me-1"></i>Active
-                                </span>
-                            {% else %}
-                                <span class="badge badge-danger">
-                                    <i class="fas fa-times me-1"></i>Inactive
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ url_for('toggle_user', user_id=parent.id) }}"
-                                   class="btn btn-sm {% if parent.is_active %}btn-danger{% else %}btn-primary{% endif %}"
-                                   style="padding: 4px 10px; font-size: 11px;"
-                                   title="{% if parent.is_active %}Disable{% else %}Enable{% endif %}"
-                                   onclick="return confirm('Kya aap is parent ka status change karna chahte hain?')">
-                                    <i class="fas fa-{{ 'ban' if parent.is_active else 'check' }}"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<!-- Custom Table Card -->
+<div class="pl-card">
+    <div class="pl-card-header">
+        <div class="pl-title">
+            <i class="fas fa-list-check"></i> Parents List
         </div>
-        {% else %}
-        <!-- Empty State -->
-        <div class="text-center py-5">
-            <i class="fas fa-user-friends fa-4x text-muted mb-3 opacity-30"></i>
-            <h5 class="text-muted fw-bold">Koi parent account nahi hai abhi</h5>
-            <p class="text-muted mb-4">Parent login banayein taake woh apne bacchon ki performance dekh sakein</p>
-            <a href="{{ url_for('add_parent') }}" class="btn btn-primary px-4">
-                <i class="fas fa-user-plus me-2"></i>Pehla Parent Login Banayein
-            </a>
-        </div>
-        {% endif %}
+        <span class="pl-total-pill">
+            <i class="fas fa-user-friends"></i> Total: {{ parents | length }}
+        </span>
     </div>
+
+    {% if parents %}
+    <div class="pl-table-wrap">
+        <table class="pl-table" id="parentsTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Children</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for parent in parents %}
+                <tr>
+                    <td class="pl-id">{{ loop.index }}</td>
+                    <td>
+                        <div class="pl-user">
+                            <div class="pl-avatar">{{ parent.full_name[0] | upper }}</div>
+                            <div class="pl-user-name">{{ parent.full_name }}</div>
+                        </div>
+                    </td>
+                    <td><span class="pl-username">{{ parent.username }}</span></td>
+                    <td class="pl-contact">
+                        {% if parent.phone %}
+                            <i class="fas fa-phone"></i>{{ parent.phone }}
+                        {% else %}
+                            <span class="pl-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="pl-contact">
+                        {% if parent.email %}
+                            <i class="fas fa-envelope"></i>{{ parent.email }}
+                        {% else %}
+                            <span class="pl-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="pl-child-pill">{{ parent.child_count }}</span></td>
+                    <td>
+                        {% if parent.is_active %}
+                            <span class="pl-status active">Active</span>
+                        {% else %}
+                            <span class="pl-status inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('toggle_user', user_id=parent.id) }}"
+                           class="pl-btn {% if parent.is_active %}danger{% else %}success{% endif %}"
+                           title="{% if parent.is_active %}Disable{% else %}Enable{% endif %}"
+                           onclick="return confirm('Kya aap is parent ka status change karna chahte hain?')">
+                            <i class="fas fa-{{ 'lock' if parent.is_active else 'lock-open' }}"></i>
+                            {{ 'Deactivate' if parent.is_active else 'Activate' }}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="pl-empty">
+        <i class="fas fa-user-friends"></i>
+        <h5>Koi parent account nahi hai abhi</h5>
+        <p>Parent login banayein taake woh apne bacchon ki performance dekh sakein</p>
+        <a href="{{ url_for('add_parent') }}" class="pl-btn success" style="padding: 10px 20px; font-size: 13px;">
+            <i class="fas fa-user-plus"></i> Pehla Parent Login Banayein
+        </a>
+    </div>
+    {% endif %}
 </div>
 
 <script>
