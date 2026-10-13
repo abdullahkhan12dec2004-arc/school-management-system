@@ -4,7 +4,7 @@
 {% block extra_css %}
  <style>
         /* ================================================================
-               GLOBAL RESET / BASE
+                GLOBAL RESET / BASE
                ================================================================ */
         body,
         .main-content,
@@ -106,54 +106,7 @@
         }
 
         /* ================================================================
-               TABLE — bordered, sky‑blue header, striped hover
-               ================================================================ */
-        .table-bordered-custom {
-            width: 100%;
-            border-collapse: collapse;
-        }
 
-        .table-bordered-custom th,
-        .table-bordered-custom td {
-            border: 1px solid #dee2e6 !important;
-            padding: 12px;
-            vertical-align: middle;
-        }
-
-        .table-bordered-custom thead th {
-            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-            color: white;
-            border: 1px solid #38bdf8 !important;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .table-bordered-custom tbody tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-
-        .table-bordered-custom tbody tr:hover {
-            background-color: #e8f1f8;
-            cursor: pointer;
-        }
-
-        .table-bordered-custom td:first-child {
-            font-weight: 700;
-            color: #c6a43b;
-            text-align: center;
-            width: 50px;
-        }
-
-        /* remove extra card wrappers */
-        .table-card,
-        .table-wrapper-card,
-        .card:has(.table-bordered-custom) {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
 
         /* ================================================================
                FORM CARD (Add New Subject)
@@ -283,7 +236,147 @@
             font-weight: 500;
             display: inline-block;
         }
+        /* ================================================================
+   CUSTOM DATA TABLE (same as System Users List)
+   ================================================================ */
+.data-table-card {
+    background: #ffffff;
+    border: 1px solid #bfe3f7;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.15);
+}
 
+.data-table-header {
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    color: #ffffff;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.data-table-header h5 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.total-pill {
+    background: #ffffff;
+    color: #334155;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.data-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+
+/* header row */
+.custom-table thead th {
+    background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    padding: 14px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* body cells — full grid borders */
+.custom-table tbody td {
+    border: 1px solid #e2e8f0;
+    padding: 16px 14px;
+    font-size: 14px;
+    color: #334155;
+    vertical-align: middle;
+    background: #ffffff;
+}
+
+.custom-table tbody tr:hover td {
+    background: #f1f9fe;
+}
+
+/* outer edges: card ka border hi kaafi hai */
+.custom-table th:first-child,
+.custom-table td:first-child { border-left: none; }
+.custom-table th:last-child,
+.custom-table td:last-child { border-right: none; }
+.custom-table tbody tr:last-child td { border-bottom: none; }
+
+.custom-table .col-index {
+    width: 60px;
+    text-align: center;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.custom-table .col-center { text-align: center; }
+
+.subject-name {
+    font-weight: 600;
+    color: #0f2b3d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* status pill (Active jesa) */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.status-pill::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.status-pill.pass  { background: #d1fae5; color: #059669; }
+.status-pill.warn  { background: #fef3c7; color: #d97706; }
+
+/* empty state */
+.table-empty {
+    text-align: center;
+    padding: 40px 10px !important;
+    color: #94a3b8;
+}
+.table-empty i { font-size: 40px; margin-bottom: 10px; display: block; }
+
+@media (max-width: 768px) {
+    .data-table-header { padding: 12px 14px; }
+    .custom-table thead th,
+    .custom-table tbody td { padding: 10px 8px; font-size: 12px; }
+}
         .marks-total {
             font-weight: 600;
             color: #059669;
@@ -295,11 +388,7 @@
         }
 
         /* remove navy header from generic cards */
-        .card.shadow-sm>.card-header {
-            background-color: #ffffff !important;
-            color: #0f2b3d !important;
-            border-bottom: 1px solid #e2e8f0 !important;
-        }
+
 
         .card-body.p-4 {
             padding: 1.2rem 1.5rem !important;
@@ -508,67 +597,5 @@
         </div>
     </div>
 
-    <!-- 4. SUBJECTS TABLE -->
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table-bordered-custom">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;">#</th>
-                            <th>Subject Name</th>
-                            <th>Class</th>
-                            <th style="text-align: center;">Total Marks</th>
-                            <th style="text-align: center;">Passing Marks</th>
-                            <th style="width: 80px;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for s in subjects %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td class="fw-semibold">
-                                <i class="fas fa-book-open" style="color: #c6a43b;"></i>
-                                {{ s.subject_name }}
-                            </td>
-                            <td>
-                                <span class="class-badge">
-                                    <i class="fas fa-door-open"></i>
-                                    {{ s.class_name }}{% if s.section %} - {{ s.section }}{% endif %}
-                                </span>
-                            </td>
-                            <td style="text-align: center;">
-                                <span class="marks-total">
-                                    <i class="fas fa-star"></i> {{ s.total_marks }}
-                                </span>
-                            </td>
-                            <td style="text-align: center;">
-                                <span class="marks-passing">
-                                    <i class="fas fa-flag-checkered"></i> {{ s.passing_marks }}
-                                </span>
-                            </td>
-                            <td style="text-align: center;">
-                                {% if s.passing_marks <= s.total_marks * 0.4 %}
-                                <span class="badge bg-success">Pass: {{ ((s.passing_marks/s.total_marks)*100)|int }}%</span>
-                                {% else %}
-                                <span class="badge bg-warning">{{ ((s.passing_marks/s.total_marks)*100)|int }}%</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <i class="fas fa-book fa-3x text-muted mb-3 d-block"></i>
-                                <p class="text-muted mb-0">No subjects found</p>
-                                <small class="text-muted">Add a subject using the form</small>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-</div>
+    
 {% endblock %}
