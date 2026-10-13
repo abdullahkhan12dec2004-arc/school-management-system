@@ -322,33 +322,7 @@
 </div>
 {% endif %}
 
-<!-- School Filter Card -->
-<div class="filter-card mb-4">
-    <div class="card-body">
-        <form method="GET" class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label fw-semibold mb-2">
-                    <i class="fas fa-filter"></i> Filter by School
-                </label>
-                <select name="school_id" class="form-select" onchange="this.form.submit()">
-                    <option value="">-- All Schools --</option>
-                    {% for school in schools %}
-                        <option value="{{ school.id }}" {% if selected_school == school.id|string %}selected{% endif %}>
-                            {{ school.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2">
-                {% if selected_school %}
-                    <a href="{{ url_for('classes') }}" class="btn btn-outline-secondary w-100">
-                        <i class="fas fa-times"></i> Clear Filter
-                    </a>
-                {% endif %}
-            </div>
-        </form>
-    </div>
-</div>
+
 
 <!-- Classes Table Card -->
 <div class="card shadow-sm">
