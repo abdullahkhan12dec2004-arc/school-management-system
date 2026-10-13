@@ -556,7 +556,8 @@
             <h5><i class="fas fa-plus-circle"></i> Add Subject</h5>
         </div>
         <div class="card-body p-4">
-            <form method="POST" action="{{ url_for('add_subject') }}" class="compact-form">
+            <form method="POST" action="{{ url_for('subjects') }}" class="compact-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <!-- agar CSRF use kar rahe hain to yeh line uncomment karein -->
                 <!-- <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> -->
 
@@ -567,10 +568,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="class_name">Class</label>
-                    <input type="text" id="class_name" name="class_name"
-                           class="form-control" placeholder="e.g. 10" required>
-                </div>
+                        <label for="class_id">Class</label>
+                     <select id="class_id" name="class_id" class="form-select" required>
+                         <option value="">Select Class</option>
+                        {% for cl in classes %}
+                               <option value="{{ cl.id }}">{{ cl.class_name }}{% if cl.section %} - {{ cl.section }}{% endif %}</option>
+                        {% endfor %}
+                     </select>
+               </div>
 
                 <div class="form-group">
                     <label for="section">Section</label>
