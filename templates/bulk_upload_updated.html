@@ -261,6 +261,77 @@
         font-weight: 400;
     }
 
+    /* Step A - compact download card */
+    .dl-card {
+        border-left: 4px solid #0ea5e9 !important;
+        overflow: hidden;
+    }
+
+    .dl-body {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 65%);
+    }
+
+    .dl-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
+    }
+
+    .dl-icon i {
+        color: #ffffff;
+        font-size: 1.3rem;
+    }
+
+    .dl-info {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .dl-info h5 {
+        margin: 0 0 2px 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .dl-info p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+
+    .dl-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .dl-actions .form-select {
+        width: 200px;
+        background-color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+        .dl-actions,
+        .dl-actions .form-select,
+        .dl-actions .btn-navy {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
 </style>
 {% endblock %}
 
@@ -282,41 +353,33 @@
   <!-- Step A -->
   <div class="row mb-4">
     <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <i class="fas fa-download"></i> Step A — Download Template
-        </div>
-        <div class="card-body">
-          <p class="text-muted small">Download the template, fill in your data, then upload it below.</p>
+      <div class="card dl-card">
+        <div class="dl-body">
+          <div class="dl-icon">
+            <i class="fas fa-file-excel"></i>
+          </div>
 
-          {% if upload_type == 'students' and classes %}
-          <div class="mb-3">
-            <label class="form-label">Select Class (to auto-fill Class ID)</label>
-            <select id="templateClassSelect" class="form-select" onchange="updateTemplateLink()">
-              <option value="">-- All Classes (enter Class ID manually) --</option>
+          <div class="dl-info">
+            <h5>Download Template</h5>
+            <p>Fill in the Excel file, then upload it below.</p>
+          </div>
+
+          <div class="dl-actions">
+            {% if upload_type == 'students' and classes %}
+            <select id="templateClassSelect" class="form-select" onchange="updateTemplateLink()" title="Auto-fills the Class ID in the template">
+              <option value="">All Classes</option>
               {% for c in classes %}
               <option value="{{ c.id }}">{{ c.class_name }} — {{ c.section }}</option>
               {% endfor %}
             </select>
-          </div>
-          {% endif %}
+            {% endif %}
 
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-            <div style="flex: 1; min-width: 250px;">
-              {% if upload_type == 'students' %}
-              <div style="font-size: 0.8rem; color: #0369a1; background: #f0f9ff; padding: 10px 15px; border-radius: 8px; border: 1px solid #bae6fd;">
-                <i class="fas fa-lightbulb me-1"></i><strong>Tip:</strong> Selecting a class above auto-fills its Class ID, or copy it from the "Class Reference" sheet.
-              </div>
-              {% endif %}
-            </div>
-            <div>
-              <a id="downloadTemplateLink"
-                 href="{{ url_for('download_' + upload_type + '_template') }}"
-                 data-base-url="{{ url_for('download_' + upload_type + '_template') }}"
-                 class="btn-navy">
-                <i class="fas fa-file-excel me-1"></i> Download {{ upload_type | title }} Template (.xlsx)
-              </a>
-            </div>
+            <a id="downloadTemplateLink"
+               href="{{ url_for('download_' + upload_type + '_template') }}"
+               data-base-url="{{ url_for('download_' + upload_type + '_template') }}"
+               class="btn-navy">
+              <i class="fas fa-download"></i> Download (.xlsx)
+            </a>
           </div>
         </div>
       </div>
@@ -354,12 +417,12 @@
                 <option value="{{ r.id }}">{{ r.role_name }}</option>
                 {% endfor %}
               </select>
-              <div class="text-muted small mt-1">Ye role file ke saare {{ upload_type }} ko assign hoga.</div>
+              <div class="text-muted small mt-1">This role will be assigned to all {{ upload_type }} in the file.</div>
               {% else %}
               <div class="role-warning">
                 <i class="fas fa-exclamation-triangle me-1"></i>
-                Is school mein koi {{ upload_type[:-1] }} role nahi hai.
-                Pehle <a href="{{ url_for('manage_roles') }}">Roles</a> page se role banayein.
+                This school has no {{ upload_type[:-1] }} role yet.
+                Please create one from the <a href="{{ url_for('manage_roles') }}">Roles</a> page first.
               </div>
               {% endif %}
             </div>
@@ -447,7 +510,7 @@
 </style>
 
 <script>
-  // Teachers/students ke liye role zaroori hai; roles na hon to upload block rahe
+  // Role is required for teachers/students; block upload if no roles exist
   const NEEDS_ROLE = {{ 'true' if upload_type in ('teachers', 'students') else 'false' }};
   const HAS_ROLES  = {{ 'true' if roles else 'false' }};
 
