@@ -3,68 +3,76 @@
 
 {% block content %}
 <style>
-    body{
-      background : #ffffff;   
+    :root {
+        --primary: #0ea5e9;
+        --primary-dark: #0284c7;
+        --primary-soft: #e0f2fe;
+        --field-bg: #f3f5f9;
+        --field-border: #e3e8f0;
+        --text-dark: #1e293b;
     }
 
-    /* ===== Page Title Bar (same style as "Edit School" heading in the reference image) ===== */
+    body { background: #ffffff; }
+
+    /* ===== Page Title Bar (same as "Edit School" heading) ===== */
     .page-title-bar {
-        max-width: 650px;
-        margin: 30px auto 20px;
-        background: #2E9BE6;
+        max-width: 620px;
+        margin: 30px auto 28px;
+        background: var(--primary);
         color: #fff;
-        padding: 16px 24px;
-        border-radius: 12px;
+        padding: 16px 22px;
+        border-radius: 22px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        box-shadow: 0 2px 10px rgba(46,155,230,0.25);
+        gap: 14px;
+        box-shadow: 0 8px 22px rgba(14,165,233,0.30);
     }
     .page-title-bar .icon-box {
         width: 38px;
         height: 38px;
         background: rgba(255,255,255,0.25);
-        border-radius: 8px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 17px;
         color: #fff;
     }
     .page-title-bar h2 {
         margin: 0;
-        font-size: 19px;
+        font-size: 20px;
         font-weight: 700;
         color: #fff;
     }
 
-    /* ===== Salary Card (width reduced to match reference image) ===== */
+    /* ===== Main Card ===== */
     .salary-card {
-        max-width: 650px;
+        max-width: 620px;
         margin: 0 auto 30px;
         background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border-radius: 22px;
+        box-shadow: 0 6px 24px rgba(15,23,42,0.10);
         overflow: hidden;
     }
     .salary-card-header {
-        background: #2E9BE6;
+        background: var(--primary);
         color: #fff;
         padding: 18px 24px;
         display: flex;
         align-items: center;
         gap: 12px;
     }
-    .salary-card-header .icon-box {
-        width: 38px;
-        height: 38px;
-        background: rgba(255,255,255,0.25);
-        border-radius: 8px;
+    .salary-card-header .icon-circle {
+        width: 20px;
+        height: 20px;
+        background: #fff;
+        color: var(--primary);
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        color: #fff;
+        font-size: 11px;
+        flex-shrink: 0;
     }
     .salary-card-header h2 {
         margin: 0;
@@ -72,127 +80,173 @@
         font-weight: 700;
         color: #fff;
     }
-    .salary-card-header p {
-        margin: 2px 0 0;
-        font-size: 13px;
-        opacity: 0.9;
-        color: #fff;
+    .salary-card-body { padding: 32px; }
+
+    /* ===== Info Banner ===== */
+    .info-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: var(--primary-soft);
+        border: 1px solid var(--primary);
+        color: var(--primary-dark);
+        border-radius: 14px;
+        padding: 12px 16px;
+        font-size: 13.5px;
+        margin-bottom: 26px;
     }
-    .salary-card-body {
-        padding: 28px;
+    .info-banner i { margin-right: 6px; }
+
+    /* ===== Section Label ===== */
+    .section-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #eef1f5;
     }
+
+    /* ===== Form ===== */
     .form-row {
         display: flex;
-        gap: 16px;
-        margin-bottom: 18px;
+        gap: 18px;
+        margin-bottom: 22px;
         flex-wrap: wrap;
     }
     .form-group {
         flex: 1;
-        min-width: 200px;
+        min-width: 220px;
         display: flex;
         flex-direction: column;
     }
     .form-group label {
-        font-weight: 600;
-        font-size: 13px;
-        color: #2E9BE6;
-        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 700;
+        font-size: 12px;
+        color: var(--primary);
+        margin-bottom: 8px;
         text-transform: uppercase;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.6px;
     }
-    .form-group label .req {
-        color: #e74c3c;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        padding: 10px 12px;
-        border: 1px solid #d5dbe3;
-        border-radius: 6px;
+    .form-group label .req { color: #e11d48; }
+
+    .input-icon { position: relative; }
+    .input-icon > i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
         font-size: 14px;
-        color: #222;
-        background: #fafbfc;
+        pointer-events: none;
     }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
+    .input-icon.textarea-icon > i { top: 18px; transform: none; }
+
+    .input-icon input,
+    .input-icon select,
+    .input-icon textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 13px 16px 13px 44px;
+        border: 1px solid var(--field-border);
+        border-radius: 14px;
+        font-size: 14px;
+        color: var(--text-dark);
+        background: var(--field-bg);
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+    .input-icon textarea { resize: vertical; }
+    .input-icon input:focus,
+    .input-icon select:focus,
+    .input-icon textarea:focus {
         outline: none;
-        border-color: #2E9BE6;
+        border-color: var(--primary);
         background: #fff;
+        box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
     }
+
+    /* ===== Bank fields ===== */
     #bank_fields {
         display: none;
-        background: #f4f8fc;
-        border: 1px dashed #b9d7f2;
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 18px;
+        background: #f8fbfe;
+        border: 1px dashed #93d5f5;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 22px;
     }
-    #bank_fields.show {
-        display: block;
-    }
-    .section-label {
-        font-size: 13px;
-        font-weight: 700;
-        color: #2E9BE6;
-        margin-bottom: 12px;
-        text-transform: uppercase;
-    }
-    .btn-submit {
-        background: #2E9BE6;
-        color: #fff;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 25px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-    .btn-submit:hover {
-        background: #1F6FD6;
-    }
-    .btn-cancel {
-        background: #eaf4fd;
-        color: #2E9BE6;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 25px;
-        font-size: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        margin-right: 10px;
-    }
+    #bank_fields.show { display: block; }
+    #bank_fields .form-row:last-child { margin-bottom: 0; }
+
+    /* ===== Buttons ===== */
     .form-footer {
         display: flex;
         justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
         margin-top: 10px;
     }
+    .btn-submit {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 30px;
+        font-size: 14.5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(14,165,233,0.30);
+        transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--primary-dark); }
+    .btn-cancel {
+        background: var(--primary-soft);
+        color: var(--primary-dark);
+        border: none;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-size: 14.5px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ===== Alerts ===== */
     .alert {
         padding: 12px 16px;
-        border-radius: 6px;
-        margin-bottom: 16px;
+        border-radius: 14px;
+        margin-bottom: 18px;
         font-size: 14px;
     }
     .alert-success { background: #e3f8e9; color: #1e7d3c; border: 1px solid #b3e8c4; }
     .alert-error   { background: #fdeaea; color: #c0392b; border: 1px solid #f5c2c0; }
-    .alert-info    { background: #eaf4fd; color: #1a5fa0; border: 1px solid #bfe0f8; }
+    .alert-info    { background: var(--primary-soft); color: var(--primary-dark); border: 1px solid #bae6fd; }
 </style>
 
-<!-- Page Title Bar (matches "Edit School" heading style from reference image) -->
+<!-- Page Title Bar -->
 <div class="page-title-bar">
-    <div class="icon-box">💰</div>
-    <h2> Salary</h2>
+    <div class="icon-box"><i class="fas fa-money-bill-wave"></i></div>
+    <h2>Salary</h2>
 </div>
 
 <div class="salary-card">
     <div class="salary-card-header">
-        <div class="icon-box">💰</div>
-        <div>
-            <h2>Pay Teacher Salary</h2>
-            <p>  "Record the month/salary payment — along with cash or bank transfer details"  </p>
-        </div>
+        <div class="icon-circle"><i class="fas fa-info"></i></div>
+        <h2>Pay Teacher Salary</h2>
     </div>
 
     <div class="salary-card-body">
@@ -207,100 +261,133 @@
           {% endif %}
         {% endwith %}
 
+        <div class="info-banner">
+            <span><i class="fas fa-file-invoice-dollar"></i> Record the monthly salary payment — with cash or bank transfer details.</span>
+        </div>
+
         <form method="POST" id="salaryForm">
 
+            <div class="section-label"><i class="fas fa-chalkboard-teacher"></i> Salary Information</div>
+
             <div class="form-row">
                 <div class="form-group">
-                    <label>Teacher <span class="req">*</span></label>
-                    <select name="teacher_id" required>
-                        <option value="">-- Select Teacher --</option>
-                        {% for t in teachers %}
-                            <option value="{{ t.id }}" data-salary="{{ t.salary or '' }}">
-                                {{ t.full_name }}{% if t.salary %} (Base: {{ t.salary }}){% endif %}
-                            </option>
-                        {% endfor %}
-                    </select>
+                    <label><i class="fas fa-user-tie"></i> Teacher <span class="req">*</span></label>
+                    <div class="input-icon">
+                        <i class="fas fa-user-tie"></i>
+                        <select name="teacher_id" required>
+                            <option value="">-- Select Teacher --</option>
+                            {% for t in teachers %}
+                                <option value="{{ t.id }}" data-salary="{{ t.salary or '' }}">
+                                    {{ t.full_name }}{% if t.salary %} (Base: {{ t.salary }}){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Month <span class="req">*</span></label>
-                    <select name="month" required>
-                        <option value="">-- Select Month --</option>
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
+                    <label><i class="fas fa-calendar-alt"></i> Month <span class="req">*</span></label>
+                    <div class="input-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                        <select name="month" required>
+                            <option value="">-- Select Month --</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Year <span class="req">*</span></label>
-                    <select name="year" required>
-                        {% set current_year = now.year %}
-                        {% for y in range(current_year - 2, current_year + 2) %}
-                            <option value="{{ y }}" {% if y == current_year %}selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Salary Amount (PKR) <span class="req">*</span></label>
-                    <input type="number" name="paid_amount" step="0.01" min="0" placeholder="e.g. 45000" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Payment Date <span class="req">*</span></label>
-                    <input type="date" name="payment_date" value="{{ now.strftime('%Y-%m-%d') }}" required>
+                    <label><i class="fas fa-calendar-check"></i> Year <span class="req">*</span></label>
+                    <div class="input-icon">
+                        <i class="fas fa-calendar-check"></i>
+                        <select name="year" required>
+                            {% set current_year = now.year %}
+                            {% for y in range(current_year - 2, current_year + 2) %}
+                                <option value="{{ y }}" {% if y == current_year %}selected{% endif %}>{{ y }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Mode of Payment <span class="req">*</span></label>
-                    <select name="payment_mode" id="payment_mode" required onchange="toggleBankFields()">
-                        <option value="">-- Select Mode --</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
-                    </select>
+                    <label><i class="fas fa-coins"></i> Salary Amount (PKR) <span class="req">*</span></label>
+                    <div class="input-icon">
+                        <i class="fas fa-coins"></i>
+                        <input type="number" name="paid_amount" step="0.01" min="0" placeholder="e.g. 45000" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-day"></i> Payment Date <span class="req">*</span></label>
+                    <div class="input-icon">
+                        <i class="fas fa-calendar-day"></i>
+                        <input type="date" name="payment_date" value="{{ now.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-wallet"></i> Mode of Payment <span class="req">*</span></label>
+                    <div class="input-icon">
+                        <i class="fas fa-wallet"></i>
+                        <select name="payment_mode" id="payment_mode" required onchange="toggleBankFields()">
+                            <option value="">-- Select Mode --</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div id="bank_fields">
-                <div class="section-label">Bank Transfer Details</div>
+                <div class="section-label"><i class="fas fa-university"></i> Bank Transfer Details</div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Bank Account Reference No.</label>
-                        <input type="text" name="bank_account_reference" placeholder="e.g. TXN-2026-00123">
+                        <label><i class="fas fa-hashtag"></i> Bank Account Reference No.</label>
+                        <div class="input-icon">
+                            <i class="fas fa-hashtag"></i>
+                            <input type="text" name="bank_account_reference" placeholder="e.g. TXN-2026-00123">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Bank Account Detail</label>
-                        <input type="text" name="bank_account_detail" placeholder="e.g. HBL - Acc# 0123456789">
+                        <label><i class="fas fa-building-columns"></i> Bank Account Detail</label>
+                        <div class="input-icon">
+                            <i class="fas fa-building-columns"></i>
+                            <input type="text" name="bank_account_detail" placeholder="e.g. HBL - Acc# 0123456789">
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Remarks (Optional)</label>
-                    <textarea name="remarks" rows="2" placeholder="Any additional note..."></textarea>
+                    <label><i class="fas fa-comment-dots"></i> Remarks (Optional)</label>
+                    <div class="input-icon textarea-icon">
+                        <i class="fas fa-pen"></i>
+                        <textarea name="remarks" rows="2" placeholder="Any additional note..."></textarea>
+                    </div>
                 </div>
             </div>
 
             <div class="form-footer">
-                <a href="{{ url_for('dashboard') }}" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-submit">Save Salary Payment</button>
+                <a href="{{ url_for('dashboard') }}" class="btn-cancel"><i class="fas fa-times"></i> Cancel</a>
+                <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Save Salary Payment</button>
             </div>
         </form>
     </div>
