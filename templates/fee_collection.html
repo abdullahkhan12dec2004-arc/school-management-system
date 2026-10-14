@@ -4,12 +4,17 @@
 {% block extra_css %}
 <style>
   :root {
-    --navy-primary: #0ea5e9;
-    --navy-light: #38bdf8;
-    --navy-dark: #0284c7;
+    /* Heading box wala shade - poore page mein yahi use hoga */
+    --sky-1: #38bdf8;
+    --sky-2: #0ea5e9;
+    --sky-grad: linear-gradient(135deg, var(--sky-1), var(--sky-2));
+    --sky-shadow: rgba(14, 165, 233, 0.28);
+    --sky-tint: rgba(14, 165, 233, 0.12);
+
     --card-radius: 0.875rem;
     --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-    --gap: 1.5rem;          /* poore page ka ek hi gap */
+    --gap: 2rem;          /* heading, Select Class, Collect Fee ke darmiyan gap */
+    --inner-gap: 1.25rem; /* card ke andar fields ka gap */
   }
 
   body { background: #ffffff; }
@@ -19,13 +24,13 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    background: linear-gradient(135deg, var(--navy-light), var(--navy-primary));
+    background: var(--sky-grad);
     color: #ffffff;
     font-size: 1.45rem;
     font-weight: 700;
     padding: 20px 24px;
     border-radius: 1rem;
-    box-shadow: 0 6px 18px rgba(14, 165, 233, 0.28);
+    box-shadow: 0 6px 18px var(--sky-shadow);
     margin: 0 0 var(--gap) 0;
   }
   .container-fluid h2::before {
@@ -39,7 +44,7 @@
     font-size: 1.15rem;
   }
 
-  /* ===== LAYOUT: sirf Bootstrap gutter, extra column-gap nahi ===== */
+  /* ===== LAYOUT ===== */
   .page-row { --bs-gutter-x: var(--gap); --bs-gutter-y: var(--gap); }
 
   /* ===== CARDS ===== */
@@ -49,12 +54,12 @@
     box-shadow: var(--card-shadow);
     overflow: hidden;
     background: #fff;
-    transition: box-shadow 0.25s, transform 0.25s;
+    transition: box-shadow 0.25s;
   }
-  .fee-card:hover { box-shadow: 0 8px 24px rgba(14, 165, 233, 0.12); }
+  .fee-card:hover { box-shadow: 0 8px 24px var(--sky-tint); }
 
   .fee-card .card-header {
-    background: linear-gradient(135deg, var(--navy-primary), var(--navy-dark)) !important;
+    background: var(--sky-grad) !important;
     padding: 14px 18px;
     display: flex;
     align-items: center;
@@ -73,20 +78,19 @@
     color: #fff; font-size: 0.95rem; font-weight: 600; margin: 0; letter-spacing: 0.3px;
   }
 
-  /* Card body: andar ke sab items mein barabar gap */
   .fee-card .card-body {
-    padding: var(--gap);
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: var(--gap);
+    gap: var(--inner-gap);
   }
-  .fee-card form { display: flex; flex-direction: column; gap: var(--gap); margin: 0; }
+  .fee-card form { display: flex; flex-direction: column; gap: var(--inner-gap); margin: 0; }
 
   /* ===== FORM FIELDS ===== */
   .fee-card .form-label {
     font-size: 0.68rem;
     font-weight: 700;
-    color: var(--navy-dark);
+    color: var(--sky-2);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 6px;
@@ -102,8 +106,8 @@
     transition: all 0.15s;
   }
   .fee-card .form-control:focus {
-    border-color: var(--navy-primary);
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+    border-color: var(--sky-2);
+    box-shadow: 0 0 0 3px var(--sky-tint);
     background-color: #fff;
   }
   .fee-card .input-wrap { position: relative; }
@@ -112,7 +116,7 @@
     color: #94a3b8; font-size: 0.8rem; pointer-events: none;
     transition: color 0.15s;
   }
-  .fee-card .input-wrap:focus-within .field-icon { color: var(--navy-primary); }
+  .fee-card .input-wrap:focus-within .field-icon { color: var(--sky-2); }
   .fee-card textarea.form-control { padding-left: 38px; min-height: 44px; resize: none; }
   .fee-card .input-wrap.is-textarea .field-icon { top: 14px; transform: none; }
 
@@ -129,48 +133,46 @@
   .fee-card .section-label {
     font-size: 0.68rem;
     font-weight: 700;
-    color: var(--navy-dark);
+    color: var(--sky-2);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    border-bottom: 1.5px solid #e0f2fe;
+    border-bottom: 1.5px solid var(--sky-tint);
     padding-bottom: 6px;
     margin: 0;
   }
 
-  /* ===== SELECT CLASS CARD (energetic) ===== */
-  .class-hint {
-    display: flex; align-items: flex-start; gap: 10px;
-    background: #f0f9ff;
-    border: 1px dashed #bae6fd;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 0.75rem;
-    color: #0369a1;
-    line-height: 1.4;
+  /* ===== SELECT CLASS CARD ===== */
+  .select-card .form-control {
+    min-height: 48px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #0f172a;
   }
-  .class-hint i { margin-top: 2px; }
 
   .btn-load {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
     width: 100%;
-    background: linear-gradient(135deg, var(--navy-light), var(--navy-primary)) !important;
+    background: var(--sky-grad) !important;
     border: none !important;
     color: #fff !important;
     font-weight: 600;
-    font-size: 0.9rem;
-    padding: 12px 18px;
+    font-size: 0.92rem;
+    letter-spacing: 0.3px;
+    padding: 13px 18px;
     border-radius: 10px;
-    box-shadow: 0 6px 14px rgba(14, 165, 233, 0.3);
+    box-shadow: 0 6px 14px var(--sky-shadow);
     transition: all 0.2s;
   }
-  .btn-load:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.38); }
+  .btn-load i.arrow { font-size: 0.8rem; transition: transform 0.2s; }
+  .btn-load:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--sky-shadow); }
+  .btn-load:hover i.arrow { transform: translateX(4px); }
   .btn-load:active { transform: translateY(0); }
 
   /* ===== PAYMENT ROW ===== */
   .row-5col {
     display: grid;
     grid-template-columns: 2fr 1.2fr 1fr 1.2fr 1.5fr;
-    gap: var(--gap);
+    gap: var(--inner-gap);
   }
   @media (max-width: 1100px) { .row-5col { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 575px)  { .row-5col { grid-template-columns: 1fr; } }
@@ -186,7 +188,7 @@
 
   .txn-cell { min-width: 0; overflow: hidden; }
   .txn-inner {
-    padding-right: var(--gap);
+    padding-right: var(--inner-gap);
     opacity: 1;
     transform: translateX(0);
     transition: opacity 0.3s ease, transform 0.4s ease;
@@ -199,24 +201,24 @@
   .remarks-cell { min-width: 0; }
 
   @media (max-width: 767px) {
-    .extra-grid, .extra-grid.cash-mode { grid-template-columns: 1fr; row-gap: var(--gap); }
+    .extra-grid, .extra-grid.cash-mode { grid-template-columns: 1fr; row-gap: var(--inner-gap); }
     .extra-grid.cash-mode .txn-cell { display: none; }
     .txn-inner { padding-right: 0; }
   }
 
   /* ===== BUTTONS ===== */
   .btn-success {
-    background: linear-gradient(135deg, var(--navy-light), var(--navy-primary)) !important;
+    background: var(--sky-grad) !important;
     border: none !important;
     font-weight: 600;
     font-size: 0.9rem;
     padding: 12px 28px;
     border-radius: 30px;
     color: #fff !important;
-    box-shadow: 0 6px 14px rgba(14, 165, 233, 0.3);
+    box-shadow: 0 6px 14px var(--sky-shadow);
     transition: all 0.2s;
   }
-  .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.38); }
+  .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--sky-shadow); }
 
   /* ===== EMPTY STATE ===== */
   .empty-state {
@@ -227,7 +229,7 @@
   }
   .empty-state .empty-icon {
     width: 60px; height: 60px; border-radius: 50%;
-    background: #f0f9ff; color: var(--navy-primary);
+    background: var(--sky-tint); color: var(--sky-2);
     display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
   }
 </style>
@@ -240,7 +242,7 @@
 
     <!-- LEFT CARD: Select Class -->
     <div class="col-md-4 col-lg-3">
-      <div class="card fee-card">
+      <div class="card fee-card select-card">
         <div class="card-header">
           <span class="hdr-icon"><i class="fas fa-layer-group"></i></span>
           <h5>Select Class</h5>
@@ -262,13 +264,8 @@
               </div>
             </div>
 
-            <div class="class-hint">
-              <i class="fas fa-info-circle"></i>
-              <span>Pehle class select karein, phir students load karke fee collect karein.</span>
-            </div>
-
             <button type="submit" class="btn-load">
-              <i class="fas fa-users"></i> Load Students
+              <i class="fas fa-users"></i> Load Students <i class="fas fa-arrow-right arrow"></i>
             </button>
           </form>
         </div>
